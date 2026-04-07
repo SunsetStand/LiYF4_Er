@@ -1,0 +1,33 @@
+# 任务类型与全局设置
+type: "ENERGY"                # 任务类型，支持 ENERGY, GEOM_OPT 等
+chkfile: "Er_CAHF_RDIIS.chk"        # 保存/读取轨道数据的检查点文件名
+
+# 1. AIMP 环境配置 (嵌入势)
+aimp:
+  dir: "aimp.xyz"             # 包含 AIMP 背景原子的坐标文件
+  orthoreg: 0.0               # 正交化正则化参数，默认为 0
+
+# 2. 点电荷环境配置 (QMMM)
+pointcharge:
+  organic: false              # 是否为有机体系，通常设为 false
+  rawxyzdir: "rawChgs.xyz"    # 原始背景点电荷坐标
+  rawchgdir: "rawCharges.dat" # 原始背景点电荷数值
+  surfxyzdir: "surfChgs.xyz"  # 表面修饰点电荷坐标 (用于补偿静电场)
+  surfchgdir: "surfaceCharges.dat" # 表面修饰点电荷数值
+
+# 3. 中心原子簇 (Cluster) 配置
+cluster:
+  dir: "cluster.xyz"          # 中心 ErF8 等原子簇的坐标文件
+  charge: -5                   # 原子簇的总电荷
+  spin: 3                     # 自旋多重度 (2S)。Er3+ 基态 4I15/2 有 3 个未成对电子，故填 3
+  
+  # 基组设置：支持直接从 Python 调用加载
+  basis:
+    Er: "ano-rcc-vdzp"  
+    F: "cc-pVDZ"
+    Li: "cc-pVDZ"
+    Y: "cc-pVDZ"
+
+  # SCF 计算控制
+  scf:
+    calc: "CAHF"              # SCF 计算方法，支持 CAHF, DFT/RKS 等
