@@ -1,0 +1,2 @@
+<class 'pyscf.qmmm.itrf.QMMMCAHF'> does not have attributes  alpha coulomb_a convergence_tol ncas beta exchange_b nelecas spin frac
+slurmstepd: error: *** JOB 12274 ON amd-cpu CANCELLED AT 2026-03-26T10:59:04 ***

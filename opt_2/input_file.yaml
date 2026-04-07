@@ -1,0 +1,9 @@
+# Input file for Ewald cluster generation
+poscarfile: "POSCAR"
+rCluster: 3.5
+rAIMP: 8.0
+rChgs: 12.0
+rSurface: 14.0
+cAtom: "Er"
+cAtomIndex: 1
+num_sites: 800

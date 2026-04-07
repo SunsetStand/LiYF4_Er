@@ -1,0 +1,1 @@
+<class 'pyscf.qmmm.itrf.QMMMCAHF'> does not have attributes  coulomb_a beta exchange_b alpha ncas convergence_tol frac nelecas spin
