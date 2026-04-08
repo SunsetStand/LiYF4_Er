@@ -1,17 +1,17 @@
 #!/bin/bash
 
 
-#Cs
+#F
 cd 01F/
 sbatch job_submit.sh
 cd ../
 
-#Sn
+#Li
 cd 02Li/
 sbatch job_submit.sh
 cd ../
 
-#Br
+#Y
 cd 03Y/
 sbatch job_submit.sh
 cd ../
