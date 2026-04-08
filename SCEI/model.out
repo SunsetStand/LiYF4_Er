@@ -1,0 +1,4917 @@
+ Read from file calcmad.in
+ Calculation lattice: 3D1
+ Calculation Method: Ewald     
+ Crystal Parameter:     9.7058    9.7339   12.2261
+ Angles:   113.2410  113.1967   90.3675
+Input file format: with atom names
+ a=     9.7058164     0.0000000     0.0000000
+ b=    -0.0624335     9.7336745     0.0000000
+ c=    -4.8157372    -4.8554128    10.1346860
+      No.      x             y             z         Charge
+ Atom  1:     0.0353015    -2.4273242     7.5634724  1.000
+ Atom  2:     4.7923443     7.3055860     2.5712136  1.000
+ Atom  3:    -0.0153817     2.4343631     2.5277266  3.000
+ Atom  4:     4.8430275     2.4438986     7.6069594  3.000
+ Atom  5:     1.5771656     4.5848726     5.9486082 -1.000
+ Atom  6:     2.1014004     5.7251257     0.8934291 -1.000
+ Atom  7:     6.4255132     4.5837425     4.1792005 -1.000
+ Atom  8:     7.5062810     8.8768982     0.8943793 -1.000
+ Atom  9:     3.2504801     0.2933892     4.1860778 -1.000
+ Atom 10:    -1.5978674     0.2945193     5.9554855 -1.000
+ Atom 11:    -2.6786352    -3.9986365     9.2403068 -1.000
+ Atom 12:     2.7262454    -0.8468639     9.2412569 -1.000
+ Minimum fund between   1 and  12
+ Minimum Distance:    3.54316168153293     
+ Core Atom List: 
+ Converge Standard:   1.000000000000000E-012
+ Ewald Alpha Optimized Estimate:   0.507548828125000     
+ Use new Ewald Alpha.
+ ---------------------Overall Madelung Constant-------------------
+ Electrostatic Energy:   -143.722206613196     
+ Madelung Constant:  -18.7138963651128     
+ ------------ Atom-Site Madelung Potential--------
+ --------------------Non-atom Madelung Potential--------------------
+ Site    1
+ Electrostatic Potential :    2.15033184149     V
+ Site    2
+ Electrostatic Potential :   -2.11625499551     V
+ Site    3
+ Electrostatic Potential :   -4.17897831499     V
+ Site    4
+ Electrostatic Potential :   -4.28803684366     V
+ Site    5
+ Electrostatic Potential :    1.63471161885     V
+ Site    6
+ Electrostatic Potential :    1.83740134322     V
+ Site    7
+ Electrostatic Potential :   -3.98272766368     V
+ Site    8
+ Electrostatic Potential :    6.13772910092     V
+ Site    9
+ Electrostatic Potential :    3.94007849433     V
+ Site   10
+ Electrostatic Potential :    25.6438517468     V
+ Site   11
+ Electrostatic Potential :    4.42457507984     V
+ Site   12
+ Electrostatic Potential :   -3.59355359356     V
+ Site   13
+ Electrostatic Potential :   -20.0207289848     V
+ Site   14
+ Electrostatic Potential :   -2.85875355805     V
+ Site   15
+ Electrostatic Potential :   -6.26941688926     V
+ Site   16
+ Electrostatic Potential :    17.0882506778     V
+ Site   17
+ Electrostatic Potential :   -2.76859998823     V
+ Site   18
+ Electrostatic Potential :   0.467912567127     V
+ Site   19
+ Electrostatic Potential :   -3.00950403527     V
+ Site   20
+ Electrostatic Potential :   0.647121899291     V
+ Site   21
+ Electrostatic Potential :   -3.42903607903     V
+ Site   22
+ Electrostatic Potential :   -33.6142649952     V
+ Site   23
+ Electrostatic Potential :    11.2931541656     V
+ Site   24
+ Electrostatic Potential :   -3.31116374199     V
+ Site   25
+ Electrostatic Potential :   -17.7762038699     V
+ Site   26
+ Electrostatic Potential :   -11.3036913062     V
+ Site   27
+ Electrostatic Potential :    4.81445592243     V
+ Site   28
+ Electrostatic Potential :   -5.88353189252     V
+ Site   29
+ Electrostatic Potential :   -4.32355150774     V
+ Site   30
+ Electrostatic Potential :    1.48580541871     V
+ Site   31
+ Electrostatic Potential :   0.571705077688     V
+ Site   32
+ Electrostatic Potential :    2.30248882686     V
+ Site   33
+ Electrostatic Potential :   -2.18801709722     V
+ Site   34
+ Electrostatic Potential :   -3.77299747395     V
+ Site   35
+ Electrostatic Potential :   -3.38218242464     V
+ Site   36
+ Electrostatic Potential :   -29.0555878907     V
+ Site   37
+ Electrostatic Potential :   -2.32018061272     V
+ Site   38
+ Electrostatic Potential :   -7.23015230805     V
+ Site   39
+ Electrostatic Potential :   -9.00837199518     V
+ Site   40
+ Electrostatic Potential :    6.69229977658     V
+ Site   41
+ Electrostatic Potential :    4.91389960975     V
+ Site   42
+ Electrostatic Potential :   -2.95935069073     V
+ Site   43
+ Electrostatic Potential :   -3.45719386915     V
+ Site   44
+ Electrostatic Potential :   -3.24799404228     V
+ Site   45
+ Electrostatic Potential :   0.148364658648     V
+ Site   46
+ Electrostatic Potential :   -2.05509381856     V
+ Site   47
+ Electrostatic Potential :    11.7783358986     V
+ Site   48
+ Electrostatic Potential :   -4.25421935953     V
+ Site   49
+ Electrostatic Potential :   -2.44910750583     V
+ Site   50
+ Electrostatic Potential :   0.825499304327     V
+ Site   51
+ Electrostatic Potential :    12.9810865835     V
+ Site   52
+ Electrostatic Potential :   -15.7459438256     V
+ Site   53
+ Electrostatic Potential :   -8.92920577951     V
+ Site   54
+ Electrostatic Potential :    43.5001582587     V
+ Site   55
+ Electrostatic Potential :   -4.06239605151     V
+ Site   56
+ Electrostatic Potential :   -4.53096101102     V
+ Site   57
+ Electrostatic Potential :   -9.47073554734     V
+ Site   58
+ Electrostatic Potential :   -6.97437340557     V
+ Site   59
+ Electrostatic Potential :   -3.24511160443     V
+ Site   60
+ Electrostatic Potential :   -3.17418719102     V
+ Site   61
+ Electrostatic Potential :    4.72639599716     V
+ Site   62
+ Electrostatic Potential :   -2.03316236261     V
+ Site   63
+ Electrostatic Potential :    7.60035602850     V
+ Site   64
+ Electrostatic Potential :   -1.86408826554     V
+ Site   65
+ Electrostatic Potential :    12.0852559633     V
+ Site   66
+ Electrostatic Potential :   -15.1715047290     V
+ Site   67
+ Electrostatic Potential :    1.34903423846     V
+ Site   68
+ Electrostatic Potential :   -1.03706534181     V
+ Site   69
+ Electrostatic Potential :    31.1411335996     V
+ Site   70
+ Electrostatic Potential :   -1.44232926825     V
+ Site   71
+ Electrostatic Potential :   -6.02561987928     V
+ Site   72
+ Electrostatic Potential :   -6.43681042260     V
+ Site   73
+ Electrostatic Potential :   -1.56480639437     V
+ Site   74
+ Electrostatic Potential :   -5.23276773321     V
+ Site   75
+ Electrostatic Potential :   -3.50339574375     V
+ Site   76
+ Electrostatic Potential :    8.80806794212     V
+ Site   77
+ Electrostatic Potential :   0.700690424564     V
+ Site   78
+ Electrostatic Potential :   -4.62517023972     V
+ Site   79
+ Electrostatic Potential :  -0.660216462260E-01 V
+ Site   80
+ Electrostatic Potential :    22.2025002224     V
+ Site   81
+ Electrostatic Potential :   -2.43718253571     V
+ Site   82
+ Electrostatic Potential :  -0.380927705044     V
+ Site   83
+ Electrostatic Potential :    6.27936122503     V
+ Site   84
+ Electrostatic Potential :   -4.66610632101     V
+ Site   85
+ Electrostatic Potential :    10.9569315011     V
+ Site   86
+ Electrostatic Potential :   0.453134251320     V
+ Site   87
+ Electrostatic Potential :   -5.26390568202     V
+ Site   88
+ Electrostatic Potential :   -15.6694529559     V
+ Site   89
+ Electrostatic Potential :  -0.155864901007     V
+ Site   90
+ Electrostatic Potential :   -3.38315047787     V
+ Site   91
+ Electrostatic Potential :   -6.00515096107     V
+ Site   92
+ Electrostatic Potential :   -7.36155513171     V
+ Site   93
+ Electrostatic Potential :    1.41744184513     V
+ Site   94
+ Electrostatic Potential :   -7.56421935216     V
+ Site   95
+ Electrostatic Potential :  -0.506927085312     V
+ Site   96
+ Electrostatic Potential :    18.7037324877     V
+ Site   97
+ Electrostatic Potential :   -2.55816546774     V
+ Site   98
+ Electrostatic Potential :   -10.7169630659     V
+ Site   99
+ Electrostatic Potential :   -4.40859878419     V
+ Site  100
+ Electrostatic Potential :   -5.19436505131     V
+ Site  101
+ Electrostatic Potential :   -5.36129648472     V
+ Site  102
+ Electrostatic Potential :   -4.30519850636     V
+ Site  103
+ Electrostatic Potential :   -5.82348369595     V
+ Site  104
+ Electrostatic Potential :    2.30303149648     V
+ Site  105
+ Electrostatic Potential :  -0.169922437378     V
+ Site  106
+ Electrostatic Potential :   -3.86460720036     V
+ Site  107
+ Electrostatic Potential :   -3.50735864206     V
+ Site  108
+ Electrostatic Potential :   -2.83810622750     V
+ Site  109
+ Electrostatic Potential :   -7.83143955838     V
+ Site  110
+ Electrostatic Potential :   -19.3355081747     V
+ Site  111
+ Electrostatic Potential :   -4.98040184419     V
+ Site  112
+ Electrostatic Potential :    12.6925699804     V
+ Site  113
+ Electrostatic Potential :   -2.53746327606     V
+ Site  114
+ Electrostatic Potential :   -8.11066872358     V
+ Site  115
+ Electrostatic Potential :   -1.53395871054     V
+ Site  116
+ Electrostatic Potential :   -3.54640621625     V
+ Site  117
+ Electrostatic Potential :    3.61629412314     V
+ Site  118
+ Electrostatic Potential :    7.54936524365     V
+ Site  119
+ Electrostatic Potential :   -5.92898937359     V
+ Site  120
+ Electrostatic Potential :   -3.19290345294     V
+ Site  121
+ Electrostatic Potential :    1.28180477803     V
+ Site  122
+ Electrostatic Potential :    10.5993268877     V
+ Site  123
+ Electrostatic Potential :   -3.62839662562     V
+ Site  124
+ Electrostatic Potential :   -3.69733583505     V
+ Site  125
+ Electrostatic Potential :   -5.24599377896     V
+ Site  126
+ Electrostatic Potential :   -2.05439739588     V
+ Site  127
+ Electrostatic Potential :   -2.01360980336     V
+ Site  128
+ Electrostatic Potential :    2.11927902299     V
+ Site  129
+ Electrostatic Potential :    10.4272191224     V
+ Site  130
+ Electrostatic Potential :   -1.27586611984     V
+ Site  131
+ Electrostatic Potential :   -6.40034816204     V
+ Site  132
+ Electrostatic Potential :   -2.20502639711     V
+ Site  133
+ Electrostatic Potential :   -8.29958368294     V
+ Site  134
+ Electrostatic Potential :    11.8333318256     V
+ Site  135
+ Electrostatic Potential :    1.65016127626     V
+ Site  136
+ Electrostatic Potential :   -2.19988299522     V
+ Site  137
+ Electrostatic Potential :   -3.01049982231     V
+ Site  138
+ Electrostatic Potential :   0.182830232600     V
+ Site  139
+ Electrostatic Potential :    7.79000604221     V
+ Site  140
+ Electrostatic Potential :    2.30845527794     V
+ Site  141
+ Electrostatic Potential :   -7.53714235546     V
+ Site  142
+ Electrostatic Potential :   -14.3200269258     V
+ Site  143
+ Electrostatic Potential :   -4.44936472452     V
+ Site  144
+ Electrostatic Potential :   -13.2941933553     V
+ Site  145
+ Electrostatic Potential :    2.82057183476     V
+ Site  146
+ Electrostatic Potential :    2.08122433908     V
+ Site  147
+ Electrostatic Potential :   -4.69121501568     V
+ Site  148
+ Electrostatic Potential :    3.86520451367     V
+ Site  149
+ Electrostatic Potential :    20.2786836358     V
+ Site  150
+ Electrostatic Potential :   -4.68590163569     V
+ Site  151
+ Electrostatic Potential :   -1.56205810305     V
+ Site  152
+ Electrostatic Potential :    3.70274349314     V
+ Site  153
+ Electrostatic Potential :   -1.21747115949     V
+ Site  154
+ Electrostatic Potential :   -3.78469106112     V
+ Site  155
+ Electrostatic Potential :   0.681220570957E-01 V
+ Site  156
+ Electrostatic Potential :   -3.98765585741     V
+ Site  157
+ Electrostatic Potential :   -1.17951209703     V
+ Site  158
+ Electrostatic Potential :    1.36299019356     V
+ Site  159
+ Electrostatic Potential :   -2.83857605524     V
+ Site  160
+ Electrostatic Potential :   -1.33411859916     V
+ Site  161
+ Electrostatic Potential :    7.39699109318     V
+ Site  162
+ Electrostatic Potential :   -12.1409544383     V
+ Site  163
+ Electrostatic Potential :    8.93816511111     V
+ Site  164
+ Electrostatic Potential :   -18.5340196964     V
+ Site  165
+ Electrostatic Potential :   -3.73266133750     V
+ Site  166
+ Electrostatic Potential :    3.02287840218     V
+ Site  167
+ Electrostatic Potential :    13.6946417748     V
+ Site  168
+ Electrostatic Potential :   -3.09035931240     V
+ Site  169
+ Electrostatic Potential :   -4.60133436831     V
+ Site  170
+ Electrostatic Potential :   -6.74132031920     V
+ Site  171
+ Electrostatic Potential :    4.66820902524     V
+ Site  172
+ Electrostatic Potential :    4.43624983931     V
+ Site  173
+ Electrostatic Potential :   -3.46115048891     V
+ Site  174
+ Electrostatic Potential :   -3.64919914931     V
+ Site  175
+ Electrostatic Potential :   -2.47810438802     V
+ Site  176
+ Electrostatic Potential :    3.50089673633     V
+ Site  177
+ Electrostatic Potential :   -3.44352118634     V
+ Site  178
+ Electrostatic Potential :   -1.36360327116     V
+ Site  179
+ Electrostatic Potential :   -5.52912940008     V
+ Site  180
+ Electrostatic Potential :   -1.25307027779     V
+ Site  181
+ Electrostatic Potential :   -4.64360626747     V
+ Site  182
+ Electrostatic Potential :   -3.17135273651     V
+ Site  183
+ Electrostatic Potential :   -8.09255656694     V
+ Site  184
+ Electrostatic Potential :   -3.42731043525     V
+ Site  185
+ Electrostatic Potential :   -1.98611435255     V
+ Site  186
+ Electrostatic Potential :   -2.21494176778     V
+ Site  187
+ Electrostatic Potential :    5.12929952268     V
+ Site  188
+ Electrostatic Potential :    5.10322365460     V
+ Site  189
+ Electrostatic Potential :   -1.94354000800     V
+ Site  190
+ Electrostatic Potential :    1.67689947148     V
+ Site  191
+ Electrostatic Potential :   -1.41240889227     V
+ Site  192
+ Electrostatic Potential :    126.273418950     V
+ Site  193
+ Electrostatic Potential :    7.39445587430     V
+ Site  194
+ Electrostatic Potential :   -1.21721107030     V
+ Site  195
+ Electrostatic Potential :   -4.04307623386     V
+ Site  196
+ Electrostatic Potential :   -5.55669102434     V
+ Site  197
+ Electrostatic Potential :   -2.76772162710     V
+ Site  198
+ Electrostatic Potential :   -1.60546220299     V
+ Site  199
+ Electrostatic Potential :   -2.23132990284     V
+ Site  200
+ Electrostatic Potential :    9.12298989454     V
+ Site  201
+ Electrostatic Potential :   -4.38079280119     V
+ Site  202
+ Electrostatic Potential :    48.3711926261     V
+ Site  203
+ Electrostatic Potential :   -5.20986849846     V
+ Site  204
+ Electrostatic Potential :   -3.10704830261     V
+ Site  205
+ Electrostatic Potential :   -7.55268111436     V
+ Site  206
+ Electrostatic Potential :   -2.84359400057     V
+ Site  207
+ Electrostatic Potential :    1.36569265169     V
+ Site  208
+ Electrostatic Potential :    36.8245391311     V
+ Site  209
+ Electrostatic Potential :   0.313141458325     V
+ Site  210
+ Electrostatic Potential :    4.35247501760     V
+ Site  211
+ Electrostatic Potential :   -4.05037757307     V
+ Site  212
+ Electrostatic Potential :   -30.5100485300     V
+ Site  213
+ Electrostatic Potential :   -10.0001920148     V
+ Site  214
+ Electrostatic Potential :    6.74338763167     V
+ Site  215
+ Electrostatic Potential :   0.172970989788     V
+ Site  216
+ Electrostatic Potential :   -2.32115735645     V
+ Site  217
+ Electrostatic Potential :   -1.38017511490     V
+ Site  218
+ Electrostatic Potential :   -3.77813790547     V
+ Site  219
+ Electrostatic Potential :   -2.49552332658     V
+ Site  220
+ Electrostatic Potential :    21.3808311887     V
+ Site  221
+ Electrostatic Potential :   -6.78490417707     V
+ Site  222
+ Electrostatic Potential :    22.1343113821     V
+ Site  223
+ Electrostatic Potential :  -0.875798758666     V
+ Site  224
+ Electrostatic Potential :   -1.61023976750     V
+ Site  225
+ Electrostatic Potential :   -3.03419533739     V
+ Site  226
+ Electrostatic Potential :   -13.8791949399     V
+ Site  227
+ Electrostatic Potential :   -21.9521419944     V
+ Site  228
+ Electrostatic Potential :    6.59494341235     V
+ Site  229
+ Electrostatic Potential :    6.47337019395     V
+ Site  230
+ Electrostatic Potential :  -0.368541414140E-01 V
+ Site  231
+ Electrostatic Potential :   -2.01959383578     V
+ Site  232
+ Electrostatic Potential :   -1.07058696702     V
+ Site  233
+ Electrostatic Potential :   -3.57874602652     V
+ Site  234
+ Electrostatic Potential :   -2.64060037433     V
+ Site  235
+ Electrostatic Potential :   -3.11363263690     V
+ Site  236
+ Electrostatic Potential :   0.287065113700     V
+ Site  237
+ Electrostatic Potential :   -2.10681566656     V
+ Site  238
+ Electrostatic Potential :   -5.73226246557     V
+ Site  239
+ Electrostatic Potential :   -2.32186578141     V
+ Site  240
+ Electrostatic Potential :   -6.37928523935     V
+ Site  241
+ Electrostatic Potential :    4.20000747396     V
+ Site  242
+ Electrostatic Potential :   -1.83544946703     V
+ Site  243
+ Electrostatic Potential :   -5.13306859507     V
+ Site  244
+ Electrostatic Potential :   -3.12958582650     V
+ Site  245
+ Electrostatic Potential :  -0.305760776804     V
+ Site  246
+ Electrostatic Potential :   -2.61825368721     V
+ Site  247
+ Electrostatic Potential :   -1.57429871022     V
+ Site  248
+ Electrostatic Potential :   -2.99500844240     V
+ Site  249
+ Electrostatic Potential :   -10.7386353764     V
+ Site  250
+ Electrostatic Potential :   -9.25264680120     V
+ Site  251
+ Electrostatic Potential :   -1.88902573763     V
+ Site  252
+ Electrostatic Potential :   -2.51340209107     V
+ Site  253
+ Electrostatic Potential :    4.07665182622     V
+ Site  254
+ Electrostatic Potential :   -15.0507822133     V
+ Site  255
+ Electrostatic Potential :    9.96547094198     V
+ Site  256
+ Electrostatic Potential :   -2.28585522844     V
+ Site  257
+ Electrostatic Potential :    3.36418721017     V
+ Site  258
+ Electrostatic Potential :   -6.54061266419     V
+ Site  259
+ Electrostatic Potential :   -1.00625325098     V
+ Site  260
+ Electrostatic Potential :    35.6662777772     V
+ Site  261
+ Electrostatic Potential :   -2.06821084173     V
+ Site  262
+ Electrostatic Potential :   0.235050646174     V
+ Site  263
+ Electrostatic Potential :  -0.977676123013     V
+ Site  264
+ Electrostatic Potential :   -4.11490978776     V
+ Site  265
+ Electrostatic Potential :    6.65174268901     V
+ Site  266
+ Electrostatic Potential :   -1.80230675736     V
+ Site  267
+ Electrostatic Potential :   -2.94289732886     V
+ Site  268
+ Electrostatic Potential :   -8.42707989820     V
+ Site  269
+ Electrostatic Potential :   -2.16592706358     V
+ Site  270
+ Electrostatic Potential :   -42.8142257396     V
+ Site  271
+ Electrostatic Potential :   -8.87048728923     V
+ Site  272
+ Electrostatic Potential :   -2.76639599537     V
+ Site  273
+ Electrostatic Potential :   -1.24191995801     V
+ Site  274
+ Electrostatic Potential :   -6.92572194424     V
+ Site  275
+ Electrostatic Potential :   -3.47894960358     V
+ Site  276
+ Electrostatic Potential :   -2.01192729875     V
+ Site  277
+ Electrostatic Potential :   -4.23278801602     V
+ Site  278
+ Electrostatic Potential :   0.280995003144     V
+ Site  279
+ Electrostatic Potential :   -3.41147996600     V
+ Site  280
+ Electrostatic Potential :   -3.78187582902     V
+ Site  281
+ Electrostatic Potential :   -3.49248452835     V
+ Site  282
+ Electrostatic Potential :   -12.1177894268     V
+ Site  283
+ Electrostatic Potential :   -3.32710437159     V
+ Site  284
+ Electrostatic Potential :   -3.53106895934     V
+ Site  285
+ Electrostatic Potential :   -4.43163440677     V
+ Site  286
+ Electrostatic Potential :   0.865671376142     V
+ Site  287
+ Electrostatic Potential :   -2.06144623042     V
+ Site  288
+ Electrostatic Potential :   -1.65641514349     V
+ Site  289
+ Electrostatic Potential :   -3.44502484240     V
+ Site  290
+ Electrostatic Potential :    9.07329358022     V
+ Site  291
+ Electrostatic Potential :   -3.69562240069     V
+ Site  292
+ Electrostatic Potential :   -4.30604315628     V
+ Site  293
+ Electrostatic Potential :   -5.18629630544     V
+ Site  294
+ Electrostatic Potential :   -2.87706866624     V
+ Site  295
+ Electrostatic Potential :   -3.78499959289     V
+ Site  296
+ Electrostatic Potential :   -5.88891786317     V
+ Site  297
+ Electrostatic Potential :    14.4085391272     V
+ Site  298
+ Electrostatic Potential :   -10.0203563917     V
+ Site  299
+ Electrostatic Potential :   -2.89478240151     V
+ Site  300
+ Electrostatic Potential :   -3.04809386237     V
+ Site  301
+ Electrostatic Potential :   -1.40097550587     V
+ Site  302
+ Electrostatic Potential :   -2.57384408003     V
+ Site  303
+ Electrostatic Potential :   -3.30981792017     V
+ Site  304
+ Electrostatic Potential :   -5.37502607301     V
+ Site  305
+ Electrostatic Potential :   -8.57359341498     V
+ Site  306
+ Electrostatic Potential :   -1.42588924257     V
+ Site  307
+ Electrostatic Potential :    4.78784621536     V
+ Site  308
+ Electrostatic Potential :   -9.88519316104     V
+ Site  309
+ Electrostatic Potential :    8.01261296682     V
+ Site  310
+ Electrostatic Potential :   -4.79827812389     V
+ Site  311
+ Electrostatic Potential :   -2.38791271615     V
+ Site  312
+ Electrostatic Potential :   -2.66443805084     V
+ Site  313
+ Electrostatic Potential :    17.1441512185     V
+ Site  314
+ Electrostatic Potential :   -3.76957104880     V
+ Site  315
+ Electrostatic Potential :  -0.170531544664     V
+ Site  316
+ Electrostatic Potential :   -6.53648524307     V
+ Site  317
+ Electrostatic Potential :   -1.72339151785     V
+ Site  318
+ Electrostatic Potential :    1.29087975021     V
+ Site  319
+ Electrostatic Potential :   -1.80794827693     V
+ Site  320
+ Electrostatic Potential :   -5.06742884149     V
+ Site  321
+ Electrostatic Potential :   -2.89776764047     V
+ Site  322
+ Electrostatic Potential :   -7.48301846003     V
+ Site  323
+ Electrostatic Potential :    1.79259790560     V
+ Site  324
+ Electrostatic Potential :   -3.91907454009     V
+ Site  325
+ Electrostatic Potential :   -4.69870261173     V
+ Site  326
+ Electrostatic Potential :   -4.13618584352     V
+ Site  327
+ Electrostatic Potential :   -12.0738144120     V
+ Site  328
+ Electrostatic Potential :  -0.726688027900     V
+ Site  329
+ Electrostatic Potential :    5.66864803686     V
+ Site  330
+ Electrostatic Potential :   -5.90640554373     V
+ Site  331
+ Electrostatic Potential :   0.521537551159     V
+ Site  332
+ Electrostatic Potential :   -8.10734661603     V
+ Site  333
+ Electrostatic Potential :   0.504166839091     V
+ Site  334
+ Electrostatic Potential :   -4.22992439568     V
+ Site  335
+ Electrostatic Potential :   0.914227793952     V
+ Site  336
+ Electrostatic Potential :   -12.6663159245     V
+ Site  337
+ Electrostatic Potential :   -5.90357620413     V
+ Site  338
+ Electrostatic Potential :  -0.315232864661     V
+ Site  339
+ Electrostatic Potential :   0.975687059408E-01 V
+ Site  340
+ Electrostatic Potential :    4.35551216088     V
+ Site  341
+ Electrostatic Potential :   -2.73569893316     V
+ Site  342
+ Electrostatic Potential :   -3.37235523331     V
+ Site  343
+ Electrostatic Potential :    2.88355070801     V
+ Site  344
+ Electrostatic Potential :   -2.08982759169     V
+ Site  345
+ Electrostatic Potential :   -4.98196758771     V
+ Site  346
+ Electrostatic Potential :   0.607801289395     V
+ Site  347
+ Electrostatic Potential :   -1.85992651792     V
+ Site  348
+ Electrostatic Potential :    19.9390334690     V
+ Site  349
+ Electrostatic Potential :    4.06503398877     V
+ Site  350
+ Electrostatic Potential :    3.40178161375     V
+ Site  351
+ Electrostatic Potential :    13.1564803378     V
+ Site  352
+ Electrostatic Potential :   -3.31392466274     V
+ Site  353
+ Electrostatic Potential :    1.53446290520     V
+ Site  354
+ Electrostatic Potential :   -2.06005816020     V
+ Site  355
+ Electrostatic Potential :    1.54069954900     V
+ Site  356
+ Electrostatic Potential :   -9.38919493358     V
+ Site  357
+ Electrostatic Potential :   -2.88484429842     V
+ Site  358
+ Electrostatic Potential :    7.11818733239     V
+ Site  359
+ Electrostatic Potential :   -5.82099379536     V
+ Site  360
+ Electrostatic Potential :  -0.563148387073     V
+ Site  361
+ Electrostatic Potential :   -1.89850699143     V
+ Site  362
+ Electrostatic Potential :  -0.564427084727E-01 V
+ Site  363
+ Electrostatic Potential :   -2.89999327329     V
+ Site  364
+ Electrostatic Potential :    4.46625505958     V
+ Site  365
+ Electrostatic Potential :   0.485394447502E-01 V
+ Site  366
+ Electrostatic Potential :    11.4753712651     V
+ Site  367
+ Electrostatic Potential :   -24.3132293585     V
+ Site  368
+ Electrostatic Potential :   -4.71059900351     V
+ Site  369
+ Electrostatic Potential :   -2.40109403137     V
+ Site  370
+ Electrostatic Potential :   -12.5008981068     V
+ Site  371
+ Electrostatic Potential :   -10.7085264730     V
+ Site  372
+ Electrostatic Potential :  -0.747354691044     V
+ Site  373
+ Electrostatic Potential :    12.0993173312     V
+ Site  374
+ Electrostatic Potential :    2.83471010701     V
+ Site  375
+ Electrostatic Potential :   -9.65366488200     V
+ Site  376
+ Electrostatic Potential :   -5.80282656455     V
+ Site  377
+ Electrostatic Potential :   -3.61331509740     V
+ Site  378
+ Electrostatic Potential :   0.447480712937     V
+ Site  379
+ Electrostatic Potential :   -4.90185211561     V
+ Site  380
+ Electrostatic Potential :   -9.31238387357     V
+ Site  381
+ Electrostatic Potential :   -3.78802618648     V
+ Site  382
+ Electrostatic Potential :   -3.87427973902     V
+ Site  383
+ Electrostatic Potential :   -1.73966360604     V
+ Site  384
+ Electrostatic Potential :   -4.60368695302     V
+ Site  385
+ Electrostatic Potential :   -6.30821762356     V
+ Site  386
+ Electrostatic Potential :   -10.0624716713     V
+ Site  387
+ Electrostatic Potential :   -17.9358785654     V
+ Site  388
+ Electrostatic Potential :    16.0635822556     V
+ Site  389
+ Electrostatic Potential :   -3.43775009370     V
+ Site  390
+ Electrostatic Potential :    5.82074364219     V
+ Site  391
+ Electrostatic Potential :    31.9816861255     V
+ Site  392
+ Electrostatic Potential :   0.594555736204     V
+ Site  393
+ Electrostatic Potential :   -7.88342870151     V
+ Site  394
+ Electrostatic Potential :   -2.81977170353     V
+ Site  395
+ Electrostatic Potential :   -3.91660739817     V
+ Site  396
+ Electrostatic Potential :   -3.19543432271     V
+ Site  397
+ Electrostatic Potential :   -5.21237039285     V
+ Site  398
+ Electrostatic Potential :  -0.143498202075     V
+ Site  399
+ Electrostatic Potential :   0.150795486239     V
+ Site  400
+ Electrostatic Potential :  -0.472357847976     V
+ Site  401
+ Electrostatic Potential :   -4.03204952940     V
+ Site  402
+ Electrostatic Potential :   -5.06280354188     V
+ Site  403
+ Electrostatic Potential :   -3.59261337944     V
+ Site  404
+ Electrostatic Potential :   -3.48164985247     V
+ Site  405
+ Electrostatic Potential :  -0.991963877010     V
+ Site  406
+ Electrostatic Potential :   -5.92381261291     V
+ Site  407
+ Electrostatic Potential :    2.76312128441     V
+ Site  408
+ Electrostatic Potential :  -0.724497250056     V
+ Site  409
+ Electrostatic Potential :    4.59335653796     V
+ Site  410
+ Electrostatic Potential :   -9.68056238557     V
+ Site  411
+ Electrostatic Potential :   -4.51000887100     V
+ Site  412
+ Electrostatic Potential :   -4.57153738530     V
+ Site  413
+ Electrostatic Potential :    35.6281078550     V
+ Site  414
+ Electrostatic Potential :   -2.33693592215     V
+ Site  415
+ Electrostatic Potential :   0.505671546824     V
+ Site  416
+ Electrostatic Potential :  -0.600494240668     V
+ Site  417
+ Electrostatic Potential :   0.741211807161     V
+ Site  418
+ Electrostatic Potential :   -38.2351334893     V
+ Site  419
+ Electrostatic Potential :   -1.37320448739     V
+ Site  420
+ Electrostatic Potential :   -2.88681527335     V
+ Site  421
+ Electrostatic Potential :   -3.13401368465     V
+ Site  422
+ Electrostatic Potential :  -0.550053338206E-02 V
+ Site  423
+ Electrostatic Potential :  -0.511309215910     V
+ Site  424
+ Electrostatic Potential :   -7.19993499595     V
+ Site  425
+ Electrostatic Potential :   -13.3913672269     V
+ Site  426
+ Electrostatic Potential :    10.7775644616     V
+ Site  427
+ Electrostatic Potential :   -2.33810215433     V
+ Site  428
+ Electrostatic Potential :   -13.0313363375     V
+ Site  429
+ Electrostatic Potential :   -3.97144824805     V
+ Site  430
+ Electrostatic Potential :   -4.30322839658     V
+ Site  431
+ Electrostatic Potential :   -3.13043492081     V
+ Site  432
+ Electrostatic Potential :   -5.70713178014     V
+ Site  433
+ Electrostatic Potential :   0.598867278029     V
+ Site  434
+ Electrostatic Potential :    1.73820397587     V
+ Site  435
+ Electrostatic Potential :   -1.00023410924     V
+ Site  436
+ Electrostatic Potential :   -28.4008153748     V
+ Site  437
+ Electrostatic Potential :   -3.35425142231     V
+ Site  438
+ Electrostatic Potential :    14.8954295522     V
+ Site  439
+ Electrostatic Potential :   -3.05776277990     V
+ Site  440
+ Electrostatic Potential :   0.116213318878     V
+ Site  441
+ Electrostatic Potential :   -1.20155120088     V
+ Site  442
+ Electrostatic Potential :   0.416951003901     V
+ Site  443
+ Electrostatic Potential :   -2.31261631014     V
+ Site  444
+ Electrostatic Potential :   0.253110149231     V
+ Site  445
+ Electrostatic Potential :   -1.47643705000     V
+ Site  446
+ Electrostatic Potential :   -6.31434957416     V
+ Site  447
+ Electrostatic Potential :    7.95946270688     V
+ Site  448
+ Electrostatic Potential :    17.4722341706     V
+ Site  449
+ Electrostatic Potential :   -2.06201296813     V
+ Site  450
+ Electrostatic Potential :   -3.28887651777     V
+ Site  451
+ Electrostatic Potential :   -4.06109692192     V
+ Site  452
+ Electrostatic Potential :   -7.80477053206     V
+ Site  453
+ Electrostatic Potential :   -7.36185578201     V
+ Site  454
+ Electrostatic Potential :   -3.27897746798     V
+ Site  455
+ Electrostatic Potential :   0.650860938278     V
+ Site  456
+ Electrostatic Potential :  -0.263386931499     V
+ Site  457
+ Electrostatic Potential :   -2.97837942505     V
+ Site  458
+ Electrostatic Potential :   -1.68784173694     V
+ Site  459
+ Electrostatic Potential :   -3.20084566171     V
+ Site  460
+ Electrostatic Potential :   -5.56485668310     V
+ Site  461
+ Electrostatic Potential :   -2.87442987325     V
+ Site  462
+ Electrostatic Potential :   -28.7845966170     V
+ Site  463
+ Electrostatic Potential :   -3.33018785721     V
+ Site  464
+ Electrostatic Potential :   -3.53500923754     V
+ Site  465
+ Electrostatic Potential :   -3.65101437940     V
+ Site  466
+ Electrostatic Potential :    8.15946557562     V
+ Site  467
+ Electrostatic Potential :    17.7990457273     V
+ Site  468
+ Electrostatic Potential :   -3.03603058176     V
+ Site  469
+ Electrostatic Potential :    53.9892178067     V
+ Site  470
+ Electrostatic Potential :    5.70597988976     V
+ Site  471
+ Electrostatic Potential :   -1.82434382067     V
+ Site  472
+ Electrostatic Potential :   -16.4712045492     V
+ Site  473
+ Electrostatic Potential :   -3.22797235491     V
+ Site  474
+ Electrostatic Potential :   -2.59812969530     V
+ Site  475
+ Electrostatic Potential :   -2.71063929888     V
+ Site  476
+ Electrostatic Potential :   -1.86474832666     V
+ Site  477
+ Electrostatic Potential :   -35.4170478063     V
+ Site  478
+ Electrostatic Potential :   -3.03532715461     V
+ Site  479
+ Electrostatic Potential :   -4.23685785183     V
+ Site  480
+ Electrostatic Potential :   -6.67399893611     V
+ Site  481
+ Electrostatic Potential :  -0.746221754014     V
+ Site  482
+ Electrostatic Potential :   -3.26056373097     V
+ Site  483
+ Electrostatic Potential :   -2.68525435285     V
+ Site  484
+ Electrostatic Potential :  -0.432406981036     V
+ Site  485
+ Electrostatic Potential :   -13.9404167990     V
+ Site  486
+ Electrostatic Potential :   -1.65788997536     V
+ Site  487
+ Electrostatic Potential :    1.06139015165     V
+ Site  488
+ Electrostatic Potential :   -2.86331950794     V
+ Site  489
+ Electrostatic Potential :   -11.6359265814     V
+ Site  490
+ Electrostatic Potential :   -1.28812154601     V
+ Site  491
+ Electrostatic Potential :    8.24020759782     V
+ Site  492
+ Electrostatic Potential :   -3.23724322370     V
+ Site  493
+ Electrostatic Potential :   -1.37928240647     V
+ Site  494
+ Electrostatic Potential :    16.3245892153     V
+ Site  495
+ Electrostatic Potential :   -1.00718302463     V
+ Site  496
+ Electrostatic Potential :   -6.83445283597     V
+ Site  497
+ Electrostatic Potential :   -85.5025447765     V
+ Site  498
+ Electrostatic Potential :   -2.39519922532     V
+ Site  499
+ Electrostatic Potential :   -1.37324558499     V
+ Site  500
+ Electrostatic Potential :    20.7920806463     V
+ Site  501
+ Electrostatic Potential :   -2.68480872228     V
+ Site  502
+ Electrostatic Potential :   -15.0917737299     V
+ Site  503
+ Electrostatic Potential :    5.89965668338     V
+ Site  504
+ Electrostatic Potential :   -2.10575021532     V
+ Site  505
+ Electrostatic Potential :    2.10379411972     V
+ Site  506
+ Electrostatic Potential :    3.45056398455     V
+ Site  507
+ Electrostatic Potential :    5.72426078531     V
+ Site  508
+ Electrostatic Potential :   -6.96738717046     V
+ Site  509
+ Electrostatic Potential :   0.312118597409     V
+ Site  510
+ Electrostatic Potential :   -6.60450276782     V
+ Site  511
+ Electrostatic Potential :   -1.56804552623     V
+ Site  512
+ Electrostatic Potential :    9.00667531097     V
+ Site  513
+ Electrostatic Potential :   -4.85724586857     V
+ Site  514
+ Electrostatic Potential :   -3.80707550560     V
+ Site  515
+ Electrostatic Potential :   -2.58678723712     V
+ Site  516
+ Electrostatic Potential :   -12.3888079150     V
+ Site  517
+ Electrostatic Potential :   0.104459042698E-01 V
+ Site  518
+ Electrostatic Potential :   -1.05097662075     V
+ Site  519
+ Electrostatic Potential :    41.5648682053     V
+ Site  520
+ Electrostatic Potential :   -6.92617174937     V
+ Site  521
+ Electrostatic Potential :   -3.82605868810     V
+ Site  522
+ Electrostatic Potential :    1.55394529704     V
+ Site  523
+ Electrostatic Potential :    58.2155825379     V
+ Site  524
+ Electrostatic Potential :    26.8906033763     V
+ Site  525
+ Electrostatic Potential :    4.50838132960     V
+ Site  526
+ Electrostatic Potential :    14.9827798658     V
+ Site  527
+ Electrostatic Potential :   -5.10332896995     V
+ Site  528
+ Electrostatic Potential :    4.60445671482     V
+ Site  529
+ Electrostatic Potential :   -3.20317029628     V
+ Site  530
+ Electrostatic Potential :   -4.11984016858     V
+ Site  531
+ Electrostatic Potential :    3.96197864591     V
+ Site  532
+ Electrostatic Potential :   -4.81516964013     V
+ Site  533
+ Electrostatic Potential :   -7.35945980449     V
+ Site  534
+ Electrostatic Potential :   -1.50773997214     V
+ Site  535
+ Electrostatic Potential :   -6.82870045046     V
+ Site  536
+ Electrostatic Potential :    21.2885075957     V
+ Site  537
+ Electrostatic Potential :   -3.60626328667     V
+ Site  538
+ Electrostatic Potential :   -4.76222673862     V
+ Site  539
+ Electrostatic Potential :   -2.43717515812     V
+ Site  540
+ Electrostatic Potential :    6.67522499549     V
+ Site  541
+ Electrostatic Potential :   -2.86123530916     V
+ Site  542
+ Electrostatic Potential :    10.9491951458     V
+ Site  543
+ Electrostatic Potential :   -2.79871369035     V
+ Site  544
+ Electrostatic Potential :   -5.05577696449     V
+ Site  545
+ Electrostatic Potential :    36.1805883427     V
+ Site  546
+ Electrostatic Potential :    5.63196478881     V
+ Site  547
+ Electrostatic Potential :   -2.28068820170     V
+ Site  548
+ Electrostatic Potential :  -0.384550402121     V
+ Site  549
+ Electrostatic Potential :  -0.590133991424     V
+ Site  550
+ Electrostatic Potential :  -0.124011337607     V
+ Site  551
+ Electrostatic Potential :   -3.98915889880     V
+ Site  552
+ Electrostatic Potential :   -3.26738484780     V
+ Site  553
+ Electrostatic Potential :    1.12780969298     V
+ Site  554
+ Electrostatic Potential :    11.8916457581     V
+ Site  555
+ Electrostatic Potential :   -1.28328069978     V
+ Site  556
+ Electrostatic Potential :   -3.15713646654     V
+ Site  557
+ Electrostatic Potential :   -7.47925853180     V
+ Site  558
+ Electrostatic Potential :   -3.69375362996     V
+ Site  559
+ Electrostatic Potential :   -1.26825083286     V
+ Site  560
+ Electrostatic Potential :    5.42632222944     V
+ Site  561
+ Electrostatic Potential :   -3.80751695696     V
+ Site  562
+ Electrostatic Potential :    5.27109744780     V
+ Site  563
+ Electrostatic Potential :    30.6141662016     V
+ Site  564
+ Electrostatic Potential :   -3.34571049724     V
+ Site  565
+ Electrostatic Potential :    3.05102753005     V
+ Site  566
+ Electrostatic Potential :    6.14762877229     V
+ Site  567
+ Electrostatic Potential :   -14.5096545565     V
+ Site  568
+ Electrostatic Potential :   -1.39704177991     V
+ Site  569
+ Electrostatic Potential :  -0.420310273175     V
+ Site  570
+ Electrostatic Potential :   -2.74840925682     V
+ Site  571
+ Electrostatic Potential :   -15.5535905963     V
+ Site  572
+ Electrostatic Potential :   -2.31486635113     V
+ Site  573
+ Electrostatic Potential :    1.70261954802     V
+ Site  574
+ Electrostatic Potential :    1.76398398610     V
+ Site  575
+ Electrostatic Potential :   -10.1397357533     V
+ Site  576
+ Electrostatic Potential :   -1.26284436309     V
+ Site  577
+ Electrostatic Potential :   -4.22037337604     V
+ Site  578
+ Electrostatic Potential :    1.24256507006     V
+ Site  579
+ Electrostatic Potential :   -6.03533594523     V
+ Site  580
+ Electrostatic Potential :   -2.31556880367     V
+ Site  581
+ Electrostatic Potential :  -0.156176542723E-01 V
+ Site  582
+ Electrostatic Potential :   -1.33676520354     V
+ Site  583
+ Electrostatic Potential :   -5.36894621274     V
+ Site  584
+ Electrostatic Potential :   -3.08333588926     V
+ Site  585
+ Electrostatic Potential :   -2.92971242133     V
+ Site  586
+ Electrostatic Potential :    2.54782197702     V
+ Site  587
+ Electrostatic Potential :   -17.3388548918     V
+ Site  588
+ Electrostatic Potential :   -3.97746022648     V
+ Site  589
+ Electrostatic Potential :   -8.78282648831     V
+ Site  590
+ Electrostatic Potential :  -0.592316095958     V
+ Site  591
+ Electrostatic Potential :   -7.02836527143     V
+ Site  592
+ Electrostatic Potential :    1.36312352180     V
+ Site  593
+ Electrostatic Potential :    3.44355436665     V
+ Site  594
+ Electrostatic Potential :   -2.65211941911     V
+ Site  595
+ Electrostatic Potential :    1.46714521645     V
+ Site  596
+ Electrostatic Potential :   -5.88082540677     V
+ Site  597
+ Electrostatic Potential :   -2.81688194246     V
+ Site  598
+ Electrostatic Potential :    5.94154734859     V
+ Site  599
+ Electrostatic Potential :   -4.77150449052     V
+ Site  600
+ Electrostatic Potential :   0.130088999636     V
+ Site  601
+ Electrostatic Potential :   -2.29551047755     V
+ Site  602
+ Electrostatic Potential :   -3.12934531963     V
+ Site  603
+ Electrostatic Potential :  -0.320109613228     V
+ Site  604
+ Electrostatic Potential :   -2.33063994126     V
+ Site  605
+ Electrostatic Potential :   -3.09216957743     V
+ Site  606
+ Electrostatic Potential :  -0.781949596735     V
+ Site  607
+ Electrostatic Potential :   -5.70399256040     V
+ Site  608
+ Electrostatic Potential :    7.39731706370     V
+ Site  609
+ Electrostatic Potential :   -3.10757380724     V
+ Site  610
+ Electrostatic Potential :    21.0504384533     V
+ Site  611
+ Electrostatic Potential :   -1.81498376668     V
+ Site  612
+ Electrostatic Potential :   0.173353450640     V
+ Site  613
+ Electrostatic Potential :   -9.66328205446     V
+ Site  614
+ Electrostatic Potential :   -3.09359182265     V
+ Site  615
+ Electrostatic Potential :  -0.597119234205     V
+ Site  616
+ Electrostatic Potential :   -5.01943381262     V
+ Site  617
+ Electrostatic Potential :    5.43924262198     V
+ Site  618
+ Electrostatic Potential :   -3.68684322825     V
+ Site  619
+ Electrostatic Potential :    2.93667189021     V
+ Site  620
+ Electrostatic Potential :   -3.62463760476     V
+ Site  621
+ Electrostatic Potential :    60.5938373642     V
+ Site  622
+ Electrostatic Potential :   -4.07515393833     V
+ Site  623
+ Electrostatic Potential :   -2.93723607555     V
+ Site  624
+ Electrostatic Potential :   -2.07094412171     V
+ Site  625
+ Electrostatic Potential :   -1.49096605349     V
+ Site  626
+ Electrostatic Potential :    3.11766829823     V
+ Site  627
+ Electrostatic Potential :   0.511526201455     V
+ Site  628
+ Electrostatic Potential :   -6.03555033120     V
+ Site  629
+ Electrostatic Potential :   -15.0063186551     V
+ Site  630
+ Electrostatic Potential :   -4.16633408135     V
+ Site  631
+ Electrostatic Potential :    1.09164863149     V
+ Site  632
+ Electrostatic Potential :   -1.89981128442     V
+ Site  633
+ Electrostatic Potential :   -2.96931874422     V
+ Site  634
+ Electrostatic Potential :   -1.39059578845     V
+ Site  635
+ Electrostatic Potential :    1.78398237470     V
+ Site  636
+ Electrostatic Potential :    27.3702770342     V
+ Site  637
+ Electrostatic Potential :   -1.57367367230     V
+ Site  638
+ Electrostatic Potential :    3.98854832724     V
+ Site  639
+ Electrostatic Potential :   -2.77395123325     V
+ Site  640
+ Electrostatic Potential :   -3.22859935345     V
+ Site  641
+ Electrostatic Potential :   -30.3891485956     V
+ Site  642
+ Electrostatic Potential :   -1.72864149500     V
+ Site  643
+ Electrostatic Potential :    3.82944464973     V
+ Site  644
+ Electrostatic Potential :   -1.99167255176     V
+ Site  645
+ Electrostatic Potential :   -10.5020947596     V
+ Site  646
+ Electrostatic Potential :    33.2080618358     V
+ Site  647
+ Electrostatic Potential :   -2.96800122695     V
+ Site  648
+ Electrostatic Potential :    3.14516273863     V
+ Site  649
+ Electrostatic Potential :   -3.88555704907     V
+ Site  650
+ Electrostatic Potential :   -5.01286949846     V
+ Site  651
+ Electrostatic Potential :   -2.50481195148     V
+ Site  652
+ Electrostatic Potential :  -0.601654519846     V
+ Site  653
+ Electrostatic Potential :   -5.96791394733     V
+ Site  654
+ Electrostatic Potential :   -2.63319480332     V
+ Site  655
+ Electrostatic Potential :   -3.06270055011     V
+ Site  656
+ Electrostatic Potential :    5.49951933596     V
+ Site  657
+ Electrostatic Potential :   0.445578354735     V
+ Site  658
+ Electrostatic Potential :  -0.602510654473     V
+ Site  659
+ Electrostatic Potential :   -3.93175379941     V
+ Site  660
+ Electrostatic Potential :   -7.33389412432     V
+ Site  661
+ Electrostatic Potential :   -6.64584762507     V
+ Site  662
+ Electrostatic Potential :   -4.11775256555     V
+ Site  663
+ Electrostatic Potential :    1.39404536910     V
+ Site  664
+ Electrostatic Potential :   -1.00336855817     V
+ Site  665
+ Electrostatic Potential :    8.84348762184     V
+ Site  666
+ Electrostatic Potential :   -11.0547356254     V
+ Site  667
+ Electrostatic Potential :   -1.51882125762     V
+ Site  668
+ Electrostatic Potential :   -4.45793430375     V
+ Site  669
+ Electrostatic Potential :   -1.80228658283     V
+ Site  670
+ Electrostatic Potential :   -7.05819273350     V
+ Site  671
+ Electrostatic Potential :    13.0996324864     V
+ Site  672
+ Electrostatic Potential :   -6.28131764793     V
+ Site  673
+ Electrostatic Potential :   -7.28103328189     V
+ Site  674
+ Electrostatic Potential :   -1.88721285215     V
+ Site  675
+ Electrostatic Potential :    5.22544874546     V
+ Site  676
+ Electrostatic Potential :   -8.55424909037     V
+ Site  677
+ Electrostatic Potential :  -0.729344153052E-01 V
+ Site  678
+ Electrostatic Potential :   -4.75394255688     V
+ Site  679
+ Electrostatic Potential :   -6.65157955575     V
+ Site  680
+ Electrostatic Potential :   -15.4678911125     V
+ Site  681
+ Electrostatic Potential :   -2.53811174442     V
+ Site  682
+ Electrostatic Potential :   -2.99119771507     V
+ Site  683
+ Electrostatic Potential :   -15.4277312370     V
+ Site  684
+ Electrostatic Potential :    16.5191159936     V
+ Site  685
+ Electrostatic Potential :   -2.55875726109     V
+ Site  686
+ Electrostatic Potential :   -3.32556632848     V
+ Site  687
+ Electrostatic Potential :   0.237605831247     V
+ Site  688
+ Electrostatic Potential :   0.657941857874     V
+ Site  689
+ Electrostatic Potential :   -8.92619568468     V
+ Site  690
+ Electrostatic Potential :   -9.91616483976     V
+ Site  691
+ Electrostatic Potential :   -9.56898162021     V
+ Site  692
+ Electrostatic Potential :   -1.54261345391     V
+ Site  693
+ Electrostatic Potential :   -1.64552259519     V
+ Site  694
+ Electrostatic Potential :   -3.53015943439     V
+ Site  695
+ Electrostatic Potential :   -2.15216776849     V
+ Site  696
+ Electrostatic Potential :   -3.48028438908     V
+ Site  697
+ Electrostatic Potential :   -14.2538519223     V
+ Site  698
+ Electrostatic Potential :   -4.25618888960     V
+ Site  699
+ Electrostatic Potential :   -2.86224701717     V
+ Site  700
+ Electrostatic Potential :   0.716310179119     V
+ Site  701
+ Electrostatic Potential :   -3.28540233584     V
+ Site  702
+ Electrostatic Potential :    6.14217057029     V
+ Site  703
+ Electrostatic Potential :   -1.31173125600     V
+ Site  704
+ Electrostatic Potential :   -2.36317328929     V
+ Site  705
+ Electrostatic Potential :    9.44088249513     V
+ Site  706
+ Electrostatic Potential :   -2.85951893205     V
+ Site  707
+ Electrostatic Potential :    30.9956202998     V
+ Site  708
+ Electrostatic Potential :    4.51095524926     V
+ Site  709
+ Electrostatic Potential :   -1.99936544863     V
+ Site  710
+ Electrostatic Potential :    3.37255945576     V
+ Site  711
+ Electrostatic Potential :   -6.41093132556     V
+ Site  712
+ Electrostatic Potential :   -9.81146132509     V
+ Site  713
+ Electrostatic Potential :   -3.33277072597     V
+ Site  714
+ Electrostatic Potential :   0.451129375742     V
+ Site  715
+ Electrostatic Potential :    5.86823619030     V
+ Site  716
+ Electrostatic Potential :   -5.10537726076     V
+ Site  717
+ Electrostatic Potential :   -2.68646151776     V
+ Site  718
+ Electrostatic Potential :    3.27037100417     V
+ Site  719
+ Electrostatic Potential :   -4.04956622184     V
+ Site  720
+ Electrostatic Potential :  -0.209432807580     V
+ Site  721
+ Electrostatic Potential :   -1.17893954272     V
+ Site  722
+ Electrostatic Potential :    47.5420868974     V
+ Site  723
+ Electrostatic Potential :   -2.20048411841     V
+ Site  724
+ Electrostatic Potential :   -6.76801699503     V
+ Site  725
+ Electrostatic Potential :   -4.38983612706     V
+ Site  726
+ Electrostatic Potential :    1.72149950588     V
+ Site  727
+ Electrostatic Potential :    4.17302070934     V
+ Site  728
+ Electrostatic Potential :  -0.640803379768     V
+ Site  729
+ Electrostatic Potential :    43.1601053436     V
+ Site  730
+ Electrostatic Potential :   -3.32122321992     V
+ Site  731
+ Electrostatic Potential :   -11.9174047829     V
+ Site  732
+ Electrostatic Potential :   -5.77145092817     V
+ Site  733
+ Electrostatic Potential :   -2.77225898209     V
+ Site  734
+ Electrostatic Potential :   -3.36676602811     V
+ Site  735
+ Electrostatic Potential :    5.95780999257     V
+ Site  736
+ Electrostatic Potential :    2.05496472428     V
+ Site  737
+ Electrostatic Potential :    45.0576336935     V
+ Site  738
+ Electrostatic Potential :    5.74000275728     V
+ Site  739
+ Electrostatic Potential :    18.3703519183     V
+ Site  740
+ Electrostatic Potential :    2.64452660122     V
+ Site  741
+ Electrostatic Potential :   -2.11710493458     V
+ Site  742
+ Electrostatic Potential :   -2.39805032981     V
+ Site  743
+ Electrostatic Potential :   -2.48192957094     V
+ Site  744
+ Electrostatic Potential :   -4.09714730392     V
+ Site  745
+ Electrostatic Potential :   -1.18921310181     V
+ Site  746
+ Electrostatic Potential :   -7.61031083743     V
+ Site  747
+ Electrostatic Potential :   0.296311810202     V
+ Site  748
+ Electrostatic Potential :   -2.52606799013     V
+ Site  749
+ Electrostatic Potential :   0.548431595485     V
+ Site  750
+ Electrostatic Potential :   -9.46375375781     V
+ Site  751
+ Electrostatic Potential :   -3.03989218125     V
+ Site  752
+ Electrostatic Potential :    4.95555102404     V
+ Site  753
+ Electrostatic Potential :    4.79919928730     V
+ Site  754
+ Electrostatic Potential :   -2.43822331684     V
+ Site  755
+ Electrostatic Potential :   -4.74868761496     V
+ Site  756
+ Electrostatic Potential :   -3.88655324423     V
+ Site  757
+ Electrostatic Potential :   -1.34913501380     V
+ Site  758
+ Electrostatic Potential :   -1.77897573587     V
+ Site  759
+ Electrostatic Potential :  -0.611373397564     V
+ Site  760
+ Electrostatic Potential :   0.752476302251     V
+ Site  761
+ Electrostatic Potential :   -2.24772658341     V
+ Site  762
+ Electrostatic Potential :   -21.6119296779     V
+ Site  763
+ Electrostatic Potential :   -7.08936412867     V
+ Site  764
+ Electrostatic Potential :   -3.53767325881     V
+ Site  765
+ Electrostatic Potential :    5.60888496414     V
+ Site  766
+ Electrostatic Potential :  -0.802067565690     V
+ Site  767
+ Electrostatic Potential :   -7.24754769566     V
+ Site  768
+ Electrostatic Potential :   -2.17968744857     V
+ Site  769
+ Electrostatic Potential :   -12.5031346122     V
+ Site  770
+ Electrostatic Potential :   -2.67701430474     V
+ Site  771
+ Electrostatic Potential :    16.0932492844     V
+ Site  772
+ Electrostatic Potential :   -2.22967663138     V
+ Site  773
+ Electrostatic Potential :   -3.74432726465     V
+ Site  774
+ Electrostatic Potential :   -2.33575272346     V
+ Site  775
+ Electrostatic Potential :   -3.35248951095     V
+ Site  776
+ Electrostatic Potential :    11.5266515028     V
+ Site  777
+ Electrostatic Potential :   0.909796156063E-01 V
+ Site  778
+ Electrostatic Potential :   -1.77666693383     V
+ Site  779
+ Electrostatic Potential :   -2.56015398750     V
+ Site  780
+ Electrostatic Potential :   -2.44126807440     V
+ Site  781
+ Electrostatic Potential :   -5.44593028846     V
+ Site  782
+ Electrostatic Potential :    10.5852058562     V
+ Site  783
+ Electrostatic Potential :   -3.56281149727     V
+ Site  784
+ Electrostatic Potential :   -1.70705645247     V
+ Site  785
+ Electrostatic Potential :   -4.04849609794     V
+ Site  786
+ Electrostatic Potential :  -0.754269085547     V
+ Site  787
+ Electrostatic Potential :   -3.40428725480     V
+ Site  788
+ Electrostatic Potential :   -3.95097926442     V
+ Site  789
+ Electrostatic Potential :  -0.106198886496     V
+ Site  790
+ Electrostatic Potential :   -3.68304931849     V
+ Site  791
+ Electrostatic Potential :   -2.97750835164     V
+ Site  792
+ Electrostatic Potential :   -5.37076143956     V
+ Site  793
+ Electrostatic Potential :   -3.31205378613     V
+ Site  794
+ Electrostatic Potential :   0.247628700006     V
+ Site  795
+ Electrostatic Potential :   -2.87821346947     V
+ Site  796
+ Electrostatic Potential :   -11.2066472654     V
+ Site  797
+ Electrostatic Potential :   -1.20196478781     V
+ Site  798
+ Electrostatic Potential :   -3.01408816080     V
+ Site  799
+ Electrostatic Potential :   0.514676482751E-01 V
+ Site  800
+ Electrostatic Potential :   -3.50709825133     V
+n_pass = 800 n_fail = 8
+Number of sites = 800
+Number of surface point charges = 345
+Number of sinular values used for fitting = 223
+Mean absolute error of electrostatic potential for raw (formal) point charges =   11.03931 V.
+Mean absolute error of electrostatic potential for fitted point charges =    0.00000 V.
+ Read from file calcmad.in
+ Calculation lattice: 3D1
+ Calculation Method: Ewald     
+ Crystal Parameter:     9.7058    9.7339   12.2261
+ Angles:   113.2410  113.1967   90.3675
+Input file format: with atom names
+ a=     9.7058164     0.0000000     0.0000000
+ b=    -0.0624335     9.7336745     0.0000000
+ c=    -4.8157372    -4.8554128    10.1346860
+      No.      x             y             z         Charge
+ Atom  1:     0.0353015    -2.4273242     7.5634724  1.000
+ Atom  2:     4.7923443     7.3055860     2.5712136  1.000
+ Atom  3:    -0.0153817     2.4343631     2.5277266  3.000
+ Atom  4:     4.8430275     2.4438986     7.6069594  3.000
+ Atom  5:     1.5771656     4.5848726     5.9486082 -1.000
+ Atom  6:     2.1014004     5.7251257     0.8934291 -1.000
+ Atom  7:     6.4255132     4.5837425     4.1792005 -1.000
+ Atom  8:     7.5062810     8.8768982     0.8943793 -1.000
+ Atom  9:     3.2504801     0.2933892     4.1860778 -1.000
+ Atom 10:    -1.5978674     0.2945193     5.9554855 -1.000
+ Atom 11:    -2.6786352    -3.9986365     9.2403068 -1.000
+ Atom 12:     2.7262454    -0.8468639     9.2412569 -1.000
+ Minimum fund between   1 and  12
+ Minimum Distance:    3.54316168153293     
+ Core Atom List: 
+ Converge Standard:   1.000000000000000E-012
+ Ewald Alpha Optimized Estimate:   0.507548828125000     
+ Use new Ewald Alpha.
+ ---------------------Overall Madelung Constant-------------------
+ Electrostatic Energy:   -143.722206613196     
+ Madelung Constant:  -18.7138963651128     
+ ------------ Atom-Site Madelung Potential--------
+ --------------------Non-atom Madelung Potential--------------------
+ Site    1
+ Electrostatic Potential :  -0.688663314607     V
+ Site    2
+ Electrostatic Potential :   -3.47577544501     V
+ Site    3
+ Electrostatic Potential :   -10.0518267055     V
+ Site    4
+ Electrostatic Potential :   -5.71102248438     V
+ Site    5
+ Electrostatic Potential :   -1.71826806668     V
+ Site    6
+ Electrostatic Potential :    1.93829719275     V
+ Site    7
+ Electrostatic Potential :    5.54724970428     V
+ Site    8
+ Electrostatic Potential :   -2.63468080434     V
+ Site    9
+ Electrostatic Potential :   -7.69951958965     V
+ Site   10
+ Electrostatic Potential :   -1.04859814559     V
+ Site   11
+ Electrostatic Potential :   -1.33059758865     V
+ Site   12
+ Electrostatic Potential :   -5.96790226709     V
+ Site   13
+ Electrostatic Potential :    2.22570718719     V
+ Site   14
+ Electrostatic Potential :   -3.11264650742     V
+ Site   15
+ Electrostatic Potential :  -0.556011380369     V
+ Site   16
+ Electrostatic Potential :   -2.66347892190     V
+ Site   17
+ Electrostatic Potential :   -2.76507113631     V
+ Site   18
+ Electrostatic Potential :   0.731163664569     V
+ Site   19
+ Electrostatic Potential :   0.690701629332     V
+ Site   20
+ Electrostatic Potential :   0.248831343928     V
+ Site   21
+ Electrostatic Potential :   -4.14268538916     V
+ Site   22
+ Electrostatic Potential :   0.256847053232     V
+ Site   23
+ Electrostatic Potential :    1.16391571284     V
+ Site   24
+ Electrostatic Potential :   -2.91024304307     V
+ Site   25
+ Electrostatic Potential :    3.78966427928     V
+ Site   26
+ Electrostatic Potential :    22.5749254783     V
+ Site   27
+ Electrostatic Potential :   -2.53297299856     V
+ Site   28
+ Electrostatic Potential :   -2.83327297219     V
+ Site   29
+ Electrostatic Potential :   -7.46451924123     V
+ Site   30
+ Electrostatic Potential :   -3.69775626461     V
+ Site   31
+ Electrostatic Potential :   -1.90468809631     V
+ Site   32
+ Electrostatic Potential :  -0.761096031716     V
+ Site   33
+ Electrostatic Potential :   -3.59760268184     V
+ Site   34
+ Electrostatic Potential :   -3.63255045820     V
+ Site   35
+ Electrostatic Potential :   -1.34607936970     V
+ Site   36
+ Electrostatic Potential :   -3.83036691743     V
+ Site   37
+ Electrostatic Potential :   -2.98672352010     V
+ Site   38
+ Electrostatic Potential :   -6.94452186092     V
+ Site   39
+ Electrostatic Potential :   -5.13503821708     V
+ Site   40
+ Electrostatic Potential :   -2.85314835467     V
+ Site   41
+ Electrostatic Potential :   -4.09168633504     V
+ Site   42
+ Electrostatic Potential :  -0.874616332537     V
+ Site   43
+ Electrostatic Potential :   -12.4298209049     V
+ Site   44
+ Electrostatic Potential :   0.992175094536     V
+ Site   45
+ Electrostatic Potential :   -3.04425629489     V
+ Site   46
+ Electrostatic Potential :   -2.47786213015     V
+ Site   47
+ Electrostatic Potential :    1.59109435515     V
+ Site   48
+ Electrostatic Potential :  -0.251239530398E-01 V
+ Site   49
+ Electrostatic Potential :   -1.74878712595     V
+ Site   50
+ Electrostatic Potential :    3.10624638824     V
+ Site   51
+ Electrostatic Potential :   -4.53221234210     V
+ Site   52
+ Electrostatic Potential :   -13.9125137327     V
+ Site   53
+ Electrostatic Potential :   -4.42126550588     V
+ Site   54
+ Electrostatic Potential :   -3.70151351062     V
+ Site   55
+ Electrostatic Potential :   -4.17423499143     V
+ Site   56
+ Electrostatic Potential :   0.604861962937     V
+ Site   57
+ Electrostatic Potential :  -0.377027483035     V
+ Site   58
+ Electrostatic Potential :   -1.25823814550     V
+ Site   59
+ Electrostatic Potential :   -1.34353504597     V
+ Site   60
+ Electrostatic Potential :   -2.18311426826     V
+ Site   61
+ Electrostatic Potential :   -1.84090147695     V
+ Site   62
+ Electrostatic Potential :   0.326943617341     V
+ Site   63
+ Electrostatic Potential :   -16.5989944101     V
+ Site   64
+ Electrostatic Potential :    2.72730127358     V
+ Site   65
+ Electrostatic Potential :   -8.36333484751     V
+ Site   66
+ Electrostatic Potential :  -0.279515014007     V
+ Site   67
+ Electrostatic Potential :   -1.90375136503     V
+ Site   68
+ Electrostatic Potential :   -7.85603285508     V
+ Site   69
+ Electrostatic Potential :    7.76221343210     V
+ Site   70
+ Electrostatic Potential :    39.8637615944     V
+ Site   71
+ Electrostatic Potential :   -3.71774942197     V
+ Site   72
+ Electrostatic Potential :   -4.92896363573     V
+ Site   73
+ Electrostatic Potential :   -4.87795992576     V
+ Site   74
+ Electrostatic Potential :   -4.38912278198     V
+ Site   75
+ Electrostatic Potential :   -7.24870679635     V
+ Site   76
+ Electrostatic Potential :  -0.680242623262E-01 V
+ Site   77
+ Electrostatic Potential :    7.11905583296     V
+ Site   78
+ Electrostatic Potential :   -11.6080081173     V
+ Site   79
+ Electrostatic Potential :    6.42693053491     V
+ Site   80
+ Electrostatic Potential :   -3.59759767321     V
+ Site   81
+ Electrostatic Potential :   -2.51468226498     V
+ Site   82
+ Electrostatic Potential :    61.7990915904     V
+ Site   83
+ Electrostatic Potential :   -3.68971551801     V
+ Site   84
+ Electrostatic Potential :   -2.29545516173     V
+ Site   85
+ Electrostatic Potential :   -1.74601611081     V
+ Site   86
+ Electrostatic Potential :   -6.61980620920     V
+ Site   87
+ Electrostatic Potential :    1.13361621237     V
+ Site   88
+ Electrostatic Potential :   -3.05465959062     V
+ Site   89
+ Electrostatic Potential :   -4.30136507981     V
+ Site   90
+ Electrostatic Potential :   -4.85291556365     V
+ Site   91
+ Electrostatic Potential :    2.02580450913     V
+ Site   92
+ Electrostatic Potential :   -5.32248497656     V
+ Site   93
+ Electrostatic Potential :   -1.44881887336     V
+ Site   94
+ Electrostatic Potential :   -2.45433181785     V
+ Site   95
+ Electrostatic Potential :    36.4217919746     V
+ Site   96
+ Electrostatic Potential :   -4.42542938288     V
+ Site   97
+ Electrostatic Potential :    12.3990759091     V
+ Site   98
+ Electrostatic Potential :  -0.104324377041E-01 V
+ Site   99
+ Electrostatic Potential :   -2.10186386502     V
+ Site  100
+ Electrostatic Potential :   -2.69930849658     V
+ Site  101
+ Electrostatic Potential :   0.648652127175     V
+ Site  102
+ Electrostatic Potential :   -3.30757107924     V
+ Site  103
+ Electrostatic Potential :   -2.73812159622     V
+ Site  104
+ Electrostatic Potential :   -6.78305939069     V
+ Site  105
+ Electrostatic Potential :   -5.45508282805     V
+ Site  106
+ Electrostatic Potential :    13.7823074381     V
+ Site  107
+ Electrostatic Potential :    23.5201730760     V
+ Site  108
+ Electrostatic Potential :   -3.52463434835     V
+ Site  109
+ Electrostatic Potential :  -0.713395780283     V
+ Site  110
+ Electrostatic Potential :   -3.79241517892     V
+ Site  111
+ Electrostatic Potential :    1.77955271773     V
+ Site  112
+ Electrostatic Potential :   -3.96878664743     V
+ Site  113
+ Electrostatic Potential :  -0.911462885583     V
+ Site  114
+ Electrostatic Potential :  -0.785131676043E-01 V
+ Site  115
+ Electrostatic Potential :   -2.00296939526     V
+ Site  116
+ Electrostatic Potential :    8.87192981176     V
+ Site  117
+ Electrostatic Potential :   -4.14372424569     V
+ Site  118
+ Electrostatic Potential :   -3.00136121931     V
+ Site  119
+ Electrostatic Potential :   -4.07782053496     V
+ Site  120
+ Electrostatic Potential :   -3.88408553261     V
+ Site  121
+ Electrostatic Potential :    8.10118848937     V
+ Site  122
+ Electrostatic Potential :   -1.75960057785     V
+ Site  123
+ Electrostatic Potential :   -4.05486301247     V
+ Site  124
+ Electrostatic Potential :   0.226093346755     V
+ Site  125
+ Electrostatic Potential :  -0.799776998502     V
+ Site  126
+ Electrostatic Potential :    4.18927661899     V
+ Site  127
+ Electrostatic Potential :    21.4980551404     V
+ Site  128
+ Electrostatic Potential :   -5.27357154650     V
+ Site  129
+ Electrostatic Potential :    63.3546524892     V
+ Site  130
+ Electrostatic Potential :   0.744292322885E-02 V
+ Site  131
+ Electrostatic Potential :   -3.92401472725     V
+ Site  132
+ Electrostatic Potential :   -5.97933341147     V
+ Site  133
+ Electrostatic Potential :  -0.529558394741     V
+ Site  134
+ Electrostatic Potential :   -4.35385708501     V
+ Site  135
+ Electrostatic Potential :   -1.19855728130     V
+ Site  136
+ Electrostatic Potential :    9.99176529456     V
+ Site  137
+ Electrostatic Potential :  -0.795383380056     V
+ Site  138
+ Electrostatic Potential :    1.55507445963     V
+ Site  139
+ Electrostatic Potential :  -0.962746226608     V
+ Site  140
+ Electrostatic Potential :   -4.84702033878     V
+ Site  141
+ Electrostatic Potential :   -4.42119414330     V
+ Site  142
+ Electrostatic Potential :  -0.140291513642     V
+ Site  143
+ Electrostatic Potential :   -2.44861718663     V
+ Site  144
+ Electrostatic Potential :   -9.04750189168     V
+ Site  145
+ Electrostatic Potential :   -3.10869144411     V
+ Site  146
+ Electrostatic Potential :   -3.71308302587     V
+ Site  147
+ Electrostatic Potential :   -1.70815116167     V
+ Site  148
+ Electrostatic Potential :   -3.71076649139     V
+ Site  149
+ Electrostatic Potential :   -5.73064625713     V
+ Site  150
+ Electrostatic Potential :    8.99566839399     V
+ Site  151
+ Electrostatic Potential :   -5.12142309884     V
+ Site  152
+ Electrostatic Potential :   -1.29393463206     V
+ Site  153
+ Electrostatic Potential :   -55.7324297290     V
+ Site  154
+ Electrostatic Potential :    1.33111379820     V
+ Site  155
+ Electrostatic Potential :   -4.12200067711     V
+ Site  156
+ Electrostatic Potential :    8.67557480167     V
+ Site  157
+ Electrostatic Potential :    3.29312050369     V
+ Site  158
+ Electrostatic Potential :   -3.85448486236     V
+ Site  159
+ Electrostatic Potential :   -3.35814030304     V
+ Site  160
+ Electrostatic Potential :   0.935852127511     V
+ Site  161
+ Electrostatic Potential :   -2.55253586266     V
+ Site  162
+ Electrostatic Potential :   -5.03508509392     V
+ Site  163
+ Electrostatic Potential :   -1.90651176529     V
+ Site  164
+ Electrostatic Potential :    3.61322063901     V
+ Site  165
+ Electrostatic Potential :   -5.13000397019     V
+ Site  166
+ Electrostatic Potential :   -4.41175106942     V
+ Site  167
+ Electrostatic Potential :   -3.75591192015     V
+ Site  168
+ Electrostatic Potential :  -0.157757098840     V
+ Site  169
+ Electrostatic Potential :   -3.72073675257     V
+ Site  170
+ Electrostatic Potential :   -4.89525062144     V
+ Site  171
+ Electrostatic Potential :   -6.77454353153     V
+ Site  172
+ Electrostatic Potential :    3.42902660792     V
+ Site  173
+ Electrostatic Potential :    12.2898916708     V
+ Site  174
+ Electrostatic Potential :  -0.919687503754     V
+ Site  175
+ Electrostatic Potential :   -1.74382978144     V
+ Site  176
+ Electrostatic Potential :   -4.28857579808     V
+ Site  177
+ Electrostatic Potential :   -6.62328780016     V
+ Site  178
+ Electrostatic Potential :   -4.18175756882     V
+ Site  179
+ Electrostatic Potential :   -3.02325475626     V
+ Site  180
+ Electrostatic Potential :    11.5429518188     V
+ Site  181
+ Electrostatic Potential :   -6.56245223182     V
+ Site  182
+ Electrostatic Potential :  -0.298057198831     V
+ Site  183
+ Electrostatic Potential :   -6.46394428411     V
+ Site  184
+ Electrostatic Potential :   -4.05698934153     V
+ Site  185
+ Electrostatic Potential :    1.07391359327     V
+ Site  186
+ Electrostatic Potential :  -0.695784952518E-01 V
+ Site  187
+ Electrostatic Potential :    3.85507137830     V
+ Site  188
+ Electrostatic Potential :   -3.24158813965     V
+ Site  189
+ Electrostatic Potential :    1.96743428366     V
+ Site  190
+ Electrostatic Potential :   -3.28805077765     V
+ Site  191
+ Electrostatic Potential :   -2.17856331041     V
+ Site  192
+ Electrostatic Potential :  -0.546673958563     V
+ Site  193
+ Electrostatic Potential :   -3.42499212324     V
+ Site  194
+ Electrostatic Potential :    12.6141499751     V
+ Site  195
+ Electrostatic Potential :    2.85586880559     V
+ Site  196
+ Electrostatic Potential :   -3.93366794453     V
+ Site  197
+ Electrostatic Potential :   -2.13013578749     V
+ Site  198
+ Electrostatic Potential :    6.88086465006     V
+ Site  199
+ Electrostatic Potential :   -30.1685028627     V
+ Site  200
+ Electrostatic Potential :   -1.54209703910     V
+ Site  201
+ Electrostatic Potential :   -18.1422772229     V
+ Site  202
+ Electrostatic Potential :   -2.05157519875     V
+ Site  203
+ Electrostatic Potential :   -5.45846708639     V
+ Site  204
+ Electrostatic Potential :   -12.3698781365     V
+ Site  205
+ Electrostatic Potential :   -4.07568146543     V
+ Site  206
+ Electrostatic Potential :    5.47745396188     V
+ Site  207
+ Electrostatic Potential :   -4.68829737872     V
+ Site  208
+ Electrostatic Potential :    15.4664166562     V
+ Site  209
+ Electrostatic Potential :   -3.16810576615     V
+ Site  210
+ Electrostatic Potential :    4.50449405044     V
+ Site  211
+ Electrostatic Potential :    5.14069539090     V
+ Site  212
+ Electrostatic Potential :   -2.51358915440     V
+ Site  213
+ Electrostatic Potential :   -3.13771046692     V
+ Site  214
+ Electrostatic Potential :   -5.87106887294     V
+ Site  215
+ Electrostatic Potential :   -13.9631481893     V
+ Site  216
+ Electrostatic Potential :    26.6606860490     V
+ Site  217
+ Electrostatic Potential :   -4.86020941486     V
+ Site  218
+ Electrostatic Potential :   0.737849527699     V
+ Site  219
+ Electrostatic Potential :   -3.73532275044     V
+ Site  220
+ Electrostatic Potential :  -0.737168845006     V
+ Site  221
+ Electrostatic Potential :   -23.6250780520     V
+ Site  222
+ Electrostatic Potential :   -8.07701442763     V
+ Site  223
+ Electrostatic Potential :   -4.72343432694     V
+ Site  224
+ Electrostatic Potential :   -7.15344262077     V
+ Site  225
+ Electrostatic Potential :   -13.2204520513     V
+ Site  226
+ Electrostatic Potential :   -2.89261387855     V
+ Site  227
+ Electrostatic Potential :   -3.79398514711     V
+ Site  228
+ Electrostatic Potential :   -4.27285861223     V
+ Site  229
+ Electrostatic Potential :   -4.16311862144     V
+ Site  230
+ Electrostatic Potential :   -2.61729934116     V
+ Site  231
+ Electrostatic Potential :   -3.21228365906     V
+ Site  232
+ Electrostatic Potential :   -3.63150539990     V
+ Site  233
+ Electrostatic Potential :    18.9834560663     V
+ Site  234
+ Electrostatic Potential :   -2.53583216579     V
+ Site  235
+ Electrostatic Potential :   -1.15564479658     V
+ Site  236
+ Electrostatic Potential :   -5.01160362154     V
+ Site  237
+ Electrostatic Potential :    8.20382482082     V
+ Site  238
+ Electrostatic Potential :   -1.48315482912     V
+ Site  239
+ Electrostatic Potential :   -2.46846715274     V
+ Site  240
+ Electrostatic Potential :  -0.466229837795     V
+ Site  241
+ Electrostatic Potential :   -2.79953475307     V
+ Site  242
+ Electrostatic Potential :   -3.64901665585     V
+ Site  243
+ Electrostatic Potential :    6.27412288927     V
+ Site  244
+ Electrostatic Potential :   -2.96169338446     V
+ Site  245
+ Electrostatic Potential :    14.0565169386     V
+ Site  246
+ Electrostatic Potential :   -2.18410066847     V
+ Site  247
+ Electrostatic Potential :   -2.43321142366     V
+ Site  248
+ Electrostatic Potential :    7.80439135566     V
+ Site  249
+ Electrostatic Potential :   -3.96806465488     V
+ Site  250
+ Electrostatic Potential :   -3.86317382061     V
+ Site  251
+ Electrostatic Potential :   -1.09509051118     V
+ Site  252
+ Electrostatic Potential :   0.542158664032     V
+ Site  253
+ Electrostatic Potential :    1.84454941871     V
+ Site  254
+ Electrostatic Potential :    10.3462456150     V
+ Site  255
+ Electrostatic Potential :    1.80172828125     V
+ Site  256
+ Electrostatic Potential :   -2.25450210935     V
+ Site  257
+ Electrostatic Potential :    6.60688869140     V
+ Site  258
+ Electrostatic Potential :   0.985596740138     V
+ Site  259
+ Electrostatic Potential :   -3.37142309048     V
+ Site  260
+ Electrostatic Potential :    11.9057267135     V
+ Site  261
+ Electrostatic Potential :   -2.03048417098     V
+ Site  262
+ Electrostatic Potential :   -2.57268671684     V
+ Site  263
+ Electrostatic Potential :   -11.3666963353     V
+ Site  264
+ Electrostatic Potential :   -2.81039331328     V
+ Site  265
+ Electrostatic Potential :   -8.15305619899     V
+ Site  266
+ Electrostatic Potential :    37.9355521808     V
+ Site  267
+ Electrostatic Potential :   -7.04671302718     V
+ Site  268
+ Electrostatic Potential :   -13.6224138468     V
+ Site  269
+ Electrostatic Potential :   -1.44987026071     V
+ Site  270
+ Electrostatic Potential :   -3.32890135296     V
+ Site  271
+ Electrostatic Potential :   -3.86281561630     V
+ Site  272
+ Electrostatic Potential :    15.3047471991     V
+ Site  273
+ Electrostatic Potential :   -6.36330234744     V
+ Site  274
+ Electrostatic Potential :    8.15999537370     V
+ Site  275
+ Electrostatic Potential :   -1.58918540356     V
+ Site  276
+ Electrostatic Potential :   -3.28701462839     V
+ Site  277
+ Electrostatic Potential :    32.3590010141     V
+ Site  278
+ Electrostatic Potential :    3.97629180444     V
+ Site  279
+ Electrostatic Potential :   -6.35826594635     V
+ Site  280
+ Electrostatic Potential :   -3.20630119891     V
+ Site  281
+ Electrostatic Potential :   -1.36369082048     V
+ Site  282
+ Electrostatic Potential :   -9.26845028571     V
+ Site  283
+ Electrostatic Potential :   -2.87197783857     V
+ Site  284
+ Electrostatic Potential :   -6.41543661147     V
+ Site  285
+ Electrostatic Potential :   0.504705614490     V
+ Site  286
+ Electrostatic Potential :   -2.28716597821     V
+ Site  287
+ Electrostatic Potential :   -2.72507363142     V
+ Site  288
+ Electrostatic Potential :   0.391961680506     V
+ Site  289
+ Electrostatic Potential :    3.52220564658     V
+ Site  290
+ Electrostatic Potential :   0.810134126181     V
+ Site  291
+ Electrostatic Potential :   -2.92946777735     V
+ Site  292
+ Electrostatic Potential :   -2.59180376608     V
+ Site  293
+ Electrostatic Potential :   -1.75091727353     V
+ Site  294
+ Electrostatic Potential :  -0.573852862795     V
+ Site  295
+ Electrostatic Potential :    23.2303600711     V
+ Site  296
+ Electrostatic Potential :   -5.45329865871     V
+ Site  297
+ Electrostatic Potential :   0.367471595496     V
+ Site  298
+ Electrostatic Potential :    21.5569625352     V
+ Site  299
+ Electrostatic Potential :   -7.08204811996     V
+ Site  300
+ Electrostatic Potential :    1.72216850025     V
+ Site  301
+ Electrostatic Potential :  -0.165444506193     V
+ Site  302
+ Electrostatic Potential :   -4.09789708714     V
+ Site  303
+ Electrostatic Potential :   -2.42833271663     V
+ Site  304
+ Electrostatic Potential :   -4.59999819410     V
+ Site  305
+ Electrostatic Potential :   -4.06457135635     V
+ Site  306
+ Electrostatic Potential :   -4.19865034888     V
+ Site  307
+ Electrostatic Potential :   -2.57852697667     V
+ Site  308
+ Electrostatic Potential :    12.3122286796     V
+ Site  309
+ Electrostatic Potential :    10.1021068255     V
+ Site  310
+ Electrostatic Potential :   0.494365117083     V
+ Site  311
+ Electrostatic Potential :   -4.65501074558     V
+ Site  312
+ Electrostatic Potential :   -3.73727308960     V
+ Site  313
+ Electrostatic Potential :   -3.26890370708     V
+ Site  314
+ Electrostatic Potential :   0.212271542707     V
+ Site  315
+ Electrostatic Potential :   -3.93412610467     V
+ Site  316
+ Electrostatic Potential :   -4.47057591130     V
+ Site  317
+ Electrostatic Potential :   0.376525917695     V
+ Site  318
+ Electrostatic Potential :   -2.17107193261     V
+ Site  319
+ Electrostatic Potential :  -0.956024972480     V
+ Site  320
+ Electrostatic Potential :    4.46493000891     V
+ Site  321
+ Electrostatic Potential :   -1.79466396402     V
+ Site  322
+ Electrostatic Potential :   -7.50609911344     V
+ Site  323
+ Electrostatic Potential :   -2.99035376443     V
+ Site  324
+ Electrostatic Potential :    1.68872531485     V
+ Site  325
+ Electrostatic Potential :   -9.42469399533     V
+ Site  326
+ Electrostatic Potential :   -6.08992139068     V
+ Site  327
+ Electrostatic Potential :   -2.75426707892     V
+ Site  328
+ Electrostatic Potential :  -0.635408206763     V
+ Site  329
+ Electrostatic Potential :    1.82245219152     V
+ Site  330
+ Electrostatic Potential :   0.529919460340E-01 V
+ Site  331
+ Electrostatic Potential :    14.0687590272     V
+ Site  332
+ Electrostatic Potential :    35.3309069584     V
+ Site  333
+ Electrostatic Potential :   -1.45313235352     V
+ Site  334
+ Electrostatic Potential :   -10.0076730727     V
+ Site  335
+ Electrostatic Potential :    4.14801572604     V
+ Site  336
+ Electrostatic Potential :   -11.1099178113     V
+ Site  337
+ Electrostatic Potential :   -7.55127438872     V
+ Site  338
+ Electrostatic Potential :    12.3319622355     V
+ Site  339
+ Electrostatic Potential :   0.546708366600     V
+ Site  340
+ Electrostatic Potential :   -4.84651533534     V
+ Site  341
+ Electrostatic Potential :    6.71008174488     V
+ Site  342
+ Electrostatic Potential :   -2.69782461224     V
+ Site  343
+ Electrostatic Potential :   -3.00642580299     V
+ Site  344
+ Electrostatic Potential :   -14.6449878003     V
+ Site  345
+ Electrostatic Potential :   -10.7183971198     V
+ Site  346
+ Electrostatic Potential :   -3.18050418079     V
+ Site  347
+ Electrostatic Potential :   -4.40905821413     V
+ Site  348
+ Electrostatic Potential :    42.2339427307     V
+ Site  349
+ Electrostatic Potential :   -2.62459944853     V
+ Site  350
+ Electrostatic Potential :   -2.71304405709     V
+ Site  351
+ Electrostatic Potential :   -3.22901680918     V
+ Site  352
+ Electrostatic Potential :   -8.04686041401     V
+ Site  353
+ Electrostatic Potential :   -3.06435164482     V
+ Site  354
+ Electrostatic Potential :   -3.67909822922     V
+ Site  355
+ Electrostatic Potential :   -80.9552285551     V
+ Site  356
+ Electrostatic Potential :   -1.77431913006     V
+ Site  357
+ Electrostatic Potential :   -3.15667589603     V
+ Site  358
+ Electrostatic Potential :   -2.62686338478     V
+ Site  359
+ Electrostatic Potential :   -2.88831950144     V
+ Site  360
+ Electrostatic Potential :   -4.89031562033     V
+ Site  361
+ Electrostatic Potential :   -5.88925764252     V
+ Site  362
+ Electrostatic Potential :   -2.11229486483     V
+ Site  363
+ Electrostatic Potential :    4.83627512704     V
+ Site  364
+ Electrostatic Potential :   -3.35939722203     V
+ Site  365
+ Electrostatic Potential :   -2.51730047127     V
+ Site  366
+ Electrostatic Potential :   -3.63907561016     V
+ Site  367
+ Electrostatic Potential :   -7.06618184681     V
+ Site  368
+ Electrostatic Potential :    2.08955813338     V
+ Site  369
+ Electrostatic Potential :    16.4108146498     V
+ Site  370
+ Electrostatic Potential :   -3.20243193733     V
+ Site  371
+ Electrostatic Potential :   -2.99108280006     V
+ Site  372
+ Electrostatic Potential :   -6.33743582636     V
+ Site  373
+ Electrostatic Potential :  -0.554014791567     V
+ Site  374
+ Electrostatic Potential :    11.5593999803     V
+ Site  375
+ Electrostatic Potential :   -3.19031570972     V
+ Site  376
+ Electrostatic Potential :   -3.73695302798     V
+ Site  377
+ Electrostatic Potential :   -3.35441249530     V
+ Site  378
+ Electrostatic Potential :   -4.10640868123     V
+ Site  379
+ Electrostatic Potential :   -28.6384654739     V
+ Site  380
+ Electrostatic Potential :   -2.36208009864     V
+ Site  381
+ Electrostatic Potential :   -3.04446352773     V
+ Site  382
+ Electrostatic Potential :   -4.13385889353     V
+ Site  383
+ Electrostatic Potential :   -4.45005785696     V
+ Site  384
+ Electrostatic Potential :  -0.828502263871     V
+ Site  385
+ Electrostatic Potential :   -6.44732274755     V
+ Site  386
+ Electrostatic Potential :  -0.710737961304     V
+ Site  387
+ Electrostatic Potential :  -0.128391683512     V
+ Site  388
+ Electrostatic Potential :   0.469971146666     V
+ Site  389
+ Electrostatic Potential :   -3.40026369850     V
+ Site  390
+ Electrostatic Potential :   -1.06176203423     V
+ Site  391
+ Electrostatic Potential :    6.49023382121     V
+ Site  392
+ Electrostatic Potential :   -4.98882072221     V
+ Site  393
+ Electrostatic Potential :  -0.560572829754     V
+ Site  394
+ Electrostatic Potential :   -1.16441768397     V
+ Site  395
+ Electrostatic Potential :   -3.26004326238     V
+ Site  396
+ Electrostatic Potential :   -5.59509072057     V
+ Site  397
+ Electrostatic Potential :   0.298717090140     V
+ Site  398
+ Electrostatic Potential :   -10.5814649326     V
+ Site  399
+ Electrostatic Potential :   -1.92821341030     V
+ Site  400
+ Electrostatic Potential :   -5.69153529677     V
+ Site  401
+ Electrostatic Potential :   -3.95507857611     V
+ Site  402
+ Electrostatic Potential :   -3.13696345456     V
+ Site  403
+ Electrostatic Potential :   -4.28080709524     V
+ Site  404
+ Electrostatic Potential :    9.85425703274     V
+ Site  405
+ Electrostatic Potential :   -3.34891218293     V
+ Site  406
+ Electrostatic Potential :    13.6735604001     V
+ Site  407
+ Electrostatic Potential :    1.31060959390     V
+ Site  408
+ Electrostatic Potential :    7.05568145372     V
+ Site  409
+ Electrostatic Potential :    5.19074772212     V
+ Site  410
+ Electrostatic Potential :   -4.26241756980     V
+ Site  411
+ Electrostatic Potential :    3.60112904947     V
+ Site  412
+ Electrostatic Potential :   -2.62506649444     V
+ Site  413
+ Electrostatic Potential :   0.408885731039     V
+ Site  414
+ Electrostatic Potential :   -1.23235405407     V
+ Site  415
+ Electrostatic Potential :    20.3520154631     V
+ Site  416
+ Electrostatic Potential :   -4.06073207702     V
+ Site  417
+ Electrostatic Potential :   -15.7054885972     V
+ Site  418
+ Electrostatic Potential :   -2.30356901738     V
+ Site  419
+ Electrostatic Potential :    3.90294466000     V
+ Site  420
+ Electrostatic Potential :   -12.5093456041     V
+ Site  421
+ Electrostatic Potential :   -3.62753543165     V
+ Site  422
+ Electrostatic Potential :   -2.56181774833     V
+ Site  423
+ Electrostatic Potential :   -1.61025636792     V
+ Site  424
+ Electrostatic Potential :   -2.89763893075     V
+ Site  425
+ Electrostatic Potential :   -1.78975614611     V
+ Site  426
+ Electrostatic Potential :   -1.86383854721     V
+ Site  427
+ Electrostatic Potential :    11.3081088155     V
+ Site  428
+ Electrostatic Potential :   -4.53249147016     V
+ Site  429
+ Electrostatic Potential :   -3.33054661002     V
+ Site  430
+ Electrostatic Potential :   -13.3449335585     V
+ Site  431
+ Electrostatic Potential :    2.64475590820     V
+ Site  432
+ Electrostatic Potential :   -3.84439613157     V
+ Site  433
+ Electrostatic Potential :    10.7708573501     V
+ Site  434
+ Electrostatic Potential :    9.29850177170     V
+ Site  435
+ Electrostatic Potential :   -3.61209505144     V
+ Site  436
+ Electrostatic Potential :   -3.94051943008     V
+ Site  437
+ Electrostatic Potential :  -0.851767469957     V
+ Site  438
+ Electrostatic Potential :  -0.909002199918     V
+ Site  439
+ Electrostatic Potential :   -1.80182176479     V
+ Site  440
+ Electrostatic Potential :    90.2541765511     V
+ Site  441
+ Electrostatic Potential :   -1.77205695546     V
+ Site  442
+ Electrostatic Potential :   -2.66213242898     V
+ Site  443
+ Electrostatic Potential :    2.21298166089     V
+ Site  444
+ Electrostatic Potential :    15.9231911245     V
+ Site  445
+ Electrostatic Potential :   -2.77276633119     V
+ Site  446
+ Electrostatic Potential :    21.0003883437     V
+ Site  447
+ Electrostatic Potential :   -3.50673465989     V
+ Site  448
+ Electrostatic Potential :    4.78727901751     V
+ Site  449
+ Electrostatic Potential :    34.9589068255     V
+ Site  450
+ Electrostatic Potential :   -3.23502371920     V
+ Site  451
+ Electrostatic Potential :   -2.75827524173     V
+ Site  452
+ Electrostatic Potential :   -2.38904835634     V
+ Site  453
+ Electrostatic Potential :   -3.63411971767     V
+ Site  454
+ Electrostatic Potential :  -0.334265012907     V
+ Site  455
+ Electrostatic Potential :   -3.78745756688     V
+ Site  456
+ Electrostatic Potential :   0.429491373670     V
+ Site  457
+ Electrostatic Potential :    1.58514235561     V
+ Site  458
+ Electrostatic Potential :   -18.2499543591     V
+ Site  459
+ Electrostatic Potential :   -1.25309105354     V
+ Site  460
+ Electrostatic Potential :    4.08646824999     V
+ Site  461
+ Electrostatic Potential :   -1.55521398877     V
+ Site  462
+ Electrostatic Potential :    1.49208412478     V
+ Site  463
+ Electrostatic Potential :    4.41723571507     V
+ Site  464
+ Electrostatic Potential :   -4.67286540178     V
+ Site  465
+ Electrostatic Potential :   -4.64505123902     V
+ Site  466
+ Electrostatic Potential :    15.4153766939     V
+ Site  467
+ Electrostatic Potential :  -0.662278089996     V
+ Site  468
+ Electrostatic Potential :   -7.95948833590     V
+ Site  469
+ Electrostatic Potential :   -3.25338401347     V
+ Site  470
+ Electrostatic Potential :   -4.16540057924     V
+ Site  471
+ Electrostatic Potential :   -3.09323858945     V
+ Site  472
+ Electrostatic Potential :  -0.188984940865     V
+ Site  473
+ Electrostatic Potential :    13.2133190762     V
+ Site  474
+ Electrostatic Potential :   -2.99806984952     V
+ Site  475
+ Electrostatic Potential :    6.48881303017     V
+ Site  476
+ Electrostatic Potential :   -3.35242886044     V
+ Site  477
+ Electrostatic Potential :   -2.53153453067     V
+ Site  478
+ Electrostatic Potential :   -3.34599189113     V
+ Site  479
+ Electrostatic Potential :   -1.65808318011     V
+ Site  480
+ Electrostatic Potential :   -2.33993954444     V
+ Site  481
+ Electrostatic Potential :  -0.147479806622     V
+ Site  482
+ Electrostatic Potential :   -4.04357603334     V
+ Site  483
+ Electrostatic Potential :    4.14361591465     V
+ Site  484
+ Electrostatic Potential :   -4.19894713153     V
+ Site  485
+ Electrostatic Potential :   -19.2114735143     V
+ Site  486
+ Electrostatic Potential :   -3.10604753257     V
+ Site  487
+ Electrostatic Potential :    24.6332660418     V
+ Site  488
+ Electrostatic Potential :    59.1009855243     V
+ Site  489
+ Electrostatic Potential :   -1.68850706870     V
+ Site  490
+ Electrostatic Potential :   -4.19394898137     V
+ Site  491
+ Electrostatic Potential :   -26.6503081181     V
+ Site  492
+ Electrostatic Potential :  -0.532530900122     V
+ Site  493
+ Electrostatic Potential :   -11.5416737163     V
+ Site  494
+ Electrostatic Potential :   -5.35601060255     V
+ Site  495
+ Electrostatic Potential :   -1.00560079138     V
+ Site  496
+ Electrostatic Potential :   -1.72901395358     V
+ Site  497
+ Electrostatic Potential :    19.1353560768     V
+ Site  498
+ Electrostatic Potential :   -1.21278492264     V
+ Site  499
+ Electrostatic Potential :   -10.7348002940     V
+ Site  500
+ Electrostatic Potential :    55.8628289713     V
+ Site  501
+ Electrostatic Potential :  -0.294585465522     V
+ Site  502
+ Electrostatic Potential :   -8.93795254985     V
+ Site  503
+ Electrostatic Potential :   -3.45925559775     V
+ Site  504
+ Electrostatic Potential :  -0.655407770674     V
+ Site  505
+ Electrostatic Potential :    1.52965798398     V
+ Site  506
+ Electrostatic Potential :   -3.30668996894     V
+ Site  507
+ Electrostatic Potential :    4.76986947972     V
+ Site  508
+ Electrostatic Potential :    18.2776487325     V
+ Site  509
+ Electrostatic Potential :    4.34440448946     V
+ Site  510
+ Electrostatic Potential :    5.41522907504     V
+ Site  511
+ Electrostatic Potential :   0.810170641446     V
+ Site  512
+ Electrostatic Potential :    4.34561027346     V
+ Site  513
+ Electrostatic Potential :    70.1172316852     V
+ Site  514
+ Electrostatic Potential :    4.98082927525     V
+ Site  515
+ Electrostatic Potential :   -2.30227940656     V
+ Site  516
+ Electrostatic Potential :    29.3461692965     V
+ Site  517
+ Electrostatic Potential :   -8.10802225083     V
+ Site  518
+ Electrostatic Potential :   -12.9032209630     V
+ Site  519
+ Electrostatic Potential :   -3.57717338896     V
+ Site  520
+ Electrostatic Potential :   -2.31497394792     V
+ Site  521
+ Electrostatic Potential :    3.50463571814     V
+ Site  522
+ Electrostatic Potential :    7.85153512121     V
+ Site  523
+ Electrostatic Potential :   -4.89571421325     V
+ Site  524
+ Electrostatic Potential :   -5.80679716414     V
+ Site  525
+ Electrostatic Potential :   -2.48190686354     V
+ Site  526
+ Electrostatic Potential :  -0.693188841838     V
+ Site  527
+ Electrostatic Potential :   -16.4485882392     V
+ Site  528
+ Electrostatic Potential :   -3.00724053848     V
+ Site  529
+ Electrostatic Potential :   -1.97613846925     V
+ Site  530
+ Electrostatic Potential :    7.62104756907     V
+ Site  531
+ Electrostatic Potential :   -2.96718539300     V
+ Site  532
+ Electrostatic Potential :   -1.90701288095     V
+ Site  533
+ Electrostatic Potential :   -4.31318916248     V
+ Site  534
+ Electrostatic Potential :   -3.67463504947     V
+ Site  535
+ Electrostatic Potential :    5.16136156592     V
+ Site  536
+ Electrostatic Potential :    7.59141854583     V
+ Site  537
+ Electrostatic Potential :   -3.28210112987     V
+ Site  538
+ Electrostatic Potential :   -3.33376444762     V
+ Site  539
+ Electrostatic Potential :   -3.22297038660     V
+ Site  540
+ Electrostatic Potential :   -1.25823265274     V
+ Site  541
+ Electrostatic Potential :    15.5308117007     V
+ Site  542
+ Electrostatic Potential :   -3.62172945458     V
+ Site  543
+ Electrostatic Potential :   -10.6168072848     V
+ Site  544
+ Electrostatic Potential :  -0.364525877131     V
+ Site  545
+ Electrostatic Potential :   -5.12572974075     V
+ Site  546
+ Electrostatic Potential :   0.253106334777     V
+ Site  547
+ Electrostatic Potential :  -0.960019471019     V
+ Site  548
+ Electrostatic Potential :   -2.47556187768     V
+ Site  549
+ Electrostatic Potential :    11.9328928675     V
+ Site  550
+ Electrostatic Potential :   -12.8982441815     V
+ Site  551
+ Electrostatic Potential :   -3.00961793575     V
+ Site  552
+ Electrostatic Potential :    15.7380758988     V
+ Site  553
+ Electrostatic Potential :   -4.09094162227     V
+ Site  554
+ Electrostatic Potential :   -1.39431839353     V
+ Site  555
+ Electrostatic Potential :   -3.97494834953     V
+ Site  556
+ Electrostatic Potential :    20.1434781505     V
+ Site  557
+ Electrostatic Potential :   -2.46291153965     V
+ Site  558
+ Electrostatic Potential :    16.0427784287     V
+ Site  559
+ Electrostatic Potential :   -21.1570647634     V
+ Site  560
+ Electrostatic Potential :    13.4829850999     V
+ Site  561
+ Electrostatic Potential :    11.6716193332     V
+ Site  562
+ Electrostatic Potential :    28.5750025065     V
+ Site  563
+ Electrostatic Potential :   -2.98045685286     V
+ Site  564
+ Electrostatic Potential :   -7.12931296792     V
+ Site  565
+ Electrostatic Potential :   -1.58328316355     V
+ Site  566
+ Electrostatic Potential :    17.0358505864     V
+ Site  567
+ Electrostatic Potential :   -2.94483476670     V
+ Site  568
+ Electrostatic Potential :    6.44670393719     V
+ Site  569
+ Electrostatic Potential :    6.38251468455     V
+ Site  570
+ Electrostatic Potential :  -0.379894131605     V
+ Site  571
+ Electrostatic Potential :   -5.09901356802     V
+ Site  572
+ Electrostatic Potential :   -3.43780657102     V
+ Site  573
+ Electrostatic Potential :   -2.95550121398     V
+ Site  574
+ Electrostatic Potential :   -2.33263832126     V
+ Site  575
+ Electrostatic Potential :    3.90324869809     V
+ Site  576
+ Electrostatic Potential :   -2.04421316678     V
+ Site  577
+ Electrostatic Potential :    5.31905428329     V
+ Site  578
+ Electrostatic Potential :    1.40178183637     V
+ Site  579
+ Electrostatic Potential :   -14.2216972858     V
+ Site  580
+ Electrostatic Potential :   -3.30183733941     V
+ Site  581
+ Electrostatic Potential :   -1.41996987039     V
+ Site  582
+ Electrostatic Potential :    5.58534939777     V
+ Site  583
+ Electrostatic Potential :   -2.01562607222     V
+ Site  584
+ Electrostatic Potential :   -1.86959567195     V
+ Site  585
+ Electrostatic Potential :   -3.26671777100     V
+ Site  586
+ Electrostatic Potential :   -1.72148579488     V
+ Site  587
+ Electrostatic Potential :   -4.98116781725     V
+ Site  588
+ Electrostatic Potential :   -3.82725721610     V
+ Site  589
+ Electrostatic Potential :    9.75350747229     V
+ Site  590
+ Electrostatic Potential :    9.65553909729     V
+ Site  591
+ Electrostatic Potential :    14.8539921280     V
+ Site  592
+ Electrostatic Potential :    28.8847391397     V
+ Site  593
+ Electrostatic Potential :    10.0343792678     V
+ Site  594
+ Electrostatic Potential :    14.3165705953     V
+ Site  595
+ Electrostatic Potential :   -1.21713489377     V
+ Site  596
+ Electrostatic Potential :   -2.45635873974     V
+ Site  597
+ Electrostatic Potential :    102.221196727     V
+ Site  598
+ Electrostatic Potential :   -3.54958947597     V
+ Site  599
+ Electrostatic Potential :    3.18321475516     V
+ Site  600
+ Electrostatic Potential :   -12.4788124164     V
+ Site  601
+ Electrostatic Potential :  -0.285430473480     V
+ Site  602
+ Electrostatic Potential :    1.11345158347     V
+ Site  603
+ Electrostatic Potential :   -3.00496597084     V
+ Site  604
+ Electrostatic Potential :   -1.70783310882     V
+ Site  605
+ Electrostatic Potential :   -2.55064801002     V
+ Site  606
+ Electrostatic Potential :   -1.61690857470     V
+ Site  607
+ Electrostatic Potential :   -13.1071219319     V
+ Site  608
+ Electrostatic Potential :    3.70276913382     V
+ Site  609
+ Electrostatic Potential :   -2.96388069957     V
+ Site  610
+ Electrostatic Potential :    1.74058314538     V
+ Site  611
+ Electrostatic Potential :   -3.08196625006     V
+ Site  612
+ Electrostatic Potential :   -3.45518825817     V
+ Site  613
+ Electrostatic Potential :   -2.62725698047     V
+ Site  614
+ Electrostatic Potential :    14.4383511144     V
+ Site  615
+ Electrostatic Potential :   -4.52442061961     V
+ Site  616
+ Electrostatic Potential :   -8.40330882129     V
+ Site  617
+ Electrostatic Potential :   -3.29685867239     V
+ Site  618
+ Electrostatic Potential :   -8.17831097584     V
+ Site  619
+ Electrostatic Potential :   -13.2838673921     V
+ Site  620
+ Electrostatic Potential :    3.53886270787     V
+ Site  621
+ Electrostatic Potential :   -1.67294507708     V
+ Site  622
+ Electrostatic Potential :   -3.93936130098     V
+ Site  623
+ Electrostatic Potential :   -4.54286544471     V
+ Site  624
+ Electrostatic Potential :    7.26059430757     V
+ Site  625
+ Electrostatic Potential :   -6.57126724700     V
+ Site  626
+ Electrostatic Potential :   -3.52843295019     V
+ Site  627
+ Electrostatic Potential :   -2.25480755891     V
+ Site  628
+ Electrostatic Potential :   -3.57779750683     V
+ Site  629
+ Electrostatic Potential :   0.366114894809     V
+ Site  630
+ Electrostatic Potential :   -6.07046173530     V
+ Site  631
+ Electrostatic Potential :    1.63611529565     V
+ Site  632
+ Electrostatic Potential :   -3.42272755199     V
+ Site  633
+ Electrostatic Potential :   -5.11413686096     V
+ Site  634
+ Electrostatic Potential :   -1.70311031814     V
+ Site  635
+ Electrostatic Potential :   -2.62121121331     V
+ Site  636
+ Electrostatic Potential :   0.694241948019     V
+ Site  637
+ Electrostatic Potential :   -16.2470332693     V
+ Site  638
+ Electrostatic Potential :   -2.58119885867     V
+ Site  639
+ Electrostatic Potential :  -0.668958949313     V
+ Site  640
+ Electrostatic Potential :   -4.39712849664     V
+ Site  641
+ Electrostatic Potential :    23.4710222694     V
+ Site  642
+ Electrostatic Potential :   -3.13714011992     V
+ Site  643
+ Electrostatic Potential :  -0.779840617946E-01 V
+ Site  644
+ Electrostatic Potential :   -4.99733126092     V
+ Site  645
+ Electrostatic Potential :   -3.02769491224     V
+ Site  646
+ Electrostatic Potential :   -3.02887786169     V
+ Site  647
+ Electrostatic Potential :  -0.774791067926     V
+ Site  648
+ Electrostatic Potential :   -2.54160603471     V
+ Site  649
+ Electrostatic Potential :   -4.35791460072     V
+ Site  650
+ Electrostatic Potential :    11.9462114996     V
+ Site  651
+ Electrostatic Potential :    2.65306335285     V
+ Site  652
+ Electrostatic Potential :   -5.97365220048     V
+ Site  653
+ Electrostatic Potential :   -3.27695168307     V
+ Site  654
+ Electrostatic Potential :    4.47391045319     V
+ Site  655
+ Electrostatic Potential :  -0.179821625929     V
+ Site  656
+ Electrostatic Potential :    6.03476690096     V
+ Site  657
+ Electrostatic Potential :   -3.56822473878     V
+ Site  658
+ Electrostatic Potential :   -4.17277299365     V
+ Site  659
+ Electrostatic Potential :   0.775828205629     V
+ Site  660
+ Electrostatic Potential :    2.38854461578     V
+ Site  661
+ Electrostatic Potential :    7.07766997612     V
+ Site  662
+ Electrostatic Potential :   -2.61448300687     V
+ Site  663
+ Electrostatic Potential :   -1.08262757851     V
+ Site  664
+ Electrostatic Potential :    1.77745311720     V
+ Site  665
+ Electrostatic Potential :   -2.23121051103     V
+ Site  666
+ Electrostatic Potential :   -5.24532190117     V
+ Site  667
+ Electrostatic Potential :   -15.2239569496     V
+ Site  668
+ Electrostatic Potential :   -7.10283495151     V
+ Site  669
+ Electrostatic Potential :    7.80455000870     V
+ Site  670
+ Electrostatic Potential :   -5.71239960454     V
+ Site  671
+ Electrostatic Potential :    55.8856767142     V
+ Site  672
+ Electrostatic Potential :   -3.07333572866     V
+ Site  673
+ Electrostatic Potential :    4.10875094195     V
+ Site  674
+ Electrostatic Potential :   -2.43424629651     V
+ Site  675
+ Electrostatic Potential :    3.20692263751     V
+ Site  676
+ Electrostatic Potential :    6.88307260350     V
+ Site  677
+ Electrostatic Potential :   -6.91200636562     V
+ Site  678
+ Electrostatic Potential :   -6.11063911467     V
+ Site  679
+ Electrostatic Potential :   -4.55819576636     V
+ Site  680
+ Electrostatic Potential :   -5.46692205407     V
+ Site  681
+ Electrostatic Potential :   -2.89211556314     V
+ Site  682
+ Electrostatic Potential :   -2.57134960504     V
+ Site  683
+ Electrostatic Potential :    2.37061601511     V
+ Site  684
+ Electrostatic Potential :   0.523360507545     V
+ Site  685
+ Electrostatic Potential :   -13.5801220900     V
+ Site  686
+ Electrostatic Potential :    5.57283926902     V
+ Site  687
+ Electrostatic Potential :    7.40962931835     V
+ Site  688
+ Electrostatic Potential :   -4.45543225755     V
+ Site  689
+ Electrostatic Potential :   -4.34753811713     V
+ Site  690
+ Electrostatic Potential :    7.53704086526     V
+ Site  691
+ Electrostatic Potential :   -4.22469627711     V
+ Site  692
+ Electrostatic Potential :  -0.466856287179     V
+ Site  693
+ Electrostatic Potential :  -0.770919931035     V
+ Site  694
+ Electrostatic Potential :    7.18400762000     V
+ Site  695
+ Electrostatic Potential :   -2.59411978514     V
+ Site  696
+ Electrostatic Potential :    5.07356007199     V
+ Site  697
+ Electrostatic Potential :   -14.1879480757     V
+ Site  698
+ Electrostatic Potential :    5.22086581970     V
+ Site  699
+ Electrostatic Potential :   -7.57396833985     V
+ Site  700
+ Electrostatic Potential :    4.71427683655     V
+ Site  701
+ Electrostatic Potential :    1.67236481805     V
+ Site  702
+ Electrostatic Potential :   -3.99418052498     V
+ Site  703
+ Electrostatic Potential :   -2.90022269276     V
+ Site  704
+ Electrostatic Potential :   -2.02228000238     V
+ Site  705
+ Electrostatic Potential :    1.13481737015     V
+ Site  706
+ Electrostatic Potential :   -4.72058626367     V
+ Site  707
+ Electrostatic Potential :   -3.45179903370     V
+ Site  708
+ Electrostatic Potential :   -34.9018030739     V
+ Site  709
+ Electrostatic Potential :    11.8787197795     V
+ Site  710
+ Electrostatic Potential :    8.59157385090     V
+ Site  711
+ Electrostatic Potential :   -18.5967028944     V
+ Site  712
+ Electrostatic Potential :   -1.73339494837     V
+ Site  713
+ Electrostatic Potential :   -2.31941151015     V
+ Site  714
+ Electrostatic Potential :   -4.59432597172     V
+ Site  715
+ Electrostatic Potential :   -3.35562032343     V
+ Site  716
+ Electrostatic Potential :    6.02363394618     V
+ Site  717
+ Electrostatic Potential :    2.84275917785     V
+ Site  718
+ Electrostatic Potential :  -0.108128848112     V
+ Site  719
+ Electrostatic Potential :    1.39335015352     V
+ Site  720
+ Electrostatic Potential :   -5.03729739176     V
+ Site  721
+ Electrostatic Potential :   -2.92541754802     V
+ Site  722
+ Electrostatic Potential :    10.0215950936     V
+ Site  723
+ Electrostatic Potential :   -7.31493890406     V
+ Site  724
+ Electrostatic Potential :   -11.1581794475     V
+ Site  725
+ Electrostatic Potential :    3.22065149028     V
+ Site  726
+ Electrostatic Potential :   -2.30000278351     V
+ Site  727
+ Electrostatic Potential :    22.3683550244     V
+ Site  728
+ Electrostatic Potential :    1.89858731463     V
+ Site  729
+ Electrostatic Potential :   0.549541359700E-01 V
+ Site  730
+ Electrostatic Potential :   -3.47589235562     V
+ Site  731
+ Electrostatic Potential :   -2.50598974960     V
+ Site  732
+ Electrostatic Potential :  -0.453017575309     V
+ Site  733
+ Electrostatic Potential :    15.2970708921     V
+ Site  734
+ Electrostatic Potential :   -1.43594187843     V
+ Site  735
+ Electrostatic Potential :    2.23824125316     V
+ Site  736
+ Electrostatic Potential :   -3.33792511874     V
+ Site  737
+ Electrostatic Potential :   -2.69383084461     V
+ Site  738
+ Electrostatic Potential :   -5.31108343122     V
+ Site  739
+ Electrostatic Potential :   -2.11644819592     V
+ Site  740
+ Electrostatic Potential :    12.9807432355     V
+ Site  741
+ Electrostatic Potential :   -5.69866117581     V
+ Site  742
+ Electrostatic Potential :    6.68585966935     V
+ Site  743
+ Electrostatic Potential :    2.66058150221     V
+ Site  744
+ Electrostatic Potential :   -16.8202878054     V
+ Site  745
+ Electrostatic Potential :    7.84848324257     V
+ Site  746
+ Electrostatic Potential :   -6.41641126197     V
+ Site  747
+ Electrostatic Potential :   0.173253906237     V
+ Site  748
+ Electrostatic Potential :   0.123785627462     V
+ Site  749
+ Electrostatic Potential :   -10.8920910641     V
+ Site  750
+ Electrostatic Potential :   -3.70288712678     V
+ Site  751
+ Electrostatic Potential :    13.9541417898     V
+ Site  752
+ Electrostatic Potential :    30.8154065526     V
+ Site  753
+ Electrostatic Potential :   -1.61613491192     V
+ Site  754
+ Electrostatic Potential :    43.4138615249     V
+ Site  755
+ Electrostatic Potential :   0.148497810868E-01 V
+ Site  756
+ Electrostatic Potential :   -3.53882142628     V
+ Site  757
+ Electrostatic Potential :   0.647645762505E-01 V
+ Site  758
+ Electrostatic Potential :   -2.30925766846     V
+ Site  759
+ Electrostatic Potential :   -2.88125711608     V
+ Site  760
+ Electrostatic Potential :   -3.19646455276     V
+ Site  761
+ Electrostatic Potential :   -3.06137036015     V
+ Site  762
+ Electrostatic Potential :   -2.48704398025     V
+ Site  763
+ Electrostatic Potential :   0.573834549945     V
+ Site  764
+ Electrostatic Potential :   -3.25168615878     V
+ Site  765
+ Electrostatic Potential :   -3.08151831631     V
+ Site  766
+ Electrostatic Potential :   -2.52715646535     V
+ Site  767
+ Electrostatic Potential :    4.67753159938     V
+ Site  768
+ Electrostatic Potential :    2.23574048930     V
+ Site  769
+ Electrostatic Potential :   -3.70450889179     V
+ Site  770
+ Electrostatic Potential :   -3.50845366435     V
+ Site  771
+ Electrostatic Potential :   -1.69873996998     V
+ Site  772
+ Electrostatic Potential :   -3.15808237473     V
+ Site  773
+ Electrostatic Potential :   -8.36065254433     V
+ Site  774
+ Electrostatic Potential :    25.7063214543     V
+ Site  775
+ Electrostatic Potential :    14.9789566654     V
+ Site  776
+ Electrostatic Potential :   -4.20232712577     V
+ Site  777
+ Electrostatic Potential :    28.1348428092     V
+ Site  778
+ Electrostatic Potential :   -27.6582435639     V
+ Site  779
+ Electrostatic Potential :   -4.91469309269     V
+ Site  780
+ Electrostatic Potential :   -1.98031598412     V
+ Site  781
+ Electrostatic Potential :    44.2760137428     V
+ Site  782
+ Electrostatic Potential :  -0.977596801827     V
+ Site  783
+ Electrostatic Potential :   -6.05696606451     V
+ Site  784
+ Electrostatic Potential :   0.737262916165     V
+ Site  785
+ Electrostatic Potential :  -0.708321959807     V
+ Site  786
+ Electrostatic Potential :    2.70898847118     V
+ Site  787
+ Electrostatic Potential :   -6.43408599545     V
+ Site  788
+ Electrostatic Potential :    1.34282979445     V
+ Site  789
+ Electrostatic Potential :    1.03015097157     V
+ Site  790
+ Electrostatic Potential :   -18.8408755853     V
+ Site  791
+ Electrostatic Potential :   0.169565833553     V
+ Site  792
+ Electrostatic Potential :    1.42913214402     V
+ Site  793
+ Electrostatic Potential :    1.35983364954     V
+ Site  794
+ Electrostatic Potential :  -0.422015875669     V
+ Site  795
+ Electrostatic Potential :    3.17139269655     V
+ Site  796
+ Electrostatic Potential :   -6.05163169354     V
+ Site  797
+ Electrostatic Potential :    3.74862232681     V
+ Site  798
+ Electrostatic Potential :   -2.61832714387     V
+ Site  799
+ Electrostatic Potential :    29.7329846017     V
+ Site  800
+ Electrostatic Potential :    21.1531544466     V
+n_pass = 800 n_fail = 14
+Number of sites = 800
+Number of surface point charges = 348
+Number of sinular values used for fitting = 226
+Mean absolute error of electrostatic potential for raw (formal) point charges =   19.87843 V.
+Mean absolute error of electrostatic potential for fitted point charges =    0.00000 V.
+ Read from file calcmad.in
+ Calculation lattice: 3D1
+ Calculation Method: Ewald     
+ Crystal Parameter:     9.7058    9.7339   12.2261
+ Angles:   113.2410  113.1967   90.3675
+Input file format: with atom names
+ a=     9.7058164     0.0000000     0.0000000
+ b=    -0.0624335     9.7336745     0.0000000
+ c=    -4.8157372    -4.8554128    10.1346860
+      No.      x             y             z         Charge
+ Atom  1:     0.0353015    -2.4273242     7.5634724  1.000
+ Atom  2:     4.7923443     7.3055860     2.5712136  1.000
+ Atom  3:    -0.0153817     2.4343631     2.5277266  3.000
+ Atom  4:     4.8430275     2.4438986     7.6069594  3.000
+ Atom  5:     1.5771656     4.5848726     5.9486082 -1.000
+ Atom  6:     2.1014004     5.7251257     0.8934291 -1.000
+ Atom  7:     6.4255132     4.5837425     4.1792005 -1.000
+ Atom  8:     7.5062810     8.8768982     0.8943793 -1.000
+ Atom  9:     3.2504801     0.2933892     4.1860778 -1.000
+ Atom 10:    -1.5978674     0.2945193     5.9554855 -1.000
+ Atom 11:    -2.6786352    -3.9986365     9.2403068 -1.000
+ Atom 12:     2.7262454    -0.8468639     9.2412569 -1.000
+ Minimum fund between   1 and  12
+ Minimum Distance:    3.54316168153293     
+ Core Atom List: 
+ Converge Standard:   1.000000000000000E-012
+ Ewald Alpha Optimized Estimate:   0.507548828125000     
+ Use new Ewald Alpha.
+ ---------------------Overall Madelung Constant-------------------
+ Electrostatic Energy:   -143.722206613196     
+ Madelung Constant:  -18.7138963651128     
+ ------------ Atom-Site Madelung Potential--------
+ --------------------Non-atom Madelung Potential--------------------
+ Site    1
+ Electrostatic Potential :    4.86049242649     V
+ Site    2
+ Electrostatic Potential :    45.7033405025     V
+ Site    3
+ Electrostatic Potential :   -2.80066802314     V
+ Site    4
+ Electrostatic Potential :   -2.19338054153     V
+ Site    5
+ Electrostatic Potential :   -1.31827798794     V
+ Site    6
+ Electrostatic Potential :   -2.76936391988     V
+ Site    7
+ Electrostatic Potential :   -3.06530080785     V
+ Site    8
+ Electrostatic Potential :   0.937702736565     V
+ Site    9
+ Electrostatic Potential :    1.52563908486     V
+ Site   10
+ Electrostatic Potential :   0.635907939597     V
+ Site   11
+ Electrostatic Potential :   -2.69990722589     V
+ Site   12
+ Electrostatic Potential :   -1.45210097641     V
+ Site   13
+ Electrostatic Potential :   -8.60481296258     V
+ Site   14
+ Electrostatic Potential :   -1.19280575168     V
+ Site   15
+ Electrostatic Potential :   -2.04336684954     V
+ Site   16
+ Electrostatic Potential :   -3.95841104617     V
+ Site   17
+ Electrostatic Potential :   -6.68876720240     V
+ Site   18
+ Electrostatic Potential :    2.71114025029     V
+ Site   19
+ Electrostatic Potential :   -5.83580376367     V
+ Site   20
+ Electrostatic Potential :    2.72537934339     V
+ Site   21
+ Electrostatic Potential :    2.83698457489     V
+ Site   22
+ Electrostatic Potential :   0.616649584635     V
+ Site   23
+ Electrostatic Potential :    12.5875069872     V
+ Site   24
+ Electrostatic Potential :   -2.44814968139     V
+ Site   25
+ Electrostatic Potential :    9.41221871121     V
+ Site   26
+ Electrostatic Potential :   -2.27754521169     V
+ Site   27
+ Electrostatic Potential :   -2.19699485974     V
+ Site   28
+ Electrostatic Potential :    5.74868334472     V
+ Site   29
+ Electrostatic Potential :    8.50550111626     V
+ Site   30
+ Electrostatic Potential :   0.549484585780E-02 V
+ Site   31
+ Electrostatic Potential :   -9.92049346812     V
+ Site   32
+ Electrostatic Potential :    10.5871940049     V
+ Site   33
+ Electrostatic Potential :   -2.69867009585     V
+ Site   34
+ Electrostatic Potential :    1.08750936520     V
+ Site   35
+ Electrostatic Potential :    2.00401170961     V
+ Site   36
+ Electrostatic Potential :   -3.34929796173     V
+ Site   37
+ Electrostatic Potential :   -1.82354496933     V
+ Site   38
+ Electrostatic Potential :   -3.72611394230     V
+ Site   39
+ Electrostatic Potential :    2.25525275790     V
+ Site   40
+ Electrostatic Potential :   0.378088634069     V
+ Site   41
+ Electrostatic Potential :   -5.77514275415     V
+ Site   42
+ Electrostatic Potential :  -0.131079095911     V
+ Site   43
+ Electrostatic Potential :   -4.70335157746     V
+ Site   44
+ Electrostatic Potential :   -2.96106741640     V
+ Site   45
+ Electrostatic Potential :   -5.14316898774     V
+ Site   46
+ Electrostatic Potential :   0.438052312126     V
+ Site   47
+ Electrostatic Potential :    10.0778054807     V
+ Site   48
+ Electrostatic Potential :  -0.305078590631     V
+ Site   49
+ Electrostatic Potential :    3.52945237138     V
+ Site   50
+ Electrostatic Potential :    10.1243686385     V
+ Site   51
+ Electrostatic Potential :   -7.42351479254     V
+ Site   52
+ Electrostatic Potential :    11.9631009328     V
+ Site   53
+ Electrostatic Potential :   -2.52058347263     V
+ Site   54
+ Electrostatic Potential :   -7.60783811543     V
+ Site   55
+ Electrostatic Potential :   -1.14823071758     V
+ Site   56
+ Electrostatic Potential :    6.46111893165     V
+ Site   57
+ Electrostatic Potential :    18.4792221953     V
+ Site   58
+ Electrostatic Potential :   -5.90732020066     V
+ Site   59
+ Electrostatic Potential :    1.21896044090     V
+ Site   60
+ Electrostatic Potential :   -1.96670283741     V
+ Site   61
+ Electrostatic Potential :   -1.35239556444     V
+ Site   62
+ Electrostatic Potential :    2.73627744832     V
+ Site   63
+ Electrostatic Potential :   0.538818935380     V
+ Site   64
+ Electrostatic Potential :   -3.86806301651     V
+ Site   65
+ Electrostatic Potential :   -4.95028313008     V
+ Site   66
+ Electrostatic Potential :   -2.78062549656     V
+ Site   67
+ Electrostatic Potential :    43.5547650128     V
+ Site   68
+ Electrostatic Potential :  -0.553986082232     V
+ Site   69
+ Electrostatic Potential :   -3.46874294614     V
+ Site   70
+ Electrostatic Potential :    19.4642806330     V
+ Site   71
+ Electrostatic Potential :   -1.09963133218     V
+ Site   72
+ Electrostatic Potential :   -1.73295429669     V
+ Site   73
+ Electrostatic Potential :   -20.2622695066     V
+ Site   74
+ Electrostatic Potential :    12.2000713661     V
+ Site   75
+ Electrostatic Potential :    7.55079218740     V
+ Site   76
+ Electrostatic Potential :   -1.39469488218     V
+ Site   77
+ Electrostatic Potential :    30.4003361069     V
+ Site   78
+ Electrostatic Potential :   -3.07013127350     V
+ Site   79
+ Electrostatic Potential :   -4.07076008937     V
+ Site   80
+ Electrostatic Potential :    18.0076473893     V
+ Site   81
+ Electrostatic Potential :   -2.98897877247     V
+ Site   82
+ Electrostatic Potential :   -5.16336911756     V
+ Site   83
+ Electrostatic Potential :   -3.59485631780     V
+ Site   84
+ Electrostatic Potential :   -3.08649942521     V
+ Site   85
+ Electrostatic Potential :   -13.9173751738     V
+ Site   86
+ Electrostatic Potential :   -8.14337007302     V
+ Site   87
+ Electrostatic Potential :   -2.54002178691     V
+ Site   88
+ Electrostatic Potential :   -1.74257392521     V
+ Site   89
+ Electrostatic Potential :   -14.1423905791     V
+ Site   90
+ Electrostatic Potential :  -0.433696668978E-01 V
+ Site   91
+ Electrostatic Potential :  -0.192632916150     V
+ Site   92
+ Electrostatic Potential :   -3.36245560292     V
+ Site   93
+ Electrostatic Potential :    1.59039631829     V
+ Site   94
+ Electrostatic Potential :   -3.30189203371     V
+ Site   95
+ Electrostatic Potential :   -2.45393832779     V
+ Site   96
+ Electrostatic Potential :   -11.6123563702     V
+ Site   97
+ Electrostatic Potential :   -3.69056074086     V
+ Site   98
+ Electrostatic Potential :   -2.13532233641     V
+ Site   99
+ Electrostatic Potential :   -4.61507868842     V
+ Site  100
+ Electrostatic Potential :    8.29169189274     V
+ Site  101
+ Electrostatic Potential :  -0.883983372821     V
+ Site  102
+ Electrostatic Potential :   -3.04065829343     V
+ Site  103
+ Electrostatic Potential :   -4.02507359962     V
+ Site  104
+ Electrostatic Potential :   -3.43430415170     V
+ Site  105
+ Electrostatic Potential :    21.9134311912     V
+ Site  106
+ Electrostatic Potential :    3.53676058611     V
+ Site  107
+ Electrostatic Potential :    19.4129649887     V
+ Site  108
+ Electrostatic Potential :   -5.67305938016     V
+ Site  109
+ Electrostatic Potential :   -1.09666442793     V
+ Site  110
+ Electrostatic Potential :    5.87987959122     V
+ Site  111
+ Electrostatic Potential :  -0.529317991061     V
+ Site  112
+ Electrostatic Potential :    10.5582593273     V
+ Site  113
+ Electrostatic Potential :  -0.629992438971     V
+ Site  114
+ Electrostatic Potential :    13.8927719464     V
+ Site  115
+ Electrostatic Potential :   -1.58680811848     V
+ Site  116
+ Electrostatic Potential :   -2.70236205050     V
+ Site  117
+ Electrostatic Potential :   -5.09126354779     V
+ Site  118
+ Electrostatic Potential :   -15.5190596596     V
+ Site  119
+ Electrostatic Potential :   -3.33700177309     V
+ Site  120
+ Electrostatic Potential :   -9.66356675005     V
+ Site  121
+ Electrostatic Potential :   0.741928953956E-01 V
+ Site  122
+ Electrostatic Potential :   -40.9591755563     V
+ Site  123
+ Electrostatic Potential :   -3.25885214948     V
+ Site  124
+ Electrostatic Potential :   0.495239716495     V
+ Site  125
+ Electrostatic Potential :   -3.77798895069     V
+ Site  126
+ Electrostatic Potential :   -3.43212838518     V
+ Site  127
+ Electrostatic Potential :    7.27117901446     V
+ Site  128
+ Electrostatic Potential :  -0.506772842966     V
+ Site  129
+ Electrostatic Potential :   -6.87092333136     V
+ Site  130
+ Electrostatic Potential :   -3.06291272462     V
+ Site  131
+ Electrostatic Potential :   -5.17357313916     V
+ Site  132
+ Electrostatic Potential :    1.39597176245     V
+ Site  133
+ Electrostatic Potential :  -0.257845269650     V
+ Site  134
+ Electrostatic Potential :    2.49156084210     V
+ Site  135
+ Electrostatic Potential :  -0.865287695925     V
+ Site  136
+ Electrostatic Potential :  -0.888535730466     V
+ Site  137
+ Electrostatic Potential :   -1.99708783841     V
+ Site  138
+ Electrostatic Potential :   -3.84976347982     V
+ Site  139
+ Electrostatic Potential :   -1.74996995681     V
+ Site  140
+ Electrostatic Potential :   -1.06940973336     V
+ Site  141
+ Electrostatic Potential :   -2.17572012920     V
+ Site  142
+ Electrostatic Potential :   -2.67523683726     V
+ Site  143
+ Electrostatic Potential :    25.8561936546     V
+ Site  144
+ Electrostatic Potential :   -4.71301425483     V
+ Site  145
+ Electrostatic Potential :    12.2439681885     V
+ Site  146
+ Electrostatic Potential :   -1.57332644242     V
+ Site  147
+ Electrostatic Potential :   -14.8569790666     V
+ Site  148
+ Electrostatic Potential :    6.93303045755     V
+ Site  149
+ Electrostatic Potential :   -3.09732081316     V
+ Site  150
+ Electrostatic Potential :   -3.74525741523     V
+ Site  151
+ Electrostatic Potential :   -1.35013041815     V
+ Site  152
+ Electrostatic Potential :    13.6016039012     V
+ Site  153
+ Electrostatic Potential :  -0.397004756751     V
+ Site  154
+ Electrostatic Potential :    11.6526677263     V
+ Site  155
+ Electrostatic Potential :   -9.04623508479     V
+ Site  156
+ Electrostatic Potential :   -1.21285219900     V
+ Site  157
+ Electrostatic Potential :   -3.44071035384     V
+ Site  158
+ Electrostatic Potential :   -3.65755720032     V
+ Site  159
+ Electrostatic Potential :    8.15863352923     V
+ Site  160
+ Electrostatic Potential :    6.08304442534     V
+ Site  161
+ Electrostatic Potential :   -16.2762730056     V
+ Site  162
+ Electrostatic Potential :   -2.88356904735     V
+ Site  163
+ Electrostatic Potential :   -9.86577320495     V
+ Site  164
+ Electrostatic Potential :   -3.73570161031     V
+ Site  165
+ Electrostatic Potential :   -8.12908491353     V
+ Site  166
+ Electrostatic Potential :   -2.46108849096     V
+ Site  167
+ Electrostatic Potential :  -0.417179076701     V
+ Site  168
+ Electrostatic Potential :   -3.03120084990     V
+ Site  169
+ Electrostatic Potential :   -3.19928746616     V
+ Site  170
+ Electrostatic Potential :   -21.2837710618     V
+ Site  171
+ Electrostatic Potential :   -15.5522345067     V
+ Site  172
+ Electrostatic Potential :   -3.03115073495     V
+ Site  173
+ Electrostatic Potential :   -1.57148657278     V
+ Site  174
+ Electrostatic Potential :   0.866332071287     V
+ Site  175
+ Electrostatic Potential :    5.96591204409     V
+ Site  176
+ Electrostatic Potential :   -6.95818807329     V
+ Site  177
+ Electrostatic Potential :   -3.45035671098     V
+ Site  178
+ Electrostatic Potential :   -2.67244430991     V
+ Site  179
+ Electrostatic Potential :   -6.03985876022     V
+ Site  180
+ Electrostatic Potential :   -3.36817000935     V
+ Site  181
+ Electrostatic Potential :   -3.15550484143     V
+ Site  182
+ Electrostatic Potential :   -2.53145537745     V
+ Site  183
+ Electrostatic Potential :    2.29570908348     V
+ Site  184
+ Electrostatic Potential :    113.363079098     V
+ Site  185
+ Electrostatic Potential :   -4.17904239149     V
+ Site  186
+ Electrostatic Potential :   -2.27188843879     V
+ Site  187
+ Electrostatic Potential :    11.4631268780     V
+ Site  188
+ Electrostatic Potential :   -3.78942002534     V
+ Site  189
+ Electrostatic Potential :   -3.11258386368     V
+ Site  190
+ Electrostatic Potential :   -16.5988999827     V
+ Site  191
+ Electrostatic Potential :   0.685834058462     V
+ Site  192
+ Electrostatic Potential :    1.04030633599     V
+ Site  193
+ Electrostatic Potential :  -0.837980045039     V
+ Site  194
+ Electrostatic Potential :   -3.37115347882     V
+ Site  195
+ Electrostatic Potential :   -3.16306577149     V
+ Site  196
+ Electrostatic Potential :    17.1370842646     V
+ Site  197
+ Electrostatic Potential :   -4.49984638874     V
+ Site  198
+ Electrostatic Potential :   -12.5654375715     V
+ Site  199
+ Electrostatic Potential :   -4.09714550708     V
+ Site  200
+ Electrostatic Potential :   0.299710744013E-02 V
+ Site  201
+ Electrostatic Potential :    23.9676815622     V
+ Site  202
+ Electrostatic Potential :   -1.47934709899     V
+ Site  203
+ Electrostatic Potential :   -7.63173923219     V
+ Site  204
+ Electrostatic Potential :   -4.48658347784     V
+ Site  205
+ Electrostatic Potential :   -4.11397611850     V
+ Site  206
+ Electrostatic Potential :    5.12227822082     V
+ Site  207
+ Electrostatic Potential :   -7.05133170870     V
+ Site  208
+ Electrostatic Potential :  -0.391384492102     V
+ Site  209
+ Electrostatic Potential :  -0.358261871636     V
+ Site  210
+ Electrostatic Potential :    4.45303231752     V
+ Site  211
+ Electrostatic Potential :   0.921726980920E-01 V
+ Site  212
+ Electrostatic Potential :    12.9495876214     V
+ Site  213
+ Electrostatic Potential :   -3.62599856539     V
+ Site  214
+ Electrostatic Potential :   -2.80465117154     V
+ Site  215
+ Electrostatic Potential :  -0.658149341333     V
+ Site  216
+ Electrostatic Potential :    7.35927307017     V
+ Site  217
+ Electrostatic Potential :   -5.86954764881     V
+ Site  218
+ Electrostatic Potential :   -3.04698548924     V
+ Site  219
+ Electrostatic Potential :    35.6458149879     V
+ Site  220
+ Electrostatic Potential :    16.2974942188     V
+ Site  221
+ Electrostatic Potential :    4.52306556549     V
+ Site  222
+ Electrostatic Potential :   -4.05999117842     V
+ Site  223
+ Electrostatic Potential :   -4.14081924039     V
+ Site  224
+ Electrostatic Potential :   -5.55952283919     V
+ Site  225
+ Electrostatic Potential :    1.33668474342     V
+ Site  226
+ Electrostatic Potential :    3.08921919566     V
+ Site  227
+ Electrostatic Potential :    5.43151950598     V
+ Site  228
+ Electrostatic Potential :   -3.33383550097     V
+ Site  229
+ Electrostatic Potential :    37.4056260960     V
+ Site  230
+ Electrostatic Potential :   -3.53872561476     V
+ Site  231
+ Electrostatic Potential :   -3.14321200351     V
+ Site  232
+ Electrostatic Potential :    9.86527302733     V
+ Site  233
+ Electrostatic Potential :   0.218133743066     V
+ Site  234
+ Electrostatic Potential :    6.18956707832     V
+ Site  235
+ Electrostatic Potential :    20.5851572027     V
+ Site  236
+ Electrostatic Potential :    56.4523893198     V
+ Site  237
+ Electrostatic Potential :   -2.95350929288     V
+ Site  238
+ Electrostatic Potential :   -2.89605480217     V
+ Site  239
+ Electrostatic Potential :   -2.35858243561     V
+ Site  240
+ Electrostatic Potential :    6.07105778093     V
+ Site  241
+ Electrostatic Potential :   -3.93048541069     V
+ Site  242
+ Electrostatic Potential :   -2.57978185230     V
+ Site  243
+ Electrostatic Potential :   -6.17916110877     V
+ Site  244
+ Electrostatic Potential :    26.5471478567     V
+ Site  245
+ Electrostatic Potential :   -2.50160510742     V
+ Site  246
+ Electrostatic Potential :   -2.23448375408     V
+ Site  247
+ Electrostatic Potential :   -3.15601063961     V
+ Site  248
+ Electrostatic Potential :    4.87529164521     V
+ Site  249
+ Electrostatic Potential :    1.91004597331     V
+ Site  250
+ Electrostatic Potential :   -7.34229858271     V
+ Site  251
+ Electrostatic Potential :    11.2512097359     V
+ Site  252
+ Electrostatic Potential :   -1.30986416406     V
+ Site  253
+ Electrostatic Potential :  -0.483187144865     V
+ Site  254
+ Electrostatic Potential :    7.79199213566     V
+ Site  255
+ Electrostatic Potential :   -6.85357735221     V
+ Site  256
+ Electrostatic Potential :   -3.87329664479     V
+ Site  257
+ Electrostatic Potential :   -5.01112238839     V
+ Site  258
+ Electrostatic Potential :   -3.13661810399     V
+ Site  259
+ Electrostatic Potential :   -1.22001427886     V
+ Site  260
+ Electrostatic Potential :    3.72427988934     V
+ Site  261
+ Electrostatic Potential :   -3.79386346897     V
+ Site  262
+ Electrostatic Potential :   -3.30910628102     V
+ Site  263
+ Electrostatic Potential :   -8.48913813764     V
+ Site  264
+ Electrostatic Potential :   -6.02212088669     V
+ Site  265
+ Electrostatic Potential :   -7.64480319754     V
+ Site  266
+ Electrostatic Potential :  -0.106100729568     V
+ Site  267
+ Electrostatic Potential :    1.69849650779     V
+ Site  268
+ Electrostatic Potential :  -0.225437414540     V
+ Site  269
+ Electrostatic Potential :   -9.31277976898     V
+ Site  270
+ Electrostatic Potential :    25.4333452439     V
+ Site  271
+ Electrostatic Potential :    105.609587263     V
+ Site  272
+ Electrostatic Potential :    6.02243236739     V
+ Site  273
+ Electrostatic Potential :   -2.24985624398     V
+ Site  274
+ Electrostatic Potential :  -0.827112306575     V
+ Site  275
+ Electrostatic Potential :   -3.59003665939     V
+ Site  276
+ Electrostatic Potential :   -4.78279535946     V
+ Site  277
+ Electrostatic Potential :    7.68897698316     V
+ Site  278
+ Electrostatic Potential :  -0.937923323886     V
+ Site  279
+ Electrostatic Potential :   -3.24385775686     V
+ Site  280
+ Electrostatic Potential :  -0.235609785619     V
+ Site  281
+ Electrostatic Potential :   -3.27601699412     V
+ Site  282
+ Electrostatic Potential :    2.00570712623     V
+ Site  283
+ Electrostatic Potential :    6.96764226480     V
+ Site  284
+ Electrostatic Potential :   -1.12253942036     V
+ Site  285
+ Electrostatic Potential :   -1.29867142242     V
+ Site  286
+ Electrostatic Potential :   -15.4808881027     V
+ Site  287
+ Electrostatic Potential :   -2.97153883529     V
+ Site  288
+ Electrostatic Potential :    8.65432132821     V
+ Site  289
+ Electrostatic Potential :   0.792543785214     V
+ Site  290
+ Electrostatic Potential :    6.80127851810     V
+ Site  291
+ Electrostatic Potential :   -2.42747558941     V
+ Site  292
+ Electrostatic Potential :    13.6612900056     V
+ Site  293
+ Electrostatic Potential :   -3.18095649952     V
+ Site  294
+ Electrostatic Potential :   -7.96525010440     V
+ Site  295
+ Electrostatic Potential :  -0.980681390458     V
+ Site  296
+ Electrostatic Potential :   -4.62226920973     V
+ Site  297
+ Electrostatic Potential :   -2.97586182307     V
+ Site  298
+ Electrostatic Potential :    6.88805928543     V
+ Site  299
+ Electrostatic Potential :   -1.27625651473     V
+ Site  300
+ Electrostatic Potential :   -9.99393628470     V
+ Site  301
+ Electrostatic Potential :    8.42622563917     V
+ Site  302
+ Electrostatic Potential :   -2.66658168173     V
+ Site  303
+ Electrostatic Potential :   -3.17437911805     V
+ Site  304
+ Electrostatic Potential :   0.512883836333     V
+ Site  305
+ Electrostatic Potential :   -3.04225721660     V
+ Site  306
+ Electrostatic Potential :   -4.26576265711     V
+ Site  307
+ Electrostatic Potential :   -3.35031302465     V
+ Site  308
+ Electrostatic Potential :   -3.67461366273     V
+ Site  309
+ Electrostatic Potential :   -3.15728882007     V
+ Site  310
+ Electrostatic Potential :   -1.90076347408     V
+ Site  311
+ Electrostatic Potential :   -3.81505885326     V
+ Site  312
+ Electrostatic Potential :   0.212612015400     V
+ Site  313
+ Electrostatic Potential :   0.564375675456E-01 V
+ Site  314
+ Electrostatic Potential :   -6.22083440793     V
+ Site  315
+ Electrostatic Potential :  -0.419671366409     V
+ Site  316
+ Electrostatic Potential :    9.55655865144     V
+ Site  317
+ Electrostatic Potential :   -3.15889800099     V
+ Site  318
+ Electrostatic Potential :   -7.25315313915     V
+ Site  319
+ Electrostatic Potential :   -4.44986588089     V
+ Site  320
+ Electrostatic Potential :   -3.50898625861     V
+ Site  321
+ Electrostatic Potential :   -9.24190615109     V
+ Site  322
+ Electrostatic Potential :   -2.58970229966     V
+ Site  323
+ Electrostatic Potential :  -0.835952226056E-01 V
+ Site  324
+ Electrostatic Potential :    22.0834931602     V
+ Site  325
+ Electrostatic Potential :    32.4398008782     V
+ Site  326
+ Electrostatic Potential :   -2.77755286816     V
+ Site  327
+ Electrostatic Potential :   -2.32930438972     V
+ Site  328
+ Electrostatic Potential :   -8.99358004036     V
+ Site  329
+ Electrostatic Potential :    3.96479819521     V
+ Site  330
+ Electrostatic Potential :   -6.11012388498     V
+ Site  331
+ Electrostatic Potential :  -0.759837262134     V
+ Site  332
+ Electrostatic Potential :   -2.63493222465     V
+ Site  333
+ Electrostatic Potential :   -8.08331498478     V
+ Site  334
+ Electrostatic Potential :   -4.85551177508     V
+ Site  335
+ Electrostatic Potential :    6.64060310380     V
+ Site  336
+ Electrostatic Potential :   -3.79451410619     V
+ Site  337
+ Electrostatic Potential :   0.576386468542     V
+ Site  338
+ Electrostatic Potential :   -2.50917268864     V
+ Site  339
+ Electrostatic Potential :   -3.85002474554     V
+ Site  340
+ Electrostatic Potential :    13.6441592569     V
+ Site  341
+ Electrostatic Potential :    2.53965362846     V
+ Site  342
+ Electrostatic Potential :   -3.18641750806     V
+ Site  343
+ Electrostatic Potential :    7.85746548005     V
+ Site  344
+ Electrostatic Potential :    11.8542640482     V
+ Site  345
+ Electrostatic Potential :   -3.65362549169     V
+ Site  346
+ Electrostatic Potential :   -1.53120691676     V
+ Site  347
+ Electrostatic Potential :   -7.62327745412     V
+ Site  348
+ Electrostatic Potential :    3.00959049471     V
+ Site  349
+ Electrostatic Potential :   -3.33546187634     V
+ Site  350
+ Electrostatic Potential :   -1.69835544759     V
+ Site  351
+ Electrostatic Potential :   -3.40663843023     V
+ Site  352
+ Electrostatic Potential :    11.8245610256     V
+ Site  353
+ Electrostatic Potential :   -1.18602935328     V
+ Site  354
+ Electrostatic Potential :    4.45573757539     V
+ Site  355
+ Electrostatic Potential :   -4.70812153659     V
+ Site  356
+ Electrostatic Potential :   -7.18755069490     V
+ Site  357
+ Electrostatic Potential :   -3.12709176410     V
+ Site  358
+ Electrostatic Potential :    2.20911686836     V
+ Site  359
+ Electrostatic Potential :   -5.13449091297     V
+ Site  360
+ Electrostatic Potential :   -2.35840293553     V
+ Site  361
+ Electrostatic Potential :   -3.03213708040     V
+ Site  362
+ Electrostatic Potential :   -2.84533504000     V
+ Site  363
+ Electrostatic Potential :   -3.82288380572     V
+ Site  364
+ Electrostatic Potential :   -12.1201548230     V
+ Site  365
+ Electrostatic Potential :   -9.80390320434     V
+ Site  366
+ Electrostatic Potential :   -4.15350038760     V
+ Site  367
+ Electrostatic Potential :    10.4186301583     V
+ Site  368
+ Electrostatic Potential :  -0.764680898621     V
+ Site  369
+ Electrostatic Potential :   -1.29111645726     V
+ Site  370
+ Electrostatic Potential :   -2.37929485654     V
+ Site  371
+ Electrostatic Potential :   -3.04931180605     V
+ Site  372
+ Electrostatic Potential :   -1.95198196833     V
+ Site  373
+ Electrostatic Potential :    42.7243213342     V
+ Site  374
+ Electrostatic Potential :    18.5992463183     V
+ Site  375
+ Electrostatic Potential :   -2.13859097947     V
+ Site  376
+ Electrostatic Potential :   0.286147371753     V
+ Site  377
+ Electrostatic Potential :  -0.808557545992     V
+ Site  378
+ Electrostatic Potential :    2.95102623754     V
+ Site  379
+ Electrostatic Potential :   -2.43096847129     V
+ Site  380
+ Electrostatic Potential :   -1.68214477237     V
+ Site  381
+ Electrostatic Potential :   -12.1123544690     V
+ Site  382
+ Electrostatic Potential :   0.844515053941     V
+ Site  383
+ Electrostatic Potential :    2.75893341079     V
+ Site  384
+ Electrostatic Potential :   -1.53695577926     V
+ Site  385
+ Electrostatic Potential :   -3.72370889891     V
+ Site  386
+ Electrostatic Potential :    8.09511103772     V
+ Site  387
+ Electrostatic Potential :   -3.76181805721     V
+ Site  388
+ Electrostatic Potential :   -10.3430031336     V
+ Site  389
+ Electrostatic Potential :    3.00418115990     V
+ Site  390
+ Electrostatic Potential :    3.25351659253     V
+ Site  391
+ Electrostatic Potential :    2.49364054995     V
+ Site  392
+ Electrostatic Potential :   -4.36619136569     V
+ Site  393
+ Electrostatic Potential :   -3.07269153144     V
+ Site  394
+ Electrostatic Potential :   -2.88334268358     V
+ Site  395
+ Electrostatic Potential :    6.96263610787     V
+ Site  396
+ Electrostatic Potential :    18.7288373760     V
+ Site  397
+ Electrostatic Potential :   -6.96412201746     V
+ Site  398
+ Electrostatic Potential :    1.21779313405     V
+ Site  399
+ Electrostatic Potential :   -1.96723554006     V
+ Site  400
+ Electrostatic Potential :   -1.84235713091     V
+ Site  401
+ Electrostatic Potential :   -10.2308441151     V
+ Site  402
+ Electrostatic Potential :   -6.41882634302     V
+ Site  403
+ Electrostatic Potential :   -17.2679069207     V
+ Site  404
+ Electrostatic Potential :    5.24919151208     V
+ Site  405
+ Electrostatic Potential :   -11.7171371799     V
+ Site  406
+ Electrostatic Potential :    11.5542286105     V
+ Site  407
+ Electrostatic Potential :   -3.51557423025     V
+ Site  408
+ Electrostatic Potential :    24.5488714301     V
+ Site  409
+ Electrostatic Potential :   -3.62477353649     V
+ Site  410
+ Electrostatic Potential :    2.72563072254     V
+ Site  411
+ Electrostatic Potential :   -1.80749678760     V
+ Site  412
+ Electrostatic Potential :   -1.05441243738     V
+ Site  413
+ Electrostatic Potential :   -3.47421274046     V
+ Site  414
+ Electrostatic Potential :   -2.09812544070     V
+ Site  415
+ Electrostatic Potential :   -2.86096104293     V
+ Site  416
+ Electrostatic Potential :   -4.09428906850     V
+ Site  417
+ Electrostatic Potential :   -3.28226706835     V
+ Site  418
+ Electrostatic Potential :   -5.35964280397     V
+ Site  419
+ Electrostatic Potential :    1.75272085170     V
+ Site  420
+ Electrostatic Potential :    10.4029770352     V
+ Site  421
+ Electrostatic Potential :    52.5120490635     V
+ Site  422
+ Electrostatic Potential :    6.34294379428     V
+ Site  423
+ Electrostatic Potential :    1.32199757379     V
+ Site  424
+ Electrostatic Potential :   -2.53180599266     V
+ Site  425
+ Electrostatic Potential :   -2.49121633962     V
+ Site  426
+ Electrostatic Potential :   -6.35088896214     V
+ Site  427
+ Electrostatic Potential :   -8.39516768704     V
+ Site  428
+ Electrostatic Potential :   -9.02297998656     V
+ Site  429
+ Electrostatic Potential :   -4.82664576690     V
+ Site  430
+ Electrostatic Potential :    5.26943926823     V
+ Site  431
+ Electrostatic Potential :    14.0953041570     V
+ Site  432
+ Electrostatic Potential :   -3.51775749077     V
+ Site  433
+ Electrostatic Potential :   -2.45838492619     V
+ Site  434
+ Electrostatic Potential :   -3.80210502557     V
+ Site  435
+ Electrostatic Potential :   0.228932984744     V
+ Site  436
+ Electrostatic Potential :   -2.95211368872     V
+ Site  437
+ Electrostatic Potential :   0.835279170496     V
+ Site  438
+ Electrostatic Potential :    12.3749474607     V
+ Site  439
+ Electrostatic Potential :   -6.60676187177     V
+ Site  440
+ Electrostatic Potential :   -2.16202381960     V
+ Site  441
+ Electrostatic Potential :   -8.55737716466     V
+ Site  442
+ Electrostatic Potential :    46.0653423525     V
+ Site  443
+ Electrostatic Potential :   -7.88605393184     V
+ Site  444
+ Electrostatic Potential :   0.696481634790     V
+ Site  445
+ Electrostatic Potential :   -6.36698931778     V
+ Site  446
+ Electrostatic Potential :   -2.85934581332     V
+ Site  447
+ Electrostatic Potential :    4.56386486510     V
+ Site  448
+ Electrostatic Potential :   -6.44926836388     V
+ Site  449
+ Electrostatic Potential :   -3.33368205004     V
+ Site  450
+ Electrostatic Potential :   -36.8552960793     V
+ Site  451
+ Electrostatic Potential :    11.5391156482     V
+ Site  452
+ Electrostatic Potential :   -7.23887472741     V
+ Site  453
+ Electrostatic Potential :   -3.69976101630     V
+ Site  454
+ Electrostatic Potential :   -7.69099065961     V
+ Site  455
+ Electrostatic Potential :    32.1242653411     V
+ Site  456
+ Electrostatic Potential :    5.29979407131     V
+ Site  457
+ Electrostatic Potential :   -2.26537078042     V
+ Site  458
+ Electrostatic Potential :   -1.67769250285     V
+ Site  459
+ Electrostatic Potential :   -4.11703604327     V
+ Site  460
+ Electrostatic Potential :   -2.80515913693     V
+ Site  461
+ Electrostatic Potential :   -4.24927144629     V
+ Site  462
+ Electrostatic Potential :    8.49307561910     V
+ Site  463
+ Electrostatic Potential :   -9.64684334046     V
+ Site  464
+ Electrostatic Potential :   -1.66271505434     V
+ Site  465
+ Electrostatic Potential :   -3.51531662457     V
+ Site  466
+ Electrostatic Potential :   -3.18641057045     V
+ Site  467
+ Electrostatic Potential :   -10.0029112158     V
+ Site  468
+ Electrostatic Potential :   -2.45349542350     V
+ Site  469
+ Electrostatic Potential :    18.9551311104     V
+ Site  470
+ Electrostatic Potential :   -2.17187946218     V
+ Site  471
+ Electrostatic Potential :   -7.84413547583     V
+ Site  472
+ Electrostatic Potential :    1.16440050309     V
+ Site  473
+ Electrostatic Potential :   -30.4443103072     V
+ Site  474
+ Electrostatic Potential :   -9.02191435080     V
+ Site  475
+ Electrostatic Potential :   -4.37901130801     V
+ Site  476
+ Electrostatic Potential :   0.939394823399     V
+ Site  477
+ Electrostatic Potential :    2.30909298557     V
+ Site  478
+ Electrostatic Potential :  -0.545947574966     V
+ Site  479
+ Electrostatic Potential :    22.2165991677     V
+ Site  480
+ Electrostatic Potential :   -4.89381333760     V
+ Site  481
+ Electrostatic Potential :   -8.47130432592     V
+ Site  482
+ Electrostatic Potential :    7.47374357611     V
+ Site  483
+ Electrostatic Potential :  -0.971789936194     V
+ Site  484
+ Electrostatic Potential :    1.31852324512     V
+ Site  485
+ Electrostatic Potential :    3.18286040947     V
+ Site  486
+ Electrostatic Potential :   -1.09137733356     V
+ Site  487
+ Electrostatic Potential :    11.2181040349     V
+ Site  488
+ Electrostatic Potential :    28.7502811245     V
+ Site  489
+ Electrostatic Potential :   -4.87619678922     V
+ Site  490
+ Electrostatic Potential :   -5.83528275198     V
+ Site  491
+ Electrostatic Potential :   -4.66093323815     V
+ Site  492
+ Electrostatic Potential :   -1.28597797390     V
+ Site  493
+ Electrostatic Potential :   -2.96235095201     V
+ Site  494
+ Electrostatic Potential :   0.351607798009     V
+ Site  495
+ Electrostatic Potential :    3.84973958750     V
+ Site  496
+ Electrostatic Potential :   0.301064584461     V
+ Site  497
+ Electrostatic Potential :   -2.45436388200     V
+ Site  498
+ Electrostatic Potential :   -4.37013192013     V
+ Site  499
+ Electrostatic Potential :   -4.88821050496     V
+ Site  500
+ Electrostatic Potential :    30.7748399189     V
+ Site  501
+ Electrostatic Potential :   -11.2494726055     V
+ Site  502
+ Electrostatic Potential :   -4.57282036972     V
+ Site  503
+ Electrostatic Potential :    11.0863458129     V
+ Site  504
+ Electrostatic Potential :   -1.95313002181     V
+ Site  505
+ Electrostatic Potential :    1.31598868363     V
+ Site  506
+ Electrostatic Potential :   -3.59250999805     V
+ Site  507
+ Electrostatic Potential :   0.984936648011     V
+ Site  508
+ Electrostatic Potential :    4.92376203266     V
+ Site  509
+ Electrostatic Potential :   -5.82945072248     V
+ Site  510
+ Electrostatic Potential :   -74.0468428722     V
+ Site  511
+ Electrostatic Potential :   0.937609762555     V
+ Site  512
+ Electrostatic Potential :   -1.42502617968     V
+ Site  513
+ Electrostatic Potential :    6.11595409584     V
+ Site  514
+ Electrostatic Potential :  -0.435011851999     V
+ Site  515
+ Electrostatic Potential :   -3.57346262050     V
+ Site  516
+ Electrostatic Potential :    22.4781055009     V
+ Site  517
+ Electrostatic Potential :   -4.48602716976     V
+ Site  518
+ Electrostatic Potential :   -3.28171183518     V
+ Site  519
+ Electrostatic Potential :  -0.273171358754     V
+ Site  520
+ Electrostatic Potential :   -2.93899862676     V
+ Site  521
+ Electrostatic Potential :   -37.2383213882     V
+ Site  522
+ Electrostatic Potential :    11.0599297344     V
+ Site  523
+ Electrostatic Potential :   -5.24625269576     V
+ Site  524
+ Electrostatic Potential :   -6.41250988435     V
+ Site  525
+ Electrostatic Potential :   -2.71742136065     V
+ Site  526
+ Electrostatic Potential :   -10.2883019932     V
+ Site  527
+ Electrostatic Potential :   -2.47412190730     V
+ Site  528
+ Electrostatic Potential :   -3.61012004794     V
+ Site  529
+ Electrostatic Potential :    20.2370239909     V
+ Site  530
+ Electrostatic Potential :    4.15843779181     V
+ Site  531
+ Electrostatic Potential :   -1.99253525114     V
+ Site  532
+ Electrostatic Potential :   -7.81257751403     V
+ Site  533
+ Electrostatic Potential :    2.84655031428     V
+ Site  534
+ Electrostatic Potential :   -7.42983306352     V
+ Site  535
+ Electrostatic Potential :   -2.91565091555     V
+ Site  536
+ Electrostatic Potential :   -4.71039695569     V
+ Site  537
+ Electrostatic Potential :   0.580605154215     V
+ Site  538
+ Electrostatic Potential :    1.03518492851     V
+ Site  539
+ Electrostatic Potential :    8.29839831333     V
+ Site  540
+ Electrostatic Potential :   -2.17695650786     V
+ Site  541
+ Electrostatic Potential :    34.8345075786     V
+ Site  542
+ Electrostatic Potential :   -3.34324433963     V
+ Site  543
+ Electrostatic Potential :    16.9830217383     V
+ Site  544
+ Electrostatic Potential :    3.67870626890     V
+ Site  545
+ Electrostatic Potential :   -25.0188033589     V
+ Site  546
+ Electrostatic Potential :   -5.99388709510     V
+ Site  547
+ Electrostatic Potential :   -4.40515044074     V
+ Site  548
+ Electrostatic Potential :   -2.93290338064     V
+ Site  549
+ Electrostatic Potential :   -3.19205204528     V
+ Site  550
+ Electrostatic Potential :    4.00357970504     V
+ Site  551
+ Electrostatic Potential :   -5.80266012015     V
+ Site  552
+ Electrostatic Potential :   -4.56727733514     V
+ Site  553
+ Electrostatic Potential :   -14.6342679286     V
+ Site  554
+ Electrostatic Potential :   -2.67886897566     V
+ Site  555
+ Electrostatic Potential :   -1.90540656993     V
+ Site  556
+ Electrostatic Potential :   0.239329717441     V
+ Site  557
+ Electrostatic Potential :   -5.46609822251     V
+ Site  558
+ Electrostatic Potential :   -3.39649148934     V
+ Site  559
+ Electrostatic Potential :    17.2579287420     V
+ Site  560
+ Electrostatic Potential :   -4.35726743464     V
+ Site  561
+ Electrostatic Potential :   0.734739125304     V
+ Site  562
+ Electrostatic Potential :   0.347215135469     V
+ Site  563
+ Electrostatic Potential :   -3.57074274571     V
+ Site  564
+ Electrostatic Potential :   -12.6945070512     V
+ Site  565
+ Electrostatic Potential :   -3.98604972755     V
+ Site  566
+ Electrostatic Potential :   -1.56381082592     V
+ Site  567
+ Electrostatic Potential :    2.83557075974     V
+ Site  568
+ Electrostatic Potential :    1.92915393465     V
+ Site  569
+ Electrostatic Potential :   -2.30824791458     V
+ Site  570
+ Electrostatic Potential :   -7.41427675607     V
+ Site  571
+ Electrostatic Potential :   -6.04667842621     V
+ Site  572
+ Electrostatic Potential :    2.77896346169     V
+ Site  573
+ Electrostatic Potential :  -0.849097029553     V
+ Site  574
+ Electrostatic Potential :   -2.74116334470     V
+ Site  575
+ Electrostatic Potential :    48.3080385319     V
+ Site  576
+ Electrostatic Potential :    17.8630770121     V
+ Site  577
+ Electrostatic Potential :   0.538428043753     V
+ Site  578
+ Electrostatic Potential :   -2.80864432642     V
+ Site  579
+ Electrostatic Potential :    10.7736159166     V
+ Site  580
+ Electrostatic Potential :   -4.95936493668     V
+ Site  581
+ Electrostatic Potential :    39.3894204382     V
+ Site  582
+ Electrostatic Potential :   -3.35011313774     V
+ Site  583
+ Electrostatic Potential :   -1.95166518816     V
+ Site  584
+ Electrostatic Potential :   -2.27237009034     V
+ Site  585
+ Electrostatic Potential :   0.577926887535     V
+ Site  586
+ Electrostatic Potential :   -6.16486970790     V
+ Site  587
+ Electrostatic Potential :   -4.81853613801     V
+ Site  588
+ Electrostatic Potential :   0.190097746613     V
+ Site  589
+ Electrostatic Potential :   -2.99545477321     V
+ Site  590
+ Electrostatic Potential :   -1.98173950215     V
+ Site  591
+ Electrostatic Potential :   -3.08710382864     V
+ Site  592
+ Electrostatic Potential :   -2.22685412813     V
+ Site  593
+ Electrostatic Potential :   -2.68546468827     V
+ Site  594
+ Electrostatic Potential :    5.96736177147     V
+ Site  595
+ Electrostatic Potential :    6.19921580116     V
+ Site  596
+ Electrostatic Potential :   -8.93095922911     V
+ Site  597
+ Electrostatic Potential :   -2.52105343400     V
+ Site  598
+ Electrostatic Potential :    14.8946688365     V
+ Site  599
+ Electrostatic Potential :    7.20256726299     V
+ Site  600
+ Electrostatic Potential :   -2.71892998214     V
+ Site  601
+ Electrostatic Potential :    7.87888013879     V
+ Site  602
+ Electrostatic Potential :    18.7878868460     V
+ Site  603
+ Electrostatic Potential :   -4.85274463621     V
+ Site  604
+ Electrostatic Potential :    2.52632463448     V
+ Site  605
+ Electrostatic Potential :   -2.14815409814     V
+ Site  606
+ Electrostatic Potential :    3.76057514105     V
+ Site  607
+ Electrostatic Potential :   -7.72341534675     V
+ Site  608
+ Electrostatic Potential :    2.49329988754     V
+ Site  609
+ Electrostatic Potential :   -3.97153873578     V
+ Site  610
+ Electrostatic Potential :    18.8680386481     V
+ Site  611
+ Electrostatic Potential :   -1.07429376276     V
+ Site  612
+ Electrostatic Potential :   -3.29438663194     V
+ Site  613
+ Electrostatic Potential :    4.24122837377     V
+ Site  614
+ Electrostatic Potential :   -4.08427967132     V
+ Site  615
+ Electrostatic Potential :   -2.71831524210     V
+ Site  616
+ Electrostatic Potential :    10.2503789687     V
+ Site  617
+ Electrostatic Potential :    9.55391020957     V
+ Site  618
+ Electrostatic Potential :   -2.77258395909     V
+ Site  619
+ Electrostatic Potential :    1.21459734553     V
+ Site  620
+ Electrostatic Potential :    25.0226790137     V
+ Site  621
+ Electrostatic Potential :   -2.79867060646     V
+ Site  622
+ Electrostatic Potential :    11.5727940662     V
+ Site  623
+ Electrostatic Potential :    1.07694602920     V
+ Site  624
+ Electrostatic Potential :  -0.371159002719     V
+ Site  625
+ Electrostatic Potential :   -13.9926182207     V
+ Site  626
+ Electrostatic Potential :   0.747173085250     V
+ Site  627
+ Electrostatic Potential :   0.705503527729E-01 V
+ Site  628
+ Electrostatic Potential :   -2.29896362886     V
+ Site  629
+ Electrostatic Potential :   -7.32410486598     V
+ Site  630
+ Electrostatic Potential :    32.3381272521     V
+ Site  631
+ Electrostatic Potential :   -3.07104170836     V
+ Site  632
+ Electrostatic Potential :    1.34322983778     V
+ Site  633
+ Electrostatic Potential :   -4.24123163118     V
+ Site  634
+ Electrostatic Potential :   -3.25558945418     V
+ Site  635
+ Electrostatic Potential :   -22.2662350435     V
+ Site  636
+ Electrostatic Potential :  -0.192961490638     V
+ Site  637
+ Electrostatic Potential :    2.03422553032     V
+ Site  638
+ Electrostatic Potential :   -3.34785969548     V
+ Site  639
+ Electrostatic Potential :   -3.22869746538     V
+ Site  640
+ Electrostatic Potential :   -4.16103397365     V
+ Site  641
+ Electrostatic Potential :   -5.74871203569     V
+ Site  642
+ Electrostatic Potential :    35.5131667689     V
+ Site  643
+ Electrostatic Potential :   -2.32160042776     V
+ Site  644
+ Electrostatic Potential :   -3.01102479413     V
+ Site  645
+ Electrostatic Potential :   -7.85784425383     V
+ Site  646
+ Electrostatic Potential :   -4.86775828040     V
+ Site  647
+ Electrostatic Potential :   -4.96858148869     V
+ Site  648
+ Electrostatic Potential :    11.3872357244     V
+ Site  649
+ Electrostatic Potential :   -1.93894411506     V
+ Site  650
+ Electrostatic Potential :   -8.50700813334     V
+ Site  651
+ Electrostatic Potential :   -6.49500452333     V
+ Site  652
+ Electrostatic Potential :   -1.18986986857     V
+ Site  653
+ Electrostatic Potential :   -1.62491621343     V
+ Site  654
+ Electrostatic Potential :   -2.64963526799     V
+ Site  655
+ Electrostatic Potential :   -1.74275065034     V
+ Site  656
+ Electrostatic Potential :   -1.15523448136     V
+ Site  657
+ Electrostatic Potential :    17.6107215399     V
+ Site  658
+ Electrostatic Potential :   -1.95111460254     V
+ Site  659
+ Electrostatic Potential :   -13.0815206400     V
+ Site  660
+ Electrostatic Potential :   -2.41998293262     V
+ Site  661
+ Electrostatic Potential :    20.4556471470     V
+ Site  662
+ Electrostatic Potential :    3.81488756247     V
+ Site  663
+ Electrostatic Potential :  -0.978121063869     V
+ Site  664
+ Electrostatic Potential :    2.74685968372     V
+ Site  665
+ Electrostatic Potential :   -3.03662105918     V
+ Site  666
+ Electrostatic Potential :   -77.0561401234     V
+ Site  667
+ Electrostatic Potential :  -0.802060871731     V
+ Site  668
+ Electrostatic Potential :   -2.57461771793     V
+ Site  669
+ Electrostatic Potential :   -1.49850631402     V
+ Site  670
+ Electrostatic Potential :    4.72247651346     V
+ Site  671
+ Electrostatic Potential :    55.6729634243     V
+ Site  672
+ Electrostatic Potential :   -4.95360321669     V
+ Site  673
+ Electrostatic Potential :    11.6619436857     V
+ Site  674
+ Electrostatic Potential :   -1.28443912930     V
+ Site  675
+ Electrostatic Potential :    30.0796869843     V
+ Site  676
+ Electrostatic Potential :   -3.39126410682     V
+ Site  677
+ Electrostatic Potential :   -5.36933317651     V
+ Site  678
+ Electrostatic Potential :   -1.92847779093     V
+ Site  679
+ Electrostatic Potential :   -3.23299669942     V
+ Site  680
+ Electrostatic Potential :   -3.33281461568     V
+ Site  681
+ Electrostatic Potential :  -0.989743325580     V
+ Site  682
+ Electrostatic Potential :    12.5660497694     V
+ Site  683
+ Electrostatic Potential :   -6.63431048652     V
+ Site  684
+ Electrostatic Potential :   -4.48392104381     V
+ Site  685
+ Electrostatic Potential :    1.21157158561     V
+ Site  686
+ Electrostatic Potential :   -2.27894902680     V
+ Site  687
+ Electrostatic Potential :   -2.17371958977     V
+ Site  688
+ Electrostatic Potential :   -5.49758229294     V
+ Site  689
+ Electrostatic Potential :    23.6316523658     V
+ Site  690
+ Electrostatic Potential :   -2.93511059356     V
+ Site  691
+ Electrostatic Potential :   -3.81798087893     V
+ Site  692
+ Electrostatic Potential :   -2.23155294065     V
+ Site  693
+ Electrostatic Potential :   -1.57574388629     V
+ Site  694
+ Electrostatic Potential :  -0.607238530477     V
+ Site  695
+ Electrostatic Potential :    3.28819895468     V
+ Site  696
+ Electrostatic Potential :   -2.99408295734     V
+ Site  697
+ Electrostatic Potential :   -5.08788116242     V
+ Site  698
+ Electrostatic Potential :   -2.23795072337     V
+ Site  699
+ Electrostatic Potential :    3.39352196592     V
+ Site  700
+ Electrostatic Potential :   -16.5432680553     V
+ Site  701
+ Electrostatic Potential :   -1.41492205850     V
+ Site  702
+ Electrostatic Potential :    1.26553358406     V
+ Site  703
+ Electrostatic Potential :   -2.41195182542     V
+ Site  704
+ Electrostatic Potential :   -1.39869199842     V
+ Site  705
+ Electrostatic Potential :   -2.62814937414     V
+ Site  706
+ Electrostatic Potential :    20.7399524008     V
+ Site  707
+ Electrostatic Potential :   -13.3740904968     V
+ Site  708
+ Electrostatic Potential :    19.7612508664     V
+ Site  709
+ Electrostatic Potential :   -5.58429125061     V
+ Site  710
+ Electrostatic Potential :   -4.59638147432     V
+ Site  711
+ Electrostatic Potential :   -4.66151561582     V
+ Site  712
+ Electrostatic Potential :  -0.282978840513     V
+ Site  713
+ Electrostatic Potential :   -8.82518554647     V
+ Site  714
+ Electrostatic Potential :    15.6356261313     V
+ Site  715
+ Electrostatic Potential :   -3.28515178143     V
+ Site  716
+ Electrostatic Potential :    1.94516756041     V
+ Site  717
+ Electrostatic Potential :    9.92856216037     V
+ Site  718
+ Electrostatic Potential :   -3.69026088167     V
+ Site  719
+ Electrostatic Potential :   -3.53037747095     V
+ Site  720
+ Electrostatic Potential :    18.0831728875     V
+ Site  721
+ Electrostatic Potential :   -3.48330394225     V
+ Site  722
+ Electrostatic Potential :   -3.58654299332     V
+ Site  723
+ Electrostatic Potential :   -5.50954534518     V
+ Site  724
+ Electrostatic Potential :   0.909324426049     V
+ Site  725
+ Electrostatic Potential :   -2.78407427026     V
+ Site  726
+ Electrostatic Potential :    2.09833101341     V
+ Site  727
+ Electrostatic Potential :   -3.48977896836     V
+ Site  728
+ Electrostatic Potential :   -2.42655179178     V
+ Site  729
+ Electrostatic Potential :    6.08776535715     V
+ Site  730
+ Electrostatic Potential :   -3.80518138919     V
+ Site  731
+ Electrostatic Potential :   -5.74882018176     V
+ Site  732
+ Electrostatic Potential :   -1.28876246471     V
+ Site  733
+ Electrostatic Potential :   -2.52861522987     V
+ Site  734
+ Electrostatic Potential :   -1.17152485404     V
+ Site  735
+ Electrostatic Potential :   -36.9395878655     V
+ Site  736
+ Electrostatic Potential :   -1.69010011006     V
+ Site  737
+ Electrostatic Potential :   -1.99919123671     V
+ Site  738
+ Electrostatic Potential :   -4.85811579077     V
+ Site  739
+ Electrostatic Potential :   -2.46887433858     V
+ Site  740
+ Electrostatic Potential :   -7.41719549840     V
+ Site  741
+ Electrostatic Potential :    7.75734677190     V
+ Site  742
+ Electrostatic Potential :   -2.20186335945     V
+ Site  743
+ Electrostatic Potential :   -3.45509377553     V
+ Site  744
+ Electrostatic Potential :   -7.58976869188     V
+ Site  745
+ Electrostatic Potential :   -4.68837096147     V
+ Site  746
+ Electrostatic Potential :    6.07356906469     V
+ Site  747
+ Electrostatic Potential :   -1.82085137626     V
+ Site  748
+ Electrostatic Potential :   -5.22394367651     V
+ Site  749
+ Electrostatic Potential :    10.6009013591     V
+ Site  750
+ Electrostatic Potential :   -1.55604143089     V
+ Site  751
+ Electrostatic Potential :   -4.18789824229     V
+ Site  752
+ Electrostatic Potential :    1.86510509527     V
+ Site  753
+ Electrostatic Potential :   -2.85617477066     V
+ Site  754
+ Electrostatic Potential :   -3.52723234955     V
+ Site  755
+ Electrostatic Potential :  -0.824443137357     V
+ Site  756
+ Electrostatic Potential :    3.01504905094     V
+ Site  757
+ Electrostatic Potential :  -0.859111130535     V
+ Site  758
+ Electrostatic Potential :   -1.79020366603     V
+ Site  759
+ Electrostatic Potential :   -2.93583190454     V
+ Site  760
+ Electrostatic Potential :    13.4109983411     V
+ Site  761
+ Electrostatic Potential :   -3.10703127692     V
+ Site  762
+ Electrostatic Potential :   -3.42039105623     V
+ Site  763
+ Electrostatic Potential :    8.84115095708     V
+ Site  764
+ Electrostatic Potential :   0.622856637696     V
+ Site  765
+ Electrostatic Potential :   -19.3368869789     V
+ Site  766
+ Electrostatic Potential :   -2.89511400593     V
+ Site  767
+ Electrostatic Potential :    4.73366868735     V
+ Site  768
+ Electrostatic Potential :    1.35570839323     V
+ Site  769
+ Electrostatic Potential :   -2.62224971989     V
+ Site  770
+ Electrostatic Potential :   -3.74367413173     V
+ Site  771
+ Electrostatic Potential :   -5.01669246176     V
+ Site  772
+ Electrostatic Potential :   -3.39839285164     V
+ Site  773
+ Electrostatic Potential :   -2.76673587571     V
+ Site  774
+ Electrostatic Potential :    19.3023417425     V
+ Site  775
+ Electrostatic Potential :    21.8632145087     V
+ Site  776
+ Electrostatic Potential :    1.15367578581     V
+ Site  777
+ Electrostatic Potential :   -2.91782406341     V
+ Site  778
+ Electrostatic Potential :    10.2150449001     V
+ Site  779
+ Electrostatic Potential :   -2.92808639955     V
+ Site  780
+ Electrostatic Potential :    2.49205337075     V
+ Site  781
+ Electrostatic Potential :   -1.82045018270     V
+ Site  782
+ Electrostatic Potential :   -3.93966308298     V
+ Site  783
+ Electrostatic Potential :   -5.26120958601     V
+ Site  784
+ Electrostatic Potential :   -2.64666118489     V
+ Site  785
+ Electrostatic Potential :   -11.1036657118     V
+ Site  786
+ Electrostatic Potential :   -4.08186581293     V
+ Site  787
+ Electrostatic Potential :   -3.01882434517     V
+ Site  788
+ Electrostatic Potential :   -6.29407311975     V
+ Site  789
+ Electrostatic Potential :  -0.875969999602     V
+ Site  790
+ Electrostatic Potential :   -2.57209772234     V
+ Site  791
+ Electrostatic Potential :   -3.96226485768     V
+ Site  792
+ Electrostatic Potential :   0.737847710235     V
+ Site  793
+ Electrostatic Potential :   -3.10661274365     V
+ Site  794
+ Electrostatic Potential :    7.46098720989     V
+ Site  795
+ Electrostatic Potential :   -2.44118118204     V
+ Site  796
+ Electrostatic Potential :    4.25523670133     V
+ Site  797
+ Electrostatic Potential :   -2.83348986308     V
+ Site  798
+ Electrostatic Potential :    2.40710548829     V
+ Site  799
+ Electrostatic Potential :   -5.06005990501     V
+ Site  800
+ Electrostatic Potential :    15.9059660430     V
+n_pass = 800 n_fail = 9
+Number of sites = 800
+Number of surface point charges = 344
+Number of sinular values used for fitting = 223
+Mean absolute error of electrostatic potential for raw (formal) point charges =   17.14607 V.
+Mean absolute error of electrostatic potential for fitted point charges =    0.00000 V.

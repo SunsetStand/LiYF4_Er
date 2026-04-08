@@ -21,7 +21,7 @@ export MKL_NUM_THREADS=16
 export OPENBLAS_NUM_THREADS=16
 
 # 5. 进入目录
-cd /data/home/wangcx/LiYF4_Er3+/AIMPModelGenerator-main/LiYF4_Er3+/no_opt || exit 1
+cd /data/home/wangcx/LiYF4_Er3+/AIMPModelGenerator-main/LiYF4_Er3+/no_opt_1/cahf_casci || exit 1
 
 echo "Running on host: $(hostname)"
 echo "Python Executable: $PYEXEC"
@@ -45,7 +45,7 @@ fi
 touch JobProcessing.state
 echo "Job Running at $(date)" >> JobProcessing.state
 
-/data/home/wangcx/LiYF4_Er3+/env/bin/python -u cahf_no_opt.py
+/data/home/wangcx/LiYF4_Er3+/env/bin/python -u cahf_casci.py
 
 # 7. 任务结束
 echo "Job $SLURM_JOB_ID $SLURM_JOB_NAME Finished !" >> $HOME/finish

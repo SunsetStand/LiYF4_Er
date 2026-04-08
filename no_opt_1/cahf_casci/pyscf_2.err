@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/data/home/wangcx/LiYF4_Er3+/AIMPModelGenerator-main/LiYF4_Er3+/no_opt_1/cahf_casci/cahf_casci.py", line 28, in <module>
+    AIMP_LOADER = AIMPEnvLoader(aimpdict)
+  File "/data/home/wangcx/LiYF4_Er3+/AIMPModelGenerator-main/src/AIMP3_DMET_SCEI.py", line 301, in __init__
+    self.get_dm_list()
+  File "/data/home/wangcx/LiYF4_Er3+/AIMPModelGenerator-main/src/AIMP3_DMET_SCEI.py", line 428, in get_dm_list
+    mo_energy = np.loadtxt(file_name_mo_energy)
+  File "/data/home/wangcx/LiYF4_Er3+/env/lib/python3.10/site-packages/numpy/lib/npyio.py", line 1373, in loadtxt
+    arr = _read(fname, dtype=dtype, comment=comment, delimiter=delimiter,
+  File "/data/home/wangcx/LiYF4_Er3+/env/lib/python3.10/site-packages/numpy/lib/npyio.py", line 992, in _read
+    fh = np.lib._datasource.open(fname, 'rt', encoding=encoding)
+  File "/data/home/wangcx/LiYF4_Er3+/env/lib/python3.10/site-packages/numpy/lib/_datasource.py", line 193, in open
+    return ds.open(path, mode, encoding=encoding, newline=newline)
+  File "/data/home/wangcx/LiYF4_Er3+/env/lib/python3.10/site-packages/numpy/lib/_datasource.py", line 533, in open
+    raise FileNotFoundError(f"{path} not found.")
+FileNotFoundError: MO_ENERGY_F.txt not found.
