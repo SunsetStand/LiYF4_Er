@@ -1,0 +1,9 @@
+# Input file for Ewald cluster generation
+poscarfile: "../LiYF4 (1).poscar"
+rCluster: 1.5
+rAIMP: 8.0
+rChgs: 12.0
+rSurface: 14.0
+cAtom: "Li"
+cAtomIndex: 1
+num_sites: 800
