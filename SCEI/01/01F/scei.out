@@ -1,0 +1,410 @@
+converged SCF energy = -7.23611864228691
+converged SCF energy = -3313.46755978021
+converged SCF energy = -99.3659835664143
+#INFO: **** input file is /data/home/wangcx/LiYF4_Er3+/AIMPModelGenerator-main/SCEI_w.py ****
+# User interface for Ab-initio Model Potential package
+
+from email.policy import default
+#from turtle import home
+from src.AIMP3 import AIMPEnvLoader, AIMP_RHF, AIMP_RKS, AIMP_ROHF, AIMP_ROKS, AIMP_UKS, AIMP_GKS
+from src.pckit2 import OrganicPCLoader, PointChargeParams
+from src.constraint_optimizer import ConstraintOptimizer
+from src.EnvGenerator import XYZParser
+from pyscf import gto, lib
+from pyscf.tddft import TDA
+from pyscf.tools.cubegen import orbital
+import yaml, sys, getopt
+import numpy as np
+import basis_set_exchange as bse
+
+Ha2eV = 27.211324570273
+
+opts, args = getopt.getopt(sys.argv[1:], "i:f:")
+
+for op, value in opts:
+    if op == "-i": 
+        workdir = value + "/"   # The working directory
+
+logdir = workdir + "log.out"
+logf = open(logdir, 'w')
+sys.stdout = logf
+
+inputdir = workdir + "input.yaml"
+with open(inputdir, 'r') as f:
+    inputdict = yaml.safe_load(f)
+aimpdict = inputdict["aimp"]
+clusterdict = inputdict["cluster"]
+#add by ZhangTeng 2023.7.12
+try: socdict = inputdict["soc"]
+except KeyError: socdict = False
+
+# Saving the interpolation results
+qlst = []
+gs_energy_lst = []
+ex_energy_lst = []
+
+#|ddm| as converge threshold for density matrix
+DDM = 10
+# ################################
+
+# Load AIMP environment
+try: aimpdir = workdir + aimpdict["dir"]
+except KeyError: aimpdir = workdir + "aimp.xyz"
+aimpdict['dir'] = aimpdir
+aimpdict['workdir'] = workdir
+# 检查 aimpdict 中是否有需要作为代码执行的基组字符串
+if "basis" in aimpdict:
+    for elem, val in aimpdict["basis"].items():
+        if isinstance(val, str) and 'bse.get_basis' in val:
+            # 使用 eval 强行执行这段字符串代码，将结果替换回字典中
+            aimpdict["basis"][elem] = eval(val)
+AIMP_LOADER = AIMPEnvLoader(aimpdict,socdict)
+try: orthoreg = aimpdict["orthoreg"]
+except: orthoreg = 0
+
+# Load Point Charge Environment
+try: 
+    pcdict = inputdict["pointcharge"]
+    try: is_organic = pcdict['organic']
+    except KeyError: is_organic = False
+
+    try: rawxyzdir = workdir + pcdict["rawxyzdir"]
+    except KeyError: rawxyzdir = workdir + "rawChgs.xyz"
+
+    if not is_organic:
+        try: rawchgdir = workdir + pcdict["rawchgdir"]
+        except KeyError: rawchgdir = workdir + "rawCharges.dat"
+        pcparam_raw = PointChargeParams(rawxyzdir, rawchgdir)
+    else:
+        pcdict = aimpdict
+        pcdict["dir"] = rawxyzdir
+        pcdict['workdir'] = workdir
+        pc_loader = OrganicPCLoader(pcdict)
+        pcparam_raw = pc_loader.make_param()
+
+    try: surfxyzdir = workdir + pcdict["surfxyzdir"]
+    except KeyError: surfxyzdir = workdir + "surfChgs.xyz"
+    try: surfchgdir = workdir + pcdict["surfchgdir"]
+    except KeyError: surfchgdir = workdir + "surfaceCharges.dat"
+    pcparam_surf = PointChargeParams(surfxyzdir, surfchgdir)
+
+    PCPARAM = pcparam_raw + pcparam_surf
+
+except: PCPARAM = None
+
+
+# Load cluster molecule
+try: ecp = clusterdict["ecp"]
+except KeyError: ecp = {}
+try: spin = clusterdict["spin"]
+except KeyError: spin = 0
+try: verbose = inputdict["verbose"]
+except KeyError: verbose = 3
+try: cubes = inputdict["cube"]
+except KeyError: cubes = -1
+try: cluster_fake_name = clusterdict["cluster_fake_name"]
+except KeyError: cluster_fake_name = False
+
+
+def aimp_calc(CLUS_MOL, scfdict, interpolation=False):
+
+    scftype = scfdict["calc"].upper()
+    if socdict:
+        if scftype in ['DFT', 'KS', 'RKS', 'TDDFT', 'TDKS']:
+            try: xc = clusterdict['scf']['xc']
+            except KeyError: xc = 'b3lyp'
+            MF = AIMP_GKS(CLUS_MOL, AIMP_LOADER, xc=xc)
+            MF.collinear = 'mcol'    
+            dm = MF.get_init_guess()
+            dm = dm.astype(np.complex128)
+            dm = dm + 0j
+            dm[0,:] += .1j
+            dm[:,0] -= .1j
+        else:
+            raise NotImplementedError("Other tags have not been implemented yet!")
+
+        if PCPARAM is not None: MF.addPCParam2(PCPARAM)
+        MF.set_orthoreg_param(orthoreg)
+    else:
+        if scftype in ['HF', 'RHF', 'TDHF', 'TDAHF']:
+            MF = AIMP_RHF(CLUS_MOL, AIMP_LOADER)
+        elif scftype in ['ROHF']:
+            MF = AIMP_ROHF(CLUS_MOL, AIMP_LOADER)
+        elif scftype in ['DFT', 'KS', 'RKS', 'TDDFT', 'TDKS']:
+            if spin == 0:
+                try: xc = clusterdict['scf']['xc']
+                except KeyError: xc = 'b3lyp'
+                MF = AIMP_RKS(CLUS_MOL, AIMP_LOADER, xc=xc)
+            else:
+                try: xc = clusterdict['scf']['xc']
+                except KeyError: xc = 'b3lyp'
+                MF = AIMP_UKS(CLUS_MOL, AIMP_LOADER, xc=xc)
+        elif scftype in ['ROKS']:
+            try: xc = clusterdict['scf']['xc']
+            except KeyError: xc = "b3lyp"
+            MF = AIMP_ROKS(CLUS_MOL, AIMP_LOADER, xc=xc)
+        else:
+            raise NotImplementedError("Other tags have not been implemented yet!")
+
+        if PCPARAM is not None: MF.addPCParam2(PCPARAM)
+        MF.set_orthoreg_param(orthoreg)
+
+    # checkpoint file for TDA method
+    try: MF.chkfile = workdir + inputdict['chkfile']
+    except KeyError: pass
+
+    if socdict:
+        MF.kernel(dm0=dm)
+    else:
+        MF.kernel()
+    if interpolation: gs_energy_lst.append(MF.e_tot)
+
+    if 'TD' in scftype: # Do time-dependent calculation using Tam-dancoff approx
+        MF = TDA(MF)
+        try: 
+            tdopt = scfdict['tdopt']
+            for key in tdopt.keys():
+                setattr(MF, key, tdopt[key])
+        except KeyError: pass
+
+        # checkpoint file for TDA method
+        try: MF.chkfile = workdir + inputdict['chkfile']
+        except KeyError: pass
+
+        MF.kernel()
+        if interpolation:
+            ex_energy_lst.append(MF.e_tot + MF.e[0] / Ha2eV)
+
+    return MF
+
+# AIMP Energy calculation
+if inputdict["type"].upper() in ["GEO_OPT", "GEOM_OPT", "RELAX", "GEOMOPT", "ENERGY"]:
+    try: clusterdir = workdir + clusterdict["dir"]
+    except KeyError: clusterdir = workdir + "cluster.xyz"
+
+    # added for custom basis sets in the NWChem format
+    for basis in clusterdict["basis"]:
+        if 'parse' in clusterdict["basis"][basis] or 'load' in clusterdict["basis"][basis]:
+            clusterdict["basis"][basis] = eval(clusterdict["basis"][basis])
+
+    CLUS_MOL = gto.M(atom=clusterdir, basis=clusterdict["basis"], 
+    ecp=ecp, charge=clusterdict["charge"], spin=spin, verbose=verbose)
+    if socdict:
+        NELEC = CLUS_MOL.nelec[0] + CLUS_MOL.nelec[1]
+    else:
+        NELEC = CLUS_MOL.nelec[0]
+    NAMELINE = np.loadtxt(clusterdir, skiprows=2, max_rows=1, dtype=str)
+    if cluster_fake_name:
+        NAME = cluster_fake_name
+    else:
+        NAME = NAMELINE[0]
+    scfdict = clusterdict["scf"]
+    MF = aimp_calc(CLUS_MOL, scfdict)
+    MO_COEFF = MF.mo_coeff[:,:NELEC]
+    MO_ENERGY = MF.mo_energy[:NELEC]
+    RDM = MF.make_rdm1()
+    E_TOT = MF.e_tot
+
+    file_name_mo_coeff = 'MO_COEFF_' + NAME + '.txt'
+    file_name_mo_energy = 'MO_ENERGY_' + NAME + '.txt'
+    file_name_rdm = 'RDM_' + NAME + '.txt'
+    file_name_etot = 'E_TOT_' + NAME + '.txt'
+
+    #Output new results
+    np.savetxt(file_name_mo_coeff, MO_COEFF)
+    np.savetxt(file_name_mo_energy, MO_ENERGY)
+    np.savetxt(file_name_rdm, RDM)
+    np.savetxt(file_name_etot, np.array([E_TOT]))
+
+    # Visualizing orbitals
+    if cubes!= -1:
+        for cube in cubes:
+            cube_name = str(cube)
+            coeff = MF.mo_coeff[:,cube]
+            orbital(CLUS_MOL, 'orbital'+cube_name+'.cube', coeff)
+
+# Geometry Optimization
+#add by ZhangTeng 2024.4.10
+if inputdict['type'].upper() in ["GEO_OPT", "GEOM_OPT", "RELAX", "GEOMOPT"]:
+    optdict = inputdict["geomopt"]
+    try: constraint = optdict["constraint"]
+    except KeyError: constraint = False
+    try: 
+        td_state = optdict["td_state"]
+        scanner = MF.nuc_grad_method().as_scanner(state=td_state)
+    except KeyError:
+        scanner = MF.nuc_grad_method().as_scanner()
+    if constraint:
+        params = {"constraints": "constraints.txt",}  
+        OPT = MF.Gradients().optimizer(solver='geomeTRIC')
+        OPT.kernel(params)
+    else:
+        OPT = scanner.optimizer(); OPT.kernel()
+    optmol = OPT.mol
+    optmol.tofile(workdir + optdict["xyzdir"], format="xyz")
+
+
+# Interpolation
+if inputdict["type"].upper() in ['INTERPOLATION']:
+    interdict = inputdict["interpolation"]
+    try: ngrid = interdict["ngrid"]
+    except KeyError: ngrid = 25
+    scfdict = clusterdict["scf"]
+    xlst = np.linspace(-1, 2, ngrid)
+    gsdir, exdir = interdict["xyzdir"]
+    gs = XYZParser(file=workdir + gsdir)
+    ex = XYZParser(file=workdir + exdir)
+    delta = gs + ex * (-1)
+    dQ = delta.calc_dQ()
+    for x in xlst:
+        q = dQ * x
+        qlst.append(q)
+        molparser = gs * (1. - x) + ex * x
+        CLUS_MOL = gto.M(atom=molparser.__str__(), basis=clusterdict["basis"], 
+        ecp=ecp, charge=clusterdict["charge"], spin=spin)
+        aimp_calc(CLUS_MOL, scfdict=scfdict, interpolation=True)
+    
+    q_and_gs = np.array([qlst, gs_energy_lst])
+    e_tda = np.array(ex_energy_lst).T
+    totlst = np.vstack((q_and_gs, e_tda))
+    np.savetxt(workdir + interdict["outdir"], totlst)
+
+# close log file
+logf.close()
+#INFO: ******************** input file end ********************
+
+
+System: uname_result(system='Linux', node='amd-cpu', release='6.8.0-101-generic', version='#101~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Wed Feb 11 13:19:54 UTC ', machine='x86_64')  Threads 16
+Python 3.10.19 | packaged by conda-forge | (main, Jan 26 2026, 23:45:08) [GCC 14.3.0]
+numpy 1.26.4  scipy 1.15.3  h5py 3.15.1
+Date: Wed Apr  8 09:07:03 2026
+PySCF version 2.12.0
+PySCF path  /data/home/wangcx/LiYF4_Er3+/env/lib/python3.10/site-packages/pyscf
+
+[CONFIG] conf_file None
+[INPUT] verbose = 5
+[INPUT] max_memory = 4000 
+[INPUT] num. atoms = 1
+[INPUT] num. electrons = 10
+[INPUT] charge = -1
+[INPUT] spin (= nelec alpha-beta = 2S) = 0
+[INPUT] symmetry False subgroup None
+[INPUT] Mole.unit = angstrom
+[INPUT] Symbol           X                Y                Z      unit          X                Y                Z       unit  Magmom
+[INPUT]  1 F      0.000000000000   0.000000000000   0.000000000000 AA    0.000000000000   0.000000000000   0.000000000000 Bohr   0.0
+[INPUT] ---------------- BASIS SET ---------------- 
+[INPUT] l, kappa, [nprim/nctr], expnt,             c_1 c_2 ...
+[INPUT] F
+[INPUT] 0    0    [8    /2   ]  14710             0.000721 -0.000165
+                                2207              0.005553 -0.001308
+                                502.8             0.028267 -0.006495
+                                142.6             0.106444 -0.026691
+                                46.47             0.286814 -0.07369
+                                16.7              0.448641 -0.170776
+                                6.356             0.264761 -0.112327
+                                1.316             0.015333 0.562814
+[INPUT] 0    0    [1    /1   ]  0.3897               1
+[INPUT] 1    0    [3    /1   ]  22.67             0.044878
+                                4.977             0.235718
+                                1.347             0.508521
+[INPUT] 1    0    [1    /1   ]  0.3471               1
+[INPUT] 2    0    [1    /1   ]  1.64                 1
+
+nuclear repulsion = 0
+number of shells = 5
+number of NR pGTOs = 26
+number of NR cGTOs = 14
+basis = {'F': 'ccpvdz'}
+ecp = {}
+CPU time:        18.33
+
+
+******** <class 'src.AIMP3.AIMP_RHF'> ********
+method = AIMP_RHF
+initial guess = minao
+damping factor = 0
+level_shift factor = 0
+DIIS = <class 'pyscf.scf.diis.CDIIS'>
+diis_start_cycle = 1
+diis_space = 8
+diis_damp = 0
+SCF conv_tol = 1e-09
+SCF conv_tol_grad = None
+SCF max_cycles = 50
+direct_scf = True
+direct_scf_tol = 1e-13
+chkfile to save SCF result = .//Er.chk
+max_memory 4000 MB (current use 144 MB)
+cond(S) = 8.923770993095477
+<class 'src.AIMP3.AIMP_RHF'> does not have attributes  nsur with_pc2 pcparams mol2_lists dm2_list orthoreg_param dme2_list
+Set gradient conv threshold to 3.16228e-05
+Initial guess from minao.
+E1 = -142.48082922560127  E_coul = 39.81470418819756
+init E= -98.8254442752699
+    CPU time for initialize scf     22.40 sec, wall time      2.21 sec
+  HOMO = -1.00789830742671  LUMO = 0.996469159137252
+  mo_energy =
+[-26.89160175  -2.01437956  -1.01934787  -1.01716614  -1.00789831
+   0.99646916   1.03563811   1.07729899   1.34487357   3.45018852
+   3.45062508   3.46675615   3.46988212   3.47283465]
+E1 = -151.90665720732338  E_coul = 48.613287672860494
+cycle= 1 E= -99.452688772329  delta_E= -0.627  |g|= 0.83  |ddm|= 0.453
+    CPU time for cycle= 1      0.41 sec, wall time      0.03 sec
+  HOMO = -0.257412606893914  LUMO = 1.74044329500504
+  mo_energy =
+[-25.46583749  -1.15032769  -0.27309767  -0.27094171  -0.25741261
+   1.7404433    1.76928752   1.80071384   2.10365041   4.34973366
+   4.35018518   4.36576124   4.36871066   4.37153264]
+E1 = -148.18274572236683  E_coul = 44.81472536414485
+cycle= 2 E= -99.5273395960881  delta_E= -0.0747  |g|= 0.445  |ddm|= 0.659
+    CPU time for cycle= 2      0.43 sec, wall time      0.03 sec
+  HOMO = -0.429993425480353  LUMO = 1.59762645307048
+  mo_energy =
+[-25.99883389  -1.33437982  -0.43904995  -0.43510825  -0.42999343
+   1.59762645   1.6287245    1.66251931   1.96242946   4.15912144
+   4.15957443   4.17515327   4.1781378    4.18095206]
+E1 = -149.4941867175502  E_coul = 46.09798523835173
+cycle= 3 E= -99.5555207170646  delta_E= -0.0282  |g|= 0.00634  |ddm|= 0.224
+    CPU time for cycle= 3      0.42 sec, wall time      0.03 sec
+  HOMO = -0.433145333860262  LUMO = 1.5997805518249
+  mo_energy =
+[-26.00307359  -1.33550389  -0.44127085  -0.43647961  -0.43314533
+   1.59978055   1.62973571   1.66251777   1.9635203    4.15877031
+   4.15922394   4.17474621   4.17769898   4.18050301]
+E1 = -149.4979627283056  E_coul = 46.1017491650598
+cycle= 4 E= -99.555532801112  delta_E= -1.21e-05  |g|= 0.00153  |ddm|= 0.00541
+    CPU time for cycle= 4      0.42 sec, wall time      0.03 sec
+  HOMO = -0.433171065325838  LUMO = 1.59996260693691
+  mo_energy =
+[-26.00225884  -1.33512275  -0.44094719  -0.43579787  -0.43317107
+   1.59996261   1.62959072   1.66210082   1.96353102   4.15887894
+   4.159333     4.17485099   4.17779837   4.18060261]
+E1 = -149.4969232304332  E_coul = 46.10070885818529
+cycle= 5 E= -99.5555336101141  delta_E= -8.09e-07  |g|= 0.000117  |ddm|= 0.00173
+    CPU time for cycle= 5      0.41 sec, wall time      0.03 sec
+  HOMO = -0.433246809809649  LUMO = 1.60002014614164
+  mo_energy =
+[-26.00241369  -1.33519459  -0.44101618  -0.43585501  -0.43324681
+   1.60002015   1.62962688   1.66212319   1.96353875   4.15886753
+   4.15932154   4.17483903   4.1777859    4.1805901 ]
+E1 = -149.49704961146145  E_coul = 46.10083523645821
+cycle= 6 E= -99.5555336128694  delta_E= -2.76e-09  |g|= 1.26e-05  |ddm|= 9.38e-05
+    CPU time for cycle= 6      0.41 sec, wall time      0.03 sec
+  HOMO = -0.433241851779268  LUMO = 1.60001349393142
+  mo_energy =
+[-26.00240256  -1.3351928   -0.44100998  -0.43584588  -0.43324185
+   1.60001349   1.62961863   1.66211504   1.96353094   4.15886499
+   4.15931902   4.17483657   4.17778347   4.18058768]
+E1 = -149.49705303834537  E_coul = 46.10083866330402
+cycle= 7 E= -99.5555336129075  delta_E= -3.81e-11  |g|= 9.74e-07  |ddm|= 1.25e-05
+    CPU time for cycle= 7      0.41 sec, wall time      0.03 sec
+  HOMO = -0.433240984891681  LUMO = 1.60001296601723
+  mo_energy =
+[-26.00240065  -1.3351921   -0.44100922  -0.4358449   -0.43324098
+   1.60001297   1.62961801   1.66211462   1.96353063   4.15886509
+   4.15931911   4.17483666   4.17778356   4.18058778]
+E1 = -149.497051515007  E_coul = 46.10083713996544
+Extra cycle  E= -99.5555336129077  delta_E= -1.99e-13  |g|= 2.98e-07  |ddm|= 7.37e-07
+    CPU time for scf_cycle     25.71 sec, wall time      2.42 sec
+    CPU time for SCF     25.72 sec, wall time      2.43 sec
+converged SCF energy = -99.5555336129077

@@ -1,0 +1,494 @@
+converged SCF energy = -7.23611864228691
+converged SCF energy = -3313.46755978021
+converged SCF energy = -99.3659835664144
+#INFO: **** input file is /data/home/wangcx/LiYF4_Er3+/AIMPModelGenerator-main/SCEI_w.py ****
+# User interface for Ab-initio Model Potential package
+
+from email.policy import default
+#from turtle import home
+from src.AIMP3 import AIMPEnvLoader, AIMP_RHF, AIMP_RKS, AIMP_ROHF, AIMP_ROKS, AIMP_UKS, AIMP_GKS
+from src.pckit2 import OrganicPCLoader, PointChargeParams
+from src.constraint_optimizer import ConstraintOptimizer
+from src.EnvGenerator import XYZParser
+from pyscf import gto, lib
+from pyscf.tddft import TDA
+from pyscf.tools.cubegen import orbital
+import yaml, sys, getopt
+import numpy as np
+import basis_set_exchange as bse
+
+Ha2eV = 27.211324570273
+
+opts, args = getopt.getopt(sys.argv[1:], "i:f:")
+
+for op, value in opts:
+    if op == "-i": 
+        workdir = value + "/"   # The working directory
+
+logdir = workdir + "log.out"
+logf = open(logdir, 'w')
+sys.stdout = logf
+
+inputdir = workdir + "input.yaml"
+with open(inputdir, 'r') as f:
+    inputdict = yaml.safe_load(f)
+aimpdict = inputdict["aimp"]
+clusterdict = inputdict["cluster"]
+#add by ZhangTeng 2023.7.12
+try: socdict = inputdict["soc"]
+except KeyError: socdict = False
+
+# Saving the interpolation results
+qlst = []
+gs_energy_lst = []
+ex_energy_lst = []
+
+#|ddm| as converge threshold for density matrix
+DDM = 10
+# ################################
+
+# Load AIMP environment
+try: aimpdir = workdir + aimpdict["dir"]
+except KeyError: aimpdir = workdir + "aimp.xyz"
+aimpdict['dir'] = aimpdir
+aimpdict['workdir'] = workdir
+# 检查 aimpdict 中是否有需要作为代码执行的基组字符串
+if "basis" in aimpdict:
+    for elem, val in aimpdict["basis"].items():
+        if isinstance(val, str) and 'bse.get_basis' in val:
+            # 使用 eval 强行执行这段字符串代码，将结果替换回字典中
+            aimpdict["basis"][elem] = eval(val)
+AIMP_LOADER = AIMPEnvLoader(aimpdict,socdict)
+try: orthoreg = aimpdict["orthoreg"]
+except: orthoreg = 0
+
+# Load Point Charge Environment
+try: 
+    pcdict = inputdict["pointcharge"]
+    try: is_organic = pcdict['organic']
+    except KeyError: is_organic = False
+
+    try: rawxyzdir = workdir + pcdict["rawxyzdir"]
+    except KeyError: rawxyzdir = workdir + "rawChgs.xyz"
+
+    if not is_organic:
+        try: rawchgdir = workdir + pcdict["rawchgdir"]
+        except KeyError: rawchgdir = workdir + "rawCharges.dat"
+        pcparam_raw = PointChargeParams(rawxyzdir, rawchgdir)
+    else:
+        pcdict = aimpdict
+        pcdict["dir"] = rawxyzdir
+        pcdict['workdir'] = workdir
+        pc_loader = OrganicPCLoader(pcdict)
+        pcparam_raw = pc_loader.make_param()
+
+    try: surfxyzdir = workdir + pcdict["surfxyzdir"]
+    except KeyError: surfxyzdir = workdir + "surfChgs.xyz"
+    try: surfchgdir = workdir + pcdict["surfchgdir"]
+    except KeyError: surfchgdir = workdir + "surfaceCharges.dat"
+    pcparam_surf = PointChargeParams(surfxyzdir, surfchgdir)
+
+    PCPARAM = pcparam_raw + pcparam_surf
+
+except: PCPARAM = None
+
+
+# Load cluster molecule
+try: ecp = clusterdict["ecp"]
+except KeyError: ecp = {}
+try: spin = clusterdict["spin"]
+except KeyError: spin = 0
+try: verbose = inputdict["verbose"]
+except KeyError: verbose = 3
+try: cubes = inputdict["cube"]
+except KeyError: cubes = -1
+try: cluster_fake_name = clusterdict["cluster_fake_name"]
+except KeyError: cluster_fake_name = False
+
+
+def aimp_calc(CLUS_MOL, scfdict, interpolation=False):
+
+    scftype = scfdict["calc"].upper()
+    if socdict:
+        if scftype in ['DFT', 'KS', 'RKS', 'TDDFT', 'TDKS']:
+            try: xc = clusterdict['scf']['xc']
+            except KeyError: xc = 'b3lyp'
+            MF = AIMP_GKS(CLUS_MOL, AIMP_LOADER, xc=xc)
+            MF.collinear = 'mcol'    
+            dm = MF.get_init_guess()
+            dm = dm.astype(np.complex128)
+            dm = dm + 0j
+            dm[0,:] += .1j
+            dm[:,0] -= .1j
+        else:
+            raise NotImplementedError("Other tags have not been implemented yet!")
+
+        if PCPARAM is not None: MF.addPCParam2(PCPARAM)
+        MF.set_orthoreg_param(orthoreg)
+    else:
+        if scftype in ['HF', 'RHF', 'TDHF', 'TDAHF']:
+            MF = AIMP_RHF(CLUS_MOL, AIMP_LOADER)
+        elif scftype in ['ROHF']:
+            MF = AIMP_ROHF(CLUS_MOL, AIMP_LOADER)
+        elif scftype in ['DFT', 'KS', 'RKS', 'TDDFT', 'TDKS']:
+            if spin == 0:
+                try: xc = clusterdict['scf']['xc']
+                except KeyError: xc = 'b3lyp'
+                MF = AIMP_RKS(CLUS_MOL, AIMP_LOADER, xc=xc)
+            else:
+                try: xc = clusterdict['scf']['xc']
+                except KeyError: xc = 'b3lyp'
+                MF = AIMP_UKS(CLUS_MOL, AIMP_LOADER, xc=xc)
+        elif scftype in ['ROKS']:
+            try: xc = clusterdict['scf']['xc']
+            except KeyError: xc = "b3lyp"
+            MF = AIMP_ROKS(CLUS_MOL, AIMP_LOADER, xc=xc)
+        else:
+            raise NotImplementedError("Other tags have not been implemented yet!")
+
+        if PCPARAM is not None: MF.addPCParam2(PCPARAM)
+        MF.set_orthoreg_param(orthoreg)
+
+    # checkpoint file for TDA method
+    try: MF.chkfile = workdir + inputdict['chkfile']
+    except KeyError: pass
+
+    if socdict:
+        MF.kernel(dm0=dm)
+    else:
+        MF.kernel()
+    if interpolation: gs_energy_lst.append(MF.e_tot)
+
+    if 'TD' in scftype: # Do time-dependent calculation using Tam-dancoff approx
+        MF = TDA(MF)
+        try: 
+            tdopt = scfdict['tdopt']
+            for key in tdopt.keys():
+                setattr(MF, key, tdopt[key])
+        except KeyError: pass
+
+        # checkpoint file for TDA method
+        try: MF.chkfile = workdir + inputdict['chkfile']
+        except KeyError: pass
+
+        MF.kernel()
+        if interpolation:
+            ex_energy_lst.append(MF.e_tot + MF.e[0] / Ha2eV)
+
+    return MF
+
+# AIMP Energy calculation
+if inputdict["type"].upper() in ["GEO_OPT", "GEOM_OPT", "RELAX", "GEOMOPT", "ENERGY"]:
+    try: clusterdir = workdir + clusterdict["dir"]
+    except KeyError: clusterdir = workdir + "cluster.xyz"
+
+    # added for custom basis sets in the NWChem format
+    for basis in clusterdict["basis"]:
+        if 'parse' in clusterdict["basis"][basis] or 'load' in clusterdict["basis"][basis]:
+            clusterdict["basis"][basis] = eval(clusterdict["basis"][basis])
+
+    CLUS_MOL = gto.M(atom=clusterdir, basis=clusterdict["basis"], 
+    ecp=ecp, charge=clusterdict["charge"], spin=spin, verbose=verbose)
+    if socdict:
+        NELEC = CLUS_MOL.nelec[0] + CLUS_MOL.nelec[1]
+    else:
+        NELEC = CLUS_MOL.nelec[0]
+    NAMELINE = np.loadtxt(clusterdir, skiprows=2, max_rows=1, dtype=str)
+    if cluster_fake_name:
+        NAME = cluster_fake_name
+    else:
+        NAME = NAMELINE[0]
+    scfdict = clusterdict["scf"]
+    MF = aimp_calc(CLUS_MOL, scfdict)
+    MO_COEFF = MF.mo_coeff[:,:NELEC]
+    MO_ENERGY = MF.mo_energy[:NELEC]
+    RDM = MF.make_rdm1()
+    E_TOT = MF.e_tot
+
+    file_name_mo_coeff = 'MO_COEFF_' + NAME + '.txt'
+    file_name_mo_energy = 'MO_ENERGY_' + NAME + '.txt'
+    file_name_rdm = 'RDM_' + NAME + '.txt'
+    file_name_etot = 'E_TOT_' + NAME + '.txt'
+
+    #Output new results
+    np.savetxt(file_name_mo_coeff, MO_COEFF)
+    np.savetxt(file_name_mo_energy, MO_ENERGY)
+    np.savetxt(file_name_rdm, RDM)
+    np.savetxt(file_name_etot, np.array([E_TOT]))
+
+    # Visualizing orbitals
+    if cubes!= -1:
+        for cube in cubes:
+            cube_name = str(cube)
+            coeff = MF.mo_coeff[:,cube]
+            orbital(CLUS_MOL, 'orbital'+cube_name+'.cube', coeff)
+
+# Geometry Optimization
+#add by ZhangTeng 2024.4.10
+if inputdict['type'].upper() in ["GEO_OPT", "GEOM_OPT", "RELAX", "GEOMOPT"]:
+    optdict = inputdict["geomopt"]
+    try: constraint = optdict["constraint"]
+    except KeyError: constraint = False
+    try: 
+        td_state = optdict["td_state"]
+        scanner = MF.nuc_grad_method().as_scanner(state=td_state)
+    except KeyError:
+        scanner = MF.nuc_grad_method().as_scanner()
+    if constraint:
+        params = {"constraints": "constraints.txt",}  
+        OPT = MF.Gradients().optimizer(solver='geomeTRIC')
+        OPT.kernel(params)
+    else:
+        OPT = scanner.optimizer(); OPT.kernel()
+    optmol = OPT.mol
+    optmol.tofile(workdir + optdict["xyzdir"], format="xyz")
+
+
+# Interpolation
+if inputdict["type"].upper() in ['INTERPOLATION']:
+    interdict = inputdict["interpolation"]
+    try: ngrid = interdict["ngrid"]
+    except KeyError: ngrid = 25
+    scfdict = clusterdict["scf"]
+    xlst = np.linspace(-1, 2, ngrid)
+    gsdir, exdir = interdict["xyzdir"]
+    gs = XYZParser(file=workdir + gsdir)
+    ex = XYZParser(file=workdir + exdir)
+    delta = gs + ex * (-1)
+    dQ = delta.calc_dQ()
+    for x in xlst:
+        q = dQ * x
+        qlst.append(q)
+        molparser = gs * (1. - x) + ex * x
+        CLUS_MOL = gto.M(atom=molparser.__str__(), basis=clusterdict["basis"], 
+        ecp=ecp, charge=clusterdict["charge"], spin=spin)
+        aimp_calc(CLUS_MOL, scfdict=scfdict, interpolation=True)
+    
+    q_and_gs = np.array([qlst, gs_energy_lst])
+    e_tda = np.array(ex_energy_lst).T
+    totlst = np.vstack((q_and_gs, e_tda))
+    np.savetxt(workdir + interdict["outdir"], totlst)
+
+# close log file
+logf.close()
+#INFO: ******************** input file end ********************
+
+
+System: uname_result(system='Linux', node='amd-cpu', release='6.8.0-101-generic', version='#101~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Wed Feb 11 13:19:54 UTC ', machine='x86_64')  Threads 16
+Python 3.10.19 | packaged by conda-forge | (main, Jan 26 2026, 23:45:08) [GCC 14.3.0]
+numpy 1.26.4  scipy 1.15.3  h5py 3.15.1
+Date: Wed Apr  8 09:07:08 2026
+PySCF version 2.12.0
+PySCF path  /data/home/wangcx/LiYF4_Er3+/env/lib/python3.10/site-packages/pyscf
+
+[CONFIG] conf_file None
+[INPUT] verbose = 5
+[INPUT] max_memory = 4000 
+[INPUT] num. atoms = 1
+[INPUT] num. electrons = 36
+[INPUT] charge = 3
+[INPUT] spin (= nelec alpha-beta = 2S) = 0
+[INPUT] symmetry False subgroup None
+[INPUT] Mole.unit = angstrom
+[INPUT] Symbol           X                Y                Z      unit          X                Y                Z       unit  Magmom
+[INPUT]  1 Y      0.000000000000   0.000000000000   0.000000000000 AA    0.000000000000   0.000000000000   0.000000000000 Bohr   0.0
+[INPUT] ---------------- BASIS SET ---------------- 
+[INPUT] l, kappa, [nprim/nctr], expnt,             c_1 c_2 ...
+[INPUT] Y
+[INPUT] 0    0    [8    /1   ]  2522141.32102     0.001699
+                                449156.299904     0.0036724
+                                151720.176453     0.0066311
+                                51855.4435404     0.0167936
+                                18689.6623294     0.041001
+                                6875.55030786     0.1012493
+                                2648.45220711     0.2522764
+                                1049.980737       0.5766767
+[INPUT] 0    0    [2    /1   ]  422.47853745      -0.5348801
+                                172.31836708      -0.4651198
+[INPUT] 0    0    [1    /1   ]  60.56530325          1
+[INPUT] 0    0    [2    /1   ]  28.30120953       0.7509238
+                                12.66764116       0.2490761
+[INPUT] 0    0    [2    /1   ]  5.05894842        0.6863196
+                                2.20390257        0.3136803
+[INPUT] 0    0    [2    /1   ]  0.72735771        0.6399224
+                                0.30401193        0.3600775
+[INPUT] 0    0    [1    /1   ]  0.04783584           1
+[INPUT] 0    0    [1    /1   ]  0.01355997           1
+[INPUT] 1    0    [7    /1   ]  11876.2548488     0.0009397
+                                3268.55095104     0.0033491
+                                1184.41460471     0.0136442
+                                463.14383928      0.0517347
+                                191.23738154      0.1583925
+                                82.85996128       0.3508255
+                                37.20448645       0.4211141
+[INPUT] 1    0    [1    /1   ]  17.1581726          -1
+[INPUT] 1    0    [2    /1   ]  7.6564011         -0.5178717
+                                3.40344219        -0.4821282
+[INPUT] 1    0    [3    /1   ]  1.2829311         0.2898036
+                                0.54825392        0.5360604
+                                0.21437241        0.1741359
+[INPUT] 1    0    [1    /1   ]  0.41142              1
+[INPUT] 1    0    [1    /1   ]  0.01782              1
+[INPUT] 2    0    [6    /1   ]  251.01056821      0.0062628
+                                74.41352333       0.0434411
+                                27.67867091       0.1557311
+                                11.29136346       0.3101388
+                                4.69433459        0.3367227
+                                1.90670194        0.1477033
+[INPUT] 2    0    [1    /1   ]  0.54823392           1
+[INPUT] 2    0    [1    /1   ]  0.15142201           1
+[INPUT] 3    0    [1    /1   ]  0.18507              1
+
+nuclear repulsion = 0
+number of shells = 18
+number of NR pGTOs = 111
+number of NR cGTOs = 48
+basis = {'Y': [[0, [2522141.32102006, 0.001699], [449156.29990432, 0.0036724], [151720.1764528, 0.0066311], [51855.44354044, 0.0167936], [18689.66232941, 0.041001], [6875.55030786, 0.1012493], [2648.45220711, 0.2522764], [1049.980737, 0.5766767]], [0, [422.47853745, -0.5348801], [172.31836708, -0.4651198]], [0, [60.56530325, 1.0]], [0, [28.30120953, 0.7509238], [12.66764116, 0.2490761]], [0, [5.05894842, 0.6863196], [2.20390257, 0.3136803]], [0, [0.72735771, 0.6399224], [0.30401193, 0.3600775]], [0, [0.04783584, 1.0]], [0, [0.01355997, 1.0]], [1, [11876.25484875, 0.0009397], [3268.55095104, 0.0033491], [1184.41460471, 0.0136442], [463.14383928, 0.0517347], [191.23738154, 0.1583925], [82.85996128, 0.3508255], [37.20448645, 0.4211141]], [1, [17.1581726, -1.0]], [1, [7.6564011, -0.5178717], [3.40344219, -0.4821282]], [1, [1.2829311, 0.2898036], [0.54825392, 0.5360604], [0.21437241, 0.1741359]], [1, [0.41142, 1.0]], [1, [0.01782, 1.0]], [2, [251.01056821, 0.0062628], [74.41352333, 0.0434411], [27.67867091, 0.1557311], [11.29136346, 0.3101388], [4.69433459, 0.3367227], [1.90670194, 0.1477033]], [2, [0.54823392, 1.0]], [2, [0.15142201, 1.0]], [3, [0.18507, 1.0]]]}
+ecp = {}
+CPU time:        18.63
+
+
+******** <class 'src.AIMP3.AIMP_RHF'> ********
+method = AIMP_RHF
+initial guess = minao
+damping factor = 0
+level_shift factor = 0
+DIIS = <class 'pyscf.scf.diis.CDIIS'>
+diis_start_cycle = 1
+diis_space = 8
+diis_damp = 0
+SCF conv_tol = 1e-09
+SCF conv_tol_grad = None
+SCF max_cycles = 50
+direct_scf = True
+direct_scf_tol = 1e-13
+chkfile to save SCF result = .//Er.chk
+max_memory 4000 MB (current use 146 MB)
+cond(S) = 118.55453218684275
+<class 'src.AIMP3.AIMP_RHF'> does not have attributes  orthoreg_param nsur with_pc2 mol2_lists pcparams dm2_list dme2_list
+Set gradient conv threshold to 3.16228e-05
+Initial guess from minao.
+E1 = -4532.387170912255  E_coul = 1278.9141091279284
+init E= -3292.66808939165
+    CPU time for initialize scf    106.19 sec, wall time     25.29 sec
+  HOMO = -0.588284645485521  LUMO = 0.774831986128426
+  mo_energy =
+[-6.06755518e+02 -8.36889260e+01 -7.67044116e+01 -7.67044089e+01
+ -7.67043932e+01 -1.38022240e+01 -1.09913154e+01 -1.09912890e+01
+ -1.09911305e+01 -5.78296731e+00 -5.78287202e+00 -5.78279268e+00
+ -5.78277612e+00 -5.78277043e+00 -1.44002410e+00 -5.88683812e-01
+ -5.88552204e-01 -5.88284645e-01  7.74831986e-01  7.77141504e-01
+  8.41855485e-01  8.54408798e-01  8.55363808e-01  8.89829749e-01
+  1.14717209e+00  1.18629075e+00  1.18691204e+00  1.19980772e+00
+  1.20718072e+00  1.20949109e+00  1.30371222e+00  1.33810609e+00
+  1.34387256e+00  1.37640034e+00  1.37984529e+00  1.41645290e+00
+  1.56201918e+00  1.58070237e+00  1.58255415e+00  1.60084687e+00
+  2.57579660e+00  2.57582317e+00  2.57588975e+00  3.50924532e+01
+  3.50924776e+01  3.50925781e+01  8.91166958e+01  2.09251279e+03]
+E1 = -4515.474270271646  E_coul = 1238.091158023352
+cycle= 1 E= -3316.57813985562  delta_E= -23.9  |g|= 1.34  |ddm|= 3.56
+    CPU time for cycle= 1      2.30 sec, wall time      0.14 sec
+  HOMO = -1.26181434845615  LUMO = 0.194989615177811
+  mo_energy =
+[-6.10097331e+02 -8.51064466e+01 -7.82948441e+01 -7.82948421e+01
+ -7.82948287e+01 -1.46707817e+01 -1.18794057e+01 -1.18793834e+01
+ -1.18792350e+01 -6.66989517e+00 -6.66980179e+00 -6.66973327e+00
+ -6.66972077e+00 -6.66971646e+00 -2.12067133e+00 -1.26222191e+00
+ -1.26209443e+00 -1.26181435e+00  1.94989615e-01  2.12182261e-01
+  2.60548216e-01  2.61362042e-01  2.87502855e-01  4.83501991e-01
+  6.02489369e-01  6.36224657e-01  6.38107527e-01  6.42115709e-01
+  6.95640808e-01  6.98983229e-01  7.28277384e-01  7.94318674e-01
+  9.66833877e-01  9.67705192e-01  9.93244565e-01  9.95415806e-01
+  1.03698810e+00  1.03829538e+00  1.04746009e+00  1.06368469e+00
+  1.90945026e+00  1.90953101e+00  1.90964694e+00  3.39059752e+01
+  3.39059966e+01  3.39060955e+01  8.77683495e+01  2.08870235e+03]
+E1 = -4519.1473428731115  E_coul = 1241.7526035186077
+cycle= 2 E= -3316.58976696183  delta_E= -0.0116  |g|= 0.141  |ddm|= 0.47
+    CPU time for cycle= 2      2.88 sec, wall time      0.18 sec
+  HOMO = -1.24476363305653  LUMO = 0.199795906505776
+  mo_energy =
+[-6.09839990e+02 -8.49459203e+01 -7.81246387e+01 -7.81246368e+01
+ -7.81246245e+01 -1.45936073e+01 -1.18042683e+01 -1.18042466e+01
+ -1.18041007e+01 -6.59044569e+00 -6.59035508e+00 -6.59028905e+00
+ -6.59027715e+00 -6.59027283e+00 -2.09897152e+00 -1.24518214e+00
+ -1.24505396e+00 -1.24476363e+00  1.99795907e-01  2.17166964e-01
+  2.66712500e-01  2.67543744e-01  2.94482773e-01  4.85748347e-01
+  6.03355154e-01  6.38995837e-01  6.40937556e-01  6.44328445e-01
+  6.96513737e-01  6.99801882e-01  7.33809365e-01  8.02558939e-01
+  9.69184092e-01  9.70139810e-01  9.96282033e-01  9.98371075e-01
+  1.03941012e+00  1.04078772e+00  1.04757332e+00  1.06565756e+00
+  1.92780393e+00  1.92788345e+00  1.92799380e+00  3.40151509e+01
+  3.40151718e+01  3.40152704e+01  8.79180732e+01  2.08895954e+03]
+E1 = -4518.590330622594  E_coul = 1241.195319614683
+cycle= 3 E= -3316.59003861524  delta_E= -0.000272  |g|= 0.00944  |ddm|= 0.0772
+    CPU time for cycle= 3      3.47 sec, wall time      0.23 sec
+  HOMO = -1.24621891287097  LUMO = 0.199387128236325
+  mo_energy =
+[-6.09856316e+02 -8.49577110e+01 -7.81372020e+01 -7.81372001e+01
+ -7.81371879e+01 -1.46000651e+01 -1.18106643e+01 -1.18106427e+01
+ -1.18104969e+01 -6.59718537e+00 -6.59709604e+00 -6.59703023e+00
+ -6.59701825e+00 -6.59701404e+00 -2.10078623e+00 -1.24664041e+00
+ -1.24651216e+00 -1.24621891e+00  1.99387128e-01  2.16756782e-01
+  2.66216478e-01  2.67046804e-01  2.93932019e-01  4.85567504e-01
+  6.03285200e-01  6.38764204e-01  6.40700957e-01  6.44143397e-01
+  6.96439293e-01  6.99732239e-01  7.33346821e-01  8.01863874e-01
+  9.68987851e-01  9.69936586e-01  9.96024561e-01  9.98119369e-01
+  1.03919760e+00  1.04056902e+00  1.04756152e+00  1.06548178e+00
+  1.92626328e+00  1.92634255e+00  1.92645623e+00  3.40065609e+01
+  3.40065817e+01  3.40066806e+01  8.79073080e+01  2.08894311e+03]
+E1 = -4518.63399193988  E_coul = 1241.2389791555875
+cycle= 4 E= -3316.59004039162  delta_E= -1.78e-06  |g|= 0.000272  |ddm|= 0.00672
+    CPU time for cycle= 4      2.30 sec, wall time      0.15 sec
+  HOMO = -1.24615498696166  LUMO = 0.199403995903319
+  mo_energy =
+[-6.09855893e+02 -8.49573297e+01 -7.81368190e+01 -7.81368171e+01
+ -7.81368049e+01 -1.45998160e+01 -1.18104231e+01 -1.18104014e+01
+ -1.18102556e+01 -6.59693081e+00 -6.59684173e+00 -6.59677598e+00
+ -6.59676398e+00 -6.59675980e+00 -2.10070472e+00 -1.24657702e+00
+ -1.24644875e+00 -1.24615499e+00  1.99403996e-01  2.16776028e-01
+  2.66241831e-01  2.67072250e-01  2.93962236e-01  4.85575331e-01
+  6.03289153e-01  6.38775048e-01  6.40712035e-01  6.44152179e-01
+  6.96442693e-01  6.99735420e-01  7.33368847e-01  8.01896339e-01
+  9.68996656e-01  9.69945729e-01  9.96035978e-01  9.98130955e-01
+  1.03920719e+00  1.04057886e+00  1.04756190e+00  1.06548950e+00
+  1.92632815e+00  1.92640738e+00  1.92652157e+00  3.40068466e+01
+  3.40068674e+01  3.40069665e+01  8.79076652e+01  2.08894352e+03]
+E1 = -4518.63268676284  E_coul = 1241.237673973239
+cycle= 5 E= -3316.59004039693  delta_E= -5.31e-09  |g|= 3.27e-05  |ddm|= 0.000216
+    CPU time for cycle= 5      2.48 sec, wall time      0.18 sec
+  HOMO = -1.24615712946141  LUMO = 0.199402830971856
+  mo_energy =
+[-6.09855904e+02 -8.49573420e+01 -7.81368316e+01 -7.81368298e+01
+ -7.81368176e+01 -1.45998245e+01 -1.18104317e+01 -1.18104101e+01
+ -1.18102643e+01 -6.59693951e+00 -6.59685049e+00 -6.59678476e+00
+ -6.59677275e+00 -6.59676857e+00 -2.10070723e+00 -1.24657928e+00
+ -1.24645102e+00 -1.24615713e+00  1.99402831e-01  2.16775236e-01
+  2.66241218e-01  2.67071650e-01  2.93961896e-01  4.85574750e-01
+  6.03289285e-01  6.38774657e-01  6.40711642e-01  6.44151869e-01
+  6.96442563e-01  6.99735296e-01  7.33368268e-01  8.01895317e-01
+  9.68996330e-01  9.69945397e-01  9.96035549e-01  9.98130579e-01
+  1.03920687e+00  1.04057852e+00  1.04756187e+00  1.06548927e+00
+  1.92632583e+00  1.92640504e+00  1.92651937e+00  3.40068365e+01
+  3.40068573e+01  3.40069564e+01  8.79076539e+01  2.08894351e+03]
+E1 = -4518.63273695213  E_coul = 1241.2377241620954
+cycle= 6 E= -3316.59004039736  delta_E= -4.33e-10  |g|= 5.96e-06  |ddm|= 3.81e-05
+    CPU time for cycle= 6      2.34 sec, wall time      0.15 sec
+  HOMO = -1.24615680503345  LUMO = 0.199402934186696
+  mo_energy =
+[-6.09855903e+02 -8.49573402e+01 -7.81368297e+01 -7.81368279e+01
+ -7.81368157e+01 -1.45998233e+01 -1.18104304e+01 -1.18104088e+01
+ -1.18102630e+01 -6.59693820e+00 -6.59684918e+00 -6.59678345e+00
+ -6.59677144e+00 -6.59676726e+00 -2.10070685e+00 -1.24657896e+00
+ -1.24645069e+00 -1.24615681e+00  1.99402934e-01  2.16775331e-01
+  2.66241325e-01  2.67071756e-01  2.93962004e-01  4.85574735e-01
+  6.03289348e-01  6.38774706e-01  6.40711692e-01  6.44151905e-01
+  6.96442589e-01  6.99735320e-01  7.33368381e-01  8.01895458e-01
+  9.68996373e-01  9.69945442e-01  9.96035609e-01  9.98130637e-01
+  1.03920692e+00  1.04057857e+00  1.04756188e+00  1.06548933e+00
+  1.92632616e+00  1.92640538e+00  1.92651971e+00  3.40068380e+01
+  3.40068588e+01  3.40069579e+01  8.79076556e+01  2.08894351e+03]
+E1 = -4518.632729412642  E_coul = 1241.237716622597
+Extra cycle  E= -3316.59004039737  delta_E= -1.09e-11  |g|= 1.96e-06  |ddm|= 5.74e-06
+    CPU time for scf_cycle    122.73 sec, wall time     26.38 sec
+    CPU time for SCF    122.73 sec, wall time     26.38 sec
+converged SCF energy = -3316.59004039737
