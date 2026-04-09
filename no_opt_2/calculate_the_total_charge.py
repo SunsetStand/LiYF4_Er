@@ -35,6 +35,6 @@ def calculate_total_charge(xyz_file):
     return total_charge
 
 if __name__ == "__main__":
-    xyz_file = 'cluster.xyz'
+    xyz_file = 'cahf_casci/cluster.xyz'
     total_charge = calculate_total_charge(xyz_file)
-    print(f'Total Charge: {total_charge}')
+    print(total_charge)
