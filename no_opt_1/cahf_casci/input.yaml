@@ -10,6 +10,10 @@ aimp:
     F: -1                    # F- 离子的电荷
     Li: 1                    # Li+ 离子的电荷
     Y: 3                     # Y3+ 离子的电荷
+  basis:                     # AIMP 背景原子的基组设置
+    F: "ccpvdz"              # F- 离子的基组
+    Li: "ccpvdz"             # Li+ 离子的基组
+    Y: "gto.basis.parse(bse.get_basis('jorge-DZP-DKH',elements='Y',fmt='nwchem'))"  # Y3+ 离子的基组
 # 2. 点电荷环境配置 (QMMM)
 pointcharge:
   organic: false              # 是否为有机体系，通常设为 false
@@ -26,10 +30,10 @@ cluster:
   
   # 基组设置：支持直接从 Python 调用加载
   basis:
-    Er: "ano-rcc-vdzp"  
-    F: "cc-pVDZ"
-    Li: "cc-pVDZ"
-    Y: "cc-pVDZ"
+    Er: "gto.basis.parse(bse.get_basis('ANO-R2',elements='Er',fmt='nwchem'))"  
+    F: "ccpvdz"             
+    Li: "ccpvdz"
+    Y: "gto.basis.parse(bse.get_basis('jorge-DZP-DKH',elements='Y',fmt='nwchem'))"
 
   # SCF 计算控制
   scf:

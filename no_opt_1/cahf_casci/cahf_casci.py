@@ -4,6 +4,7 @@ import numpy as np
 from pyscf import gto, lib, mcscf
 from pyscf.lib import chkfile
 from embed_sim import rdiis, myavas
+import basis_set_exchange as bse
 
 # 导入 AIMP 相关的自定义类
 from src.AIMP3_DMET_SCEI import AIMPEnvLoader,AIMP_CAHF
@@ -48,7 +49,7 @@ except:
 # --- 2. 定义计算核心函数 ---
 def run_aimp_scf(CLUS_MOL, scfdict):
     # 使用 CAHF 处理 Er3+ (S=3/2, spin=3)
-    MF = AIMP_CAHF(CLUS_MOL, AIMP_LOADER).density_fit()
+    MF = AIMP_CAHF(CLUS_MOL, AIMP_LOADER)
     
     if PCPARAM is not None: 
         MF.addPCParam2(PCPARAM)
@@ -87,7 +88,8 @@ if os.path.exists(MF.chkfile):
 else:
     print("\n--- 开始 CAHF 计算 (Level Shift = 1.0) ---")
     MF.init_guess = 'atom'
-    MF.kernel()
+
+MF.kernel()
 
 # --- 4. 执行 CASCI 计算 ---
 print("\n--- 开始 CASCI 计算分析 ---")

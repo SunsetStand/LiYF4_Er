@@ -45,7 +45,7 @@ fi
 touch JobProcessing.state
 echo "Job Running at $(date)" >> JobProcessing.state
 
-/data/home/wangcx/LiYF4_Er3+/env/bin/python -u cahf_casci.py
+/data/home/wangcx/LiYF4_Er3+/env/bin/python -u main_AIMP_CAHF_CASCI_SCEI.py -i ./
 
 # 7. 任务结束
 echo "Job $SLURM_JOB_ID $SLURM_JOB_NAME Finished !" >> $HOME/finish
