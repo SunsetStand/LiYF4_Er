@@ -1,5 +1,5 @@
 import sys, os
-from embed_sim import rdiis, myavas
+from embed_sim import rdiis, myavas, siso
 
 from src.AIMP3_DMET_SCEI import AIMPEnvLoader, AIMP_RHF, AIMP_RKS, AIMP_ROHF, AIMP_ROKS, AIMP_CAHF
 from src.pckit2 import OrganicPCLoader, PointChargeParams
@@ -154,23 +154,30 @@ ncas, nelec, mo = myavas.avas(MF, ['Er 4f'],
 print(f"AVAS 提取结果: ncas={ncas}, nelec={nelec}")
 
 # 定义 CASCI (计算基态和第一激发态)
-n_states = 2
+n_states = 5
 mycas = mcscf.CASCI(MF, ncas_set, nelec_set)
+mycas.fcisolver.spin = spin
 mycas.fcisolver.nroots = n_states
 
 print(f"正在求解前 {n_states} 个态...")
 mycas.kernel(mo)
 
+title = "LiYF4:Er3+"
+
+mysiso = siso.SISO(title, mycas, amfi=True, verbose=6)
+mysiso.kernel()
+
+mysiso.analyze()
+
 # --- 5. 输出结果与能级分析 ---
-if hasattr(mycas, 'e_states') and mycas.e_states is not None:
-    e_states = np.array(mycas.e_states)
+if hasattr(mysiso, 'e_states') and mysiso.e_states is not None:
+    e_states = np.array(mysiso.e_states)
 else:
     # PySCF 执行多态计算后，e_tot 本身就是一个数组
-    e_states = np.atleast_1d(mycas.e_tot)
+    e_states = np.atleast_1d(mysiso.e_tot)
 
 print(f"成功获取到 {len(e_states)} 个态的能量")
 
-title = "LiYF4:Er3+"
 Ha2cm = 219474.63
 delta_e_cm = (e_states[1] - e_states[0]) * Ha2cm
 

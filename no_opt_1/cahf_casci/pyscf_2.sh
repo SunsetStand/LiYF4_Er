@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH -p amd
-#SBATCH -o pyscf_2.out
-#SBATCH -e pyscf_2.err
-#SBATCH -J pyscf_2
+#SBATCH -o pyscf_3.out
+#SBATCH -e pyscf_3.err
+#SBATCH -J pyscf_3
 #SBATCH -n 16
 
 PYEXEC="/data/home/wangcx/LiYF4_Er3+/env/bin/python"
