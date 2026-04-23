@@ -3,7 +3,7 @@
 #SBATCH -o pyscf_2.out
 #SBATCH -e pyscf_2.err
 #SBATCH -J pyscf_2
-#SBATCH -n 16
+#SBATCH -n 32
 
 PYEXEC="/data/home/wangcx/LiYF4_Er3+/env/bin/python"
 # 3. 【核心修复】加入额外的拓展包路径
@@ -16,9 +16,9 @@ export PYTHONPATH=$PYTHONPATH:/data/home/wangcx/.local/lib/python3.10/site-packa
 # export PYTHONPATH=$PYTHONPATH:/你的/拓展包/绝对路径
 
 # 4. 线程设置
-export OMP_NUM_THREADS=16
-export MKL_NUM_THREADS=16
-export OPENBLAS_NUM_THREADS=16
+export OMP_NUM_THREADS=32
+export MKL_NUM_THREADS=32
+export OPENBLAS_NUM_THREADS=32
 
 echo "Running on host: $(hostname)"
 echo "Python Executable: $PYEXEC"

@@ -117,10 +117,13 @@ if inputdict["type"].upper() in ["GEO_OPT", "GEOM_OPT", "RELAX", "GEOMOPT", "ENE
     CLUS_MOL = gto.M(atom=clusterdir, basis=clusterdict["basis"], charge=clusterdict["charge"], spin=spin, verbose=4)
     scfdict = clusterdict["scf"]
     MF = aimp_calc(CLUS_MOL, scfdict)
-    # MF.diis = rdiis.RDIIS(rdiis_prop='dS', imp_idx=CLUS_MOL.search_ao_label(['Ce.*']),power=0.2)
+    # MF.diis = rdiis.RDIIS(rdiis_prop='dS', imp_idx=CLUS_MOL.search_ao_label(['Er.*']),power=0.2)
     MF.max_cycle = 3000
     MF.conv_tol = 1e-07
     MF.level_shift = 1.0
+    MF.diis_space = 15
+    # MF.diis_start_cycle = 20
+    MF.diis_damp = 0.5
     if os.path.exists(MF.chkfile):
         print("Load from chk file.")
         MF.init_guess = 'chk'
@@ -129,7 +132,7 @@ if inputdict["type"].upper() in ["GEO_OPT", "GEOM_OPT", "RELAX", "GEOMOPT", "ENE
         MF.mo_coeff = scfdat['mo_coeff']
         MF.mo_occ = scfdat['mo_occ']
         MF.mo_energy = scfdat['mo_energy']
-        #MF.kernel()
+        MF.kernel()
     else:
         MF.init_guess = 'atom'
         print()
