@@ -138,87 +138,87 @@ if inputdict["type"].upper() in ["GEO_OPT", "GEOM_OPT", "RELAX", "GEOMOPT", "ENE
 
 print()
 
-# --- 4. 执行 CASCI 计算 ---
-print("\n--- 开始 CASCI 计算分析 ---")
+# # --- 4. 执行 CASCI 计算 ---
+# print("\n--- 开始 CASCI 计算分析 ---")
 
-# 使用 AVAS 自动提取 Er 的 7 个 4f 轨道
-# Er3+: 11个 4f 电子 -> nelec = 11, ncas = 7
+# # 使用 AVAS 自动提取 Er 的 7 个 4f 轨道
+# # Er3+: 11个 4f 电子 -> nelec = 11, ncas = 7
+# ncas_set = 7
+# nelec_set = 11
+
+# ncas, nelec, mo = myavas.avas(MF, ['Er 4f'], 
+#                               minao=CLUS_MOL._basis['Er'], 
+#                               threshold=0.5, 
+#                               openshell_option=2)
+
+# print(f"AVAS 提取结果: ncas={ncas}, nelec={nelec}")
+
+# # 定义 CASCI (计算基态和第一激发态)
+# n_states = 5
+# mycas = mcscf.CASCI(MF, ncas_set, nelec_set)
+# mycas.fcisolver.spin = spin
+# mycas.fcisolver.nroots = n_states
+
+# print(f"正在求解前 {n_states} 个态...")
+# mycas.kernel(mo)
+
+# title = "LiYF4:Er3+"
+
+# mysiso = siso.SISO(title, mycas, amfi=True, verbose=6)
+# mysiso.kernel()
+
+# mysiso.analyze()
+
+# # --- 5. 输出结果与能级分析 ---
+# if hasattr(mysiso, 'e_states') and mysiso.e_states is not None:
+#     e_states = np.array(mysiso.e_states)
+# else:
+#     # PySCF 执行多态计算后，e_tot 本身就是一个数组
+#     e_states = np.atleast_1d(mysiso.e_tot)
+
+# print(f"成功获取到 {len(e_states)} 个态的能量")
+
+# Ha2cm = 219474.63
+# delta_e_cm = (e_states[1] - e_states[0]) * Ha2cm
+
+# print("\n" + "="*40)
+# print(f"{title} 基态能量: {e_states[0]:.8f} Hartree")
+# print(f"{title} 第一激发态能量: {e_states[1]:.8f} Hartree")
+# print(f"基态-激发态能级差: {delta_e_cm:.2f} cm^-1")
+# print("="*40)
+
+# # 保存能级数据
+# np.savetxt(f'{title}_casci_levels.txt', (e_states - np.min(e_states)) * Ha2cm, 
+#            fmt='%.6f', header='Energy levels in cm^-1')
+# print(f"能级数据已保存至 {title}_casci_levels.txt")
+
+
+# All-electron CASSCF+NEVPT2
+from embed_sim import myavas, sacasscf_mixer, siso
+
+title = 'LiYF4:Er3+'
+ncas, nelec, mo = myavas.avas(MF, ['Er 4f'], minao=CLUS_MOL._basis['Er'], threshold=0.5, openshell_option=2)
 ncas_set = 7
 nelec_set = 11
 
-ncas, nelec, mo = myavas.avas(MF, ['Er 4f'], 
-                              minao=CLUS_MOL._basis['Er'], 
-                              threshold=0.5, 
-                              openshell_option=2)
-
-print(f"AVAS 提取结果: ncas={ncas}, nelec={nelec}")
-
-# 定义 CASCI (计算基态和第一激发态)
-n_states = 8
-mycas = mcscf.CASCI(MF, ncas_set, nelec_set)
-mycas.fcisolver.spin = spin
-mycas.fcisolver.nroots = n_states
-
-print(f"正在求解前 {n_states} 个态...")
+statelis = [0, 0, 0, 15] # 15 roots for the lowest S=3/2 state, which corresponds to the 4I15/2(8) ground state and the 4I13/2(7) first excited state of Er3+ in LiYF4
+mycas = sacasscf_mixer.sacasscf_mixer(MF, ncas_set, nelec_set, statelis=statelis)
 mycas.kernel(mo)
+Ha2cm = 219474.63
+np.savetxt(title+'_cas_NO_SOC.txt',(mycas.fcisolver.e_states-np.min(mycas.fcisolver.e_states))*Ha2cm,fmt='%.6f')
 
-title = "LiYF4:Er3+"
+
+#NVEPT2
+
+ecorr = sacasscf_mixer.sacasscf_nevpt2(mycas, method='SC')
+mycas.fcisolver.e_states = mycas.fcisolver.e_states + ecorr
+np.savetxt(title+'_nevpt2.txt',ecorr)
+
+Ha2cm = 219474.63
+np.savetxt(title+'_opt.txt',(mycas.fcisolver.e_states-np.min(mycas.fcisolver.e_states))*Ha2cm,fmt='%.6f')
+
 
 mysiso = siso.SISO(title, mycas, amfi=True, verbose=6)
 mysiso.kernel()
 
 mysiso.analyze()
-
-# --- 5. 输出结果与能级分析 ---
-if hasattr(mysiso, 'e_states') and mysiso.e_states is not None:
-    e_states = np.array(mysiso.e_states)
-else:
-    # PySCF 执行多态计算后，e_tot 本身就是一个数组
-    e_states = np.atleast_1d(mysiso.e_tot)
-
-print(f"成功获取到 {len(e_states)} 个态的能量")
-
-Ha2cm = 219474.63
-delta_e_cm = (e_states[1] - e_states[0]) * Ha2cm
-
-print("\n" + "="*40)
-print(f"{title} 基态能量: {e_states[0]:.8f} Hartree")
-print(f"{title} 第一激发态能量: {e_states[1]:.8f} Hartree")
-print(f"基态-激发态能级差: {delta_e_cm:.2f} cm^-1")
-print("="*40)
-
-# 保存能级数据
-np.savetxt(f'{title}_casci_levels.txt', (e_states - np.min(e_states)) * Ha2cm, 
-           fmt='%.6f', header='Energy levels in cm^-1')
-print(f"能级数据已保存至 {title}_casci_levels.txt")
-
-
-# # All-electron CASSCF+NEVPT2
-# from embed_sim import myavas, sacasscf_mixer, siso
-
-# title = 'Ce'
-# ncas, nelec, mo = myavas.avas(MF, ['Ce 4f','Ce 5d'], minao=CLUS_MOL._basis['Ce'], threshold=0.5, openshell_option=2)
-# print("This is ncas", ncas)
-# print("This is nelec", nelec)
-# ncas = 12
-# nelec = 1
-
-
-# mycas = sacasscf_mixer.sacasscf_mixer(MF, ncas, nelec, statelis=[0, 12, 0])
-# mycas.kernel(mo)
-# Ha2cm = 219474.63
-# np.savetxt(title+'_cas_NO_SOC.txt',(mycas.fcisolver.e_states-np.min(mycas.fcisolver.e_states))*Ha2cm,fmt='%.6f')
-
-
-# #NVEPT2
-
-# ecorr = sacasscf_mixer.sacasscf_nevpt2(mycas, method='SC')
-# mycas.fcisolver.e_states = mycas.fcisolver.e_states + ecorr
-# np.savetxt(title+'_nevpt2.txt',ecorr)
-
-# Ha2cm = 219474.63
-# np.savetxt(title+'_opt.txt',(mycas.fcisolver.e_states-np.min(mycas.fcisolver.e_states))*Ha2cm,fmt='%.6f')
-
-
-# #mysiso = siso.SISO(title, mycas, amfi=True, verbose=6).density_fit()
-# #mysiso.kernel()
