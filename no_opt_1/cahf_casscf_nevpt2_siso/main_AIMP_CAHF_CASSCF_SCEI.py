@@ -201,7 +201,7 @@ ncas, nelec, mo = myavas.avas(MF, ['Er 4f'], minao=CLUS_MOL._basis['Er'], thresh
 ncas_set = 7
 nelec_set = 11
 
-statelis = [0, 0, 0, 15] # 15 roots for the lowest S=3/2 state, which corresponds to the 4I15/2(8) ground state and the 4I13/2(7) first excited state of Er3+ in LiYF4
+statelis = [0, 0, 0, 35] # 35 roots for all S=3/2 states in the 4f11 CAS(11,7) manifold
 mycas = sacasscf_mixer.sacasscf_mixer(MF, ncas_set, nelec_set, statelis=statelis)
 mycas.kernel(mo)
 Ha2cm = 219474.63

@@ -154,7 +154,7 @@ ncas, nelec, mo = myavas.avas(MF, ['Er 4f'],
 print(f"AVAS 提取结果: ncas={ncas}, nelec={nelec}")
 
 # 定义 CASCI (计算基态和第一激发态)
-n_states = 8
+n_states = 35 # 计算前 35 个态以确保包含所有相关激发态
 mycas = mcscf.CASCI(MF, ncas_set, nelec_set)
 mycas.fcisolver.spin = spin
 mycas.fcisolver.nroots = n_states
