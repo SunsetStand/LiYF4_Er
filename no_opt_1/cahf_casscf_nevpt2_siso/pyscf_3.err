@@ -1,4 +1,0 @@
-Traceback (most recent call last):
-  File "/data/home/wangcx/LiYF4_Er3+/AIMPModelGenerator-main/LiYF4_Er3+/no_opt_1/cahf_casscf_nevpt2_siso/main_AIMP_CAHF_CASSCF_SCEI.py", line 4, in <module>
-    from src.AIMP3_DMET_SCEI import AIMPEnvLoader, AIMP_RHF, AIMP_RKS, AIMP_ROHF, AIMP_ROKS, AIMP_CAHF
-ModuleNotFoundError: No module named 'src'
