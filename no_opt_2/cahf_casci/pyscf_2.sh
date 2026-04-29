@@ -4,6 +4,7 @@
 #SBATCH -e pyscf_3.err
 #SBATCH -J pyscf_3
 #SBATCH -n 16
+#SBATCH --time=24:00:00
 
 source /data/home/wangcx/LiYF4_Er3+/AIMPModelGenerator-main/setup_env.sh
 
