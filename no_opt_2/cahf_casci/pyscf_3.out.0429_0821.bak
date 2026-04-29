@@ -1,0 +1,315 @@
+Running on host: amd-cpu
+Python Executable: /data/home/wangcx/LiYF4_Er3+/env/bin/python
+PYTHONPATH: /data/home/wangcx/LiYF4_Er3+/AIMPModelGenerator-main/LiYF4_Er3+:/data/home/wangcx/.local/lib/python3.10/site-packages:/data/home/wangcx/LAMP_emb/embed_sim:/data/home/wangcx/LAMP_emb:/data/home/wangcx/LiYF4_Er3+/dmet/embed_sim:/data/home/wangcx/LiYF4_Er3+/dmet:/data/home/wangcx/LiYF4_Er3+/AIMPModelGenerator-main/src:/data/home/wangcx/LiYF4_Er3+/AIMPModelGenerator-main
+Python OK
+Modules OK
+F is load
+Li is load
+Y is load
+#INFO: **** input file is /data/home/wangcx/LiYF4_Er3+/AIMPModelGenerator-main/LiYF4_Er3+/no_opt_2/cahf_casci/main_AIMP_CAHF_CASCI_SCEI.py ****
+import sys, os
+from embed_sim import rdiis, myavas
+
+from src.AIMP3_DMET_SCEI import AIMPEnvLoader, AIMP_RHF, AIMP_RKS, AIMP_ROHF, AIMP_ROKS, AIMP_CAHF
+from src.pckit2 import OrganicPCLoader, PointChargeParams
+from src.EnvGenerator import XYZParser
+from pyscf import gto, lib, mcscf
+from pyscf.lib import chkfile
+import yaml, getopt
+import numpy as np
+import basis_set_exchange as bse
+
+
+
+
+
+
+
+Ha2eV = 27.211324570273
+
+workdir = "./"
+inputdir = workdir + "input.yaml"
+with open(inputdir, 'r') as f:
+    inputdict = yaml.safe_load(f)
+aimpdict = inputdict["aimp"]
+clusterdict = inputdict["cluster"]
+
+# Load AIMP environment
+try: aimpdir = workdir + aimpdict["dir"]
+except KeyError: aimpdir = workdir + "aimp.xyz"
+aimpdict['dir'] = aimpdir
+aimpdict['workdir'] = workdir
+AIMP_LOADER = AIMPEnvLoader(aimpdict)
+try: orthoreg = aimpdict["orthoreg"]
+except: orthoreg = 0
+
+# Load Point Charge Environment
+try: 
+    pcdict = inputdict["pointcharge"]
+    try: is_organic = pcdict['organic']
+    except KeyError: is_organic = False
+
+    try: rawxyzdir = workdir + pcdict["rawxyzdir"]
+    except KeyError: rawxyzdir = workdir + "rawChgs.xyz"
+
+    if not is_organic:
+        try: rawchgdir = workdir + pcdict["rawchgdir"]
+        except KeyError: rawchgdir = workdir + "rawCharges.dat"
+        pcparam_raw = PointChargeParams(rawxyzdir, rawchgdir)
+    else:
+        pcdict = aimpdict
+        pcdict["dir"] = rawxyzdir
+        pcdict['workdir'] = workdir
+        pc_loader = OrganicPCLoader(pcdict)
+        pcparam_raw = pc_loader.make_param()
+
+    try: surfxyzdir = workdir + pcdict["surfxyzdir"]
+    except KeyError: surfxyzdir = workdir + "surfChgs.xyz"
+    try: surfchgdir = workdir + pcdict["surfchgdir"]
+    except KeyError: surfchgdir = workdir + "surfaceCharges.dat"
+    pcparam_surf = PointChargeParams(surfxyzdir, surfchgdir)
+
+    PCPARAM = pcparam_raw + pcparam_surf
+
+except: PCPARAM = None
+
+
+# Load cluster molecule
+try: ecp = clusterdict["ecp"]
+except KeyError: ecp = {}
+try: spin = clusterdict["spin"]
+except KeyError: spin = 0
+
+def aimp_calc(CLUS_MOL, scfdict, interpolation=False):
+
+    scftype = scfdict["calc"].upper()
+
+    if scftype in ['HF', 'RHF', 'TDHF', 'TDAHF']:
+        MF = AIMP_RHF(CLUS_MOL, AIMP_LOADER)
+    elif scftype in ['ROHF']:
+        MF = AIMP_ROHF(CLUS_MOL, AIMP_LOADER).density_fit()
+    elif scftype in ['DFT', 'KS', 'RKS', 'TDDFT', 'TDKS']:
+        try: xc = clusterdict['scf']['xc']
+        except KeyError: xc = 'b3lyp'
+        MF = AIMP_RKS(CLUS_MOL, AIMP_LOADER, xc=xc)
+    elif scftype in ['ROKS']:
+        try: xc = clusterdict['scf']['xc']
+        except KeyError: xc = "b3lyp"
+        MF = AIMP_ROKS(CLUS_MOL, AIMP_LOADER, xc=xc)
+    elif scftype in ['CAHF']:
+        try: ortho = clusterdict['scf']['orthoreg']
+        except KeyError: ortho = 0
+        MF = AIMP_CAHF(CLUS_MOL, AIMP_LOADER)
+        MF.set_orthoreg_param(ortho)
+    else:
+        raise NotImplementedError("Other tags have not been implemented yet!")
+
+    if PCPARAM is not None: MF.addPCParam2(PCPARAM)
+    MF.set_orthoreg_param(orthoreg)
+
+    # checkpoint file for TDA method
+    try: MF.chkfile = workdir + inputdict['chkfile']
+    except KeyError: pass
+    
+    return MF
+
+# AIMP Energy calculation
+if inputdict["type"].upper() in ["GEO_OPT", "GEOM_OPT", "RELAX", "GEOMOPT", "ENERGY"]:
+    try: clusterdir = workdir + clusterdict["dir"]
+    except KeyError: clusterdir = workdir + "cluster.xyz"
+
+    # added for custom basis sets in the NWChem format
+    for basis in clusterdict["basis"]:
+        if 'parse' in clusterdict["basis"][basis] or 'load' in clusterdict["basis"][basis]:
+            clusterdict["basis"][basis] = eval(clusterdict["basis"][basis])
+    
+    CLUS_MOL = gto.M(atom=clusterdir, basis=clusterdict["basis"], charge=clusterdict["charge"], spin=spin, verbose=4)
+    scfdict = clusterdict["scf"]
+    MF = aimp_calc(CLUS_MOL, scfdict)
+    MF.diis = rdiis.RDIIS(rdiis_prop='dS', imp_idx=CLUS_MOL.search_ao_label(['Er.*']),power=0.2)
+    MF.max_cycle = 3000
+    MF.conv_tol = 1e-07
+    MF.level_shift = 4.0
+    MF.diis_space = 15
+    # MF.diis_start_cycle = 20
+    MF.diis_damp = 0.5
+    if os.path.exists(MF.chkfile):
+        print("Load from chk file.")
+        MF.init_guess = 'chk'
+        scfdat = chkfile.load(MF.chkfile,'scf')
+        MF.e_tot = scfdat['e_tot']
+        MF.mo_coeff = scfdat['mo_coeff']
+        MF.mo_occ = scfdat['mo_occ']
+        MF.mo_energy = scfdat['mo_energy']
+        MF.kernel()
+    else:
+        MF.init_guess = 'atom'
+        print()
+        print("Ready for MF.kernel().")
+        MF.kernel()
+
+print()
+
+# --- 4. 执行 CASCI 计算 ---
+print("\n--- 开始 CASCI 计算分析 ---")
+
+# 使用 AVAS 自动提取 Er 的 7 个 4f 轨道
+# Er3+: 11个 4f 电子 -> nelec = 11, ncas = 7
+ncas_set = 7
+nelec_set = 11
+
+ncas, nelec, mo = myavas.avas(MF, ['Er 4f'], 
+                              minao=CLUS_MOL._basis['Er'], 
+                              threshold=0.5, 
+                              openshell_option=2)
+
+print(f"AVAS 提取结果: ncas={ncas}, nelec={nelec}")
+
+# 定义 CASCI (计算基态和第一激发态)
+n_states = 2
+mycas = mcscf.CASCI(MF, ncas_set, nelec_set)
+mycas.fcisolver.nroots = n_states
+
+print(f"正在求解前 {n_states} 个态...")
+mycas.kernel(mo)
+
+# --- 5. 输出结果与能级分析 ---
+if hasattr(mycas, 'e_states') and mycas.e_states is not None:
+    e_states = np.array(mycas.e_states)
+else:
+    # PySCF 执行多态计算后，e_tot 本身就是一个数组
+    e_states = np.atleast_1d(mycas.e_tot)
+
+print(f"成功获取到 {len(e_states)} 个态的能量")
+
+title = "LiYF4:Er3+"
+Ha2cm = 219474.63
+delta_e_cm = (e_states[1] - e_states[0]) * Ha2cm
+
+print("\n" + "="*40)
+print(f"{title} 基态能量: {e_states[0]:.8f} Hartree")
+print(f"{title} 第一激发态能量: {e_states[1]:.8f} Hartree")
+print(f"基态-激发态能级差: {delta_e_cm:.2f} cm^-1")
+print("="*40)
+
+# 保存能级数据
+np.savetxt(f'{title}_casci_levels.txt', (e_states - np.min(e_states)) * Ha2cm, 
+           fmt='%.6f', header='Energy levels in cm^-1')
+print(f"能级数据已保存至 {title}_casci_levels.txt")
+
+
+# # All-electron CASSCF+NEVPT2
+# from embed_sim import myavas, sacasscf_mixer, siso
+
+# title = 'Ce'
+# ncas, nelec, mo = myavas.avas(MF, ['Ce 4f','Ce 5d'], minao=CLUS_MOL._basis['Ce'], threshold=0.5, openshell_option=2)
+# print("This is ncas", ncas)
+# print("This is nelec", nelec)
+# ncas = 12
+# nelec = 1
+
+
+# mycas = sacasscf_mixer.sacasscf_mixer(MF, ncas, nelec, statelis=[0, 12, 0])
+# mycas.kernel(mo)
+# Ha2cm = 219474.63
+# np.savetxt(title+'_cas_NO_SOC.txt',(mycas.fcisolver.e_states-np.min(mycas.fcisolver.e_states))*Ha2cm,fmt='%.6f')
+
+
+# #NVEPT2
+
+# ecorr = sacasscf_mixer.sacasscf_nevpt2(mycas, method='SC')
+# mycas.fcisolver.e_states = mycas.fcisolver.e_states + ecorr
+# np.savetxt(title+'_nevpt2.txt',ecorr)
+
+# Ha2cm = 219474.63
+# np.savetxt(title+'_opt.txt',(mycas.fcisolver.e_states-np.min(mycas.fcisolver.e_states))*Ha2cm,fmt='%.6f')
+
+
+# #mysiso = siso.SISO(title, mycas, amfi=True, verbose=6).density_fit()
+# #mysiso.kernel()#INFO: ******************** input file end ********************
+
+
+System: uname_result(system='Linux', node='amd-cpu', release='6.8.0-107-generic', version='#107~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Wed Mar 18 23:40:43 UTC ', machine='x86_64')  Threads 16
+Python 3.10.19 | packaged by conda-forge | (main, Jan 26 2026, 23:45:08) [GCC 14.3.0]
+numpy 1.26.4  scipy 1.15.3  h5py 3.15.1
+Date: Wed Apr 29 03:56:08 2026
+PySCF version 2.12.0
+PySCF path  /data/home/wangcx/LiYF4_Er3+/env/lib/python3.10/site-packages/pyscf
+
+[CONFIG] conf_file None
+[INPUT] verbose = 4
+[INPUT] num. atoms = 25
+[INPUT] num. electrons = 345
+[INPUT] charge = 11
+[INPUT] spin (= nelec alpha-beta = 2S) = 3
+[INPUT] symmetry False subgroup None
+[INPUT] Mole.unit = angstrom
+[INPUT] Symbol           X                Y                Z      unit          X                Y                Z       unit  Magmom
+[INPUT]  1 Er     0.000000000000   0.000000000000   0.000000000000 AA    0.000000000000   0.000000000000   0.000000000000 Bohr   0.0
+[INPUT]  2 F      1.120153900000   1.741396600000  -0.864832900000 AA    2.116784088363   3.290762648249  -1.634297324513 Bohr   0.0
+[INPUT]  3 F      1.728219100000  -1.132954600000   0.877561600000 AA    3.265860782242  -2.140973905566   1.658351081435 Bohr   0.0
+[INPUT]  4 F     -1.122767600000  -1.741596000000  -0.864330100000 AA   -2.121723265535  -3.291139459638  -1.633347170218 Bohr   0.0
+[INPUT]  5 F     -1.727721000000   1.137402500000   0.873922300000 AA   -3.264919509660   2.149379218396   1.651473801150 Bohr   0.0
+[INPUT]  6 F     -1.136911800000   0.833023200000  -1.810397500000 AA   -2.148451929786   1.574185703409  -3.421155451597 Bohr   0.0
+[INPUT]  7 F     -0.837415700000  -1.132356600000   1.813891800000 AA   -1.582486325411  -2.139843849344   3.427758721594 Bohr   0.0
+[INPUT]  8 F      1.139044200000  -0.834823000000  -1.810900300000 AA    2.152481581774  -1.577586832488  -3.422105605893 Bohr   0.0
+[INPUT]  9 F      0.842741100000   1.138000500000   1.810252500000 AA    1.592549872915   2.150509274618   3.420881441309 Bohr   0.0
+[INPUT] 10 Li     2.544141000000   2.577740100000   0.023012300000 AA    4.807729712277   4.871222809309   0.043486944496 Bohr   0.0
+[INPUT] 11 Li    -2.558921400000  -2.573098600000   0.023012300000 AA   -4.835660620289  -4.862451645502   0.043486944496 Bohr   0.0
+[INPUT] 12 Li     2.577175500000  -2.573098600000   0.023012300000 AA    4.870155869939  -4.862451645502   0.043486944496 Bohr   0.0
+[INPUT] 13 Li    -2.591955900000   2.577740100000   0.023012300000 AA   -4.898086777951   4.871222809309   0.043486944496 Bohr   0.0
+[INPUT] 14 F     -3.407877800000  -1.132954600000   0.877561600000 AA   -6.439955707985  -2.140973905566   1.658351081435 Bohr   0.0
+[INPUT] 15 F      3.408375900000   1.137402500000   0.873922300000 AA    6.440896980568   2.149379218396   1.651473801150 Bohr   0.0
+[INPUT] 16 F      1.153188400000  -3.409442200000  -0.864832900000 AA    2.179210246025  -6.442911995535  -1.634297324513 Bohr   0.0
+[INPUT] 17 F     -1.155802100000   3.409242800000  -0.864330100000 AA   -2.184149423197   6.442535184145  -1.633347170218 Bohr   0.0
+[INPUT] 18 Li     0.026819200000  -2.572694200000   2.664801800000 AA    0.050680942880  -4.861687440257   5.035745578248 Bohr   0.0
+[INPUT] 19 Li    -0.006215300000   2.578144500000   2.664801800000 AA   -0.011745214782   4.871987014554   5.035745578248 Bohr   0.0
+[INPUT] 20 Y     -0.016757900000   2.574419800000  -2.675230500000 AA   -0.031667841423   4.864948351658  -5.055452965083 Bohr   0.0
+[INPUT] 21 Y      0.016276600000  -2.576418900000  -2.675230500000 AA    0.030758316239  -4.868726103153  -5.055452965083 Bohr   0.0
+[INPUT] 22 Y     -2.565136700000   0.005045900000   2.687814100000 AA   -4.847405835071   0.009535369052   5.079232522744 Bohr   0.0
+[INPUT] 23 Y      2.570960200000   0.005045900000   2.687814100000 AA    4.858410655157   0.009535369052   5.079232522744 Bohr   0.0
+[INPUT] 24 Li    -2.560898800000  -0.003320300000  -2.698242800000 AA   -4.839397364727  -0.006274457651  -5.098939909580 Bohr   0.0
+[INPUT] 25 Li     2.575198000000  -0.003320300000  -2.698242800000 AA    4.866418936528  -0.006274457651  -5.098939909580 Bohr   0.0
+
+nuclear repulsion = 7940.955314423
+number of shells = 177
+number of NR pGTOs = 1221
+number of NR cGTOs = 549
+basis = {'Er': [[0, [58741043.595, 0.0003095617, -0.0001259089, 6.91037e-05, -1.85591e-05, 1.0646e-05, -2.8433e-06, 8.7323e-06, -1.35596e-05, 1.22007e-05], [13545709.704, 0.0008516942, -0.0003466459, 0.000190297, -5.11104e-05, 2.93191e-05, -7.8312e-06, 2.40575e-05, -3.73546e-05, 3.35856e-05], [3592430.6955, 0.0019082673, -0.0007777057, 0.0004270617, -0.00011472, 6.5803e-05, -1.75727e-05, 5.39601e-05, -8.37945e-05, 7.54362e-05], [1068997.5743, 0.0039195893, -0.0016019262, 0.0008804759, -0.0002365759, 0.0001357079, -3.62538e-05, 0.0001114133, -0.0001729792, 0.0001553739], [349706.57902, 0.0079014176, -0.0032457866, 0.0017860832, -0.0004801945, 0.0002753786, -7.35186e-05, 0.0002256084, -0.0003504131, 0.0003160705], [123694.33912, 0.0157477694, -0.0065247398, 0.0036004833, -0.0009686648, 0.0005556288, -0.0001485097, 0.0004569229, -0.0007092419, 0.0006350258], [46678.398919, 0.0315658984, -0.0132634217, 0.0073419466, -0.001978727, 0.0011340632, -0.0003025333, 0.0009268542, -0.0014402417, 0.00130602], [18595.315822, 0.0629662301, -0.0270708201, 0.0150963167, -0.0040754906, 0.0023372419, -0.000625405, 0.001929166, -0.0029931159, 0.0026602426], [7755.2163127, 0.1221158296, -0.0546773715, 0.0307772461, -0.0083518799, 0.0047794665, -0.0012731364, 0.0038880662, -0.0060469357, 0.0055436892], [3363.779054, 0.2163719352, -0.104424382, 0.0601260542, -0.0164146081, 0.0094035178, -0.0025217555, 0.0078186556, -0.0121224202, 0.0106191691], [1509.3223033, 0.3107230962, -0.1727137331, 0.1028299975, -0.0285728915, 0.0162739243, -0.0043197692, 0.0130943713, -0.020410749, 0.0192252465], [697.35341479, 0.2829389649, -0.1915966744, 0.1213177905, -0.0342877174, 0.0196005497, -0.0053102484, 0.0168441816, -0.0260260623, 0.0212627647], [330.31834917, 0.1107960478, 0.0034524045, -0.0181721285, 0.0066342313, -0.0038699051, 0.0012231975, -0.0050898659, 0.0075551906, -0.0012422347], [159.65709504, 0.0270243507, 0.4305459366, -0.4433513468, 0.1566058182, -0.0860727872, 0.0225872722, -0.0670551554, 0.1058849283, -0.1109799087], [78.31452052, 0.0232087242, 0.4684246852, -0.6988915467, 0.2808109652, -0.1552371292, 0.0426972868, -0.1405799382, 0.2184698745, -0.1696579273], [38.72141347, 0.0055176072, 0.1426867969, 0.1943727124, -0.1280926327, 0.0718453765, -0.0217060429, 0.0829657157, -0.1245611955, 0.0411381473], [19.13306359, 0.0031445846, 0.0929387262, 1.0361135919, -0.9537793805, 0.525773751, -0.1391241817, 0.4492313044, -0.7655773076, 0.9930541848], [9.34554064, 0.0004607124, 0.0232306464, 0.2626141253, -0.0422353432, 0.0201638951, -0.0136943468, 0.0349080406, 0.0454196412, -0.6396768379], [4.45086586, 0.0001781851, -0.0031742957, -0.1267686346, 1.0541080152, -0.8378775487, 0.2628172995, -1.2056038591, 2.147979658, -1.9410318798], [2.03183894, -7.56855e-05, -0.0016126249, -0.0408915598, 0.3248928868, -0.3964838724, 0.0993913427, 0.5682899564, -1.7434598196, 3.6018504183], [0.87066929, 3.65992e-05, 0.0002068927, 0.0007349372, 0.0139982831, 0.8863351232, -0.2957863828, 0.9403581481, -1.3586599759, -2.346333334], [0.34147598, -1.51071e-05, -9.14805e-05, -0.0007009845, 0.0168647478, 0.5480126667, -0.501983712, -0.1922763278, 2.8649308149, -0.2115088121], [0.11893832, 5.8215e-06, 3.66177e-05, 0.0002306016, -0.0017855486, -0.0040889684, 0.4012936792, -1.3781196527, -1.7164544585, 1.9831692389], [0.03550733, -2.1488e-06, -1.41275e-05, -9.22395e-05, 0.0006879657, 0.0254351638, 0.8667698628, 0.6781220542, -0.02489973, -2.3638636205], [0.0106002, 6.241e-07, 3.9799e-06, 2.50085e-05, -0.0002447711, -0.0024978973, 0.0032299041, 0.4465290241, 0.684248083, 1.4645723957]], [1, [1999053.9457, 5.27248e-05, -4.22635e-05, 1.30946e-05, -4.9249e-06, -7.3048e-06, 4.3447e-06], [321492.94665, 0.0002062575, -0.0001656169, 5.13657e-05, -1.93198e-05, -2.86616e-05, 1.7027e-05], [69812.056384, 0.0007907197, -0.0006363455, 0.000197712, -7.43577e-05, -0.0001102843, 6.56782e-05], [19170.076373, 0.0028024207, -0.002264492, 0.0007050579, -0.0002652092, -0.0003936378, 0.0002333715], [6305.3605866, 0.0095627773, -0.0077776077, 0.0024344086, -0.0009155802, -0.0013579797, 0.0008104196], [2376.8728903, 0.0304081438, -0.0250497846, 0.0078955451, -0.0029703482, -0.0044130515, 0.0026094783], [991.08412563, 0.0858604085, -0.0724292592, 0.0232269816, -0.0087378, -0.0129711589, 0.0077547693], [444.45398997, 0.1955859903, -0.1717398404, 0.0563532022, -0.0212133939, -0.0316035208, 0.0186048576], [209.69390666, 0.3155610848, -0.2911116024, 0.0989987042, -0.0372819372, -0.0554689629, 0.0333537151], [102.29811686, 0.2905358073, -0.2282088299, 0.0668567425, -0.0250422154, -0.0374428239, 0.0210996293], [50.88921302, 0.1591725371, 0.2080341786, -0.1627677359, 0.0633913839, 0.099232041, -0.0550030502], [25.50997433, 0.1299786618, 0.5917917452, -0.4481104632, 0.1774758008, 0.2882984752, -0.1694027739], [12.7434798, 0.0625434303, 0.2992606204, -0.0676100109, 0.0108147877, -0.0133784295, 0.0098207141], [6.27002774, 0.0032893684, 0.0040392694, 0.6422905592, -0.3270990029, -0.7392411815, 0.3365294551], [2.99728634, -0.0006558915, -0.0130864967, 0.4864450388, -0.2791426358, -0.0930687868, 0.2382128786], [1.36875252, -0.0004321153, -0.0031844737, 0.0628819747, 0.2842338164, 1.437166915, -0.6804512825], [0.58442767, 0.0001110347, 0.000417432, 0.0028540545, 0.6667205951, -0.615533406, -0.2295587724], [0.22701214, -4.69339e-05, -0.0001930291, -0.0002962991, 0.2702142984, -1.0704463494, 0.2950152407], [0.08817945, 1.45036e-05, 5.98307e-05, 0.0001287369, 0.0016271736, 1.1394985724, 0.7705007891]], [2, [5075.2324021, 0.0004624199, -0.000212402, -0.0001338418, 7.03252e-05], [1400.6417964, 0.0037918263, -0.0017568935, -0.0010946858, 0.0006244381], [508.75311079, 0.0209012836, -0.0097240779, -0.006121187, 0.0032341649], [217.04181128, 0.0790282781, -0.0374730955, -0.0233913319, 0.0133490101], [101.12993278, 0.2106341946, -0.1012553833, -0.0640717841, 0.0335018815], [49.31418858, 0.3724161614, -0.1765190844, -0.1116543118, 0.0648584305], [24.56993946, 0.3724484114, -0.128055937, -0.0882595432, 0.0322480645], [12.30281942, 0.148439962, 0.1923894925, 0.1729546348, -0.060142795], [6.06684041, 0.0098260817, 0.4912902906, 0.4780271086, -0.2393569992], [2.84408803, -0.0060274869, 0.3965132651, 0.0275202804, -0.0459067525], [1.19180063, -0.0014732962, 0.0922209987, -1.5212904072, 0.1481679239], [0.499418, 1.92511e-05, 0.0018946649, 1.1745898944, 0.8929833783]], [3, [267.83532496, 0.002136697, -0.0023682897, 0.0028860639], [91.41297085, 0.0173101959, -0.0192847672, 0.0233886013], [38.11144675, 0.0692400235, -0.0773233756, 0.0942762644], [17.45050795, 0.1795048421, -0.2008573225, 0.24774166], [8.22655234, 0.3013531728, -0.2941870723, 0.2935809324], [3.84017672, 0.3456940442, -0.1630393094, -0.1608245388], [1.72324813, 0.2910461118, 0.2530702283, -0.7001354408], [0.7167717, 0.1773588489, 0.5241741225, 0.2478955537], [0.26038487, 0.0581198269, 0.2828111484, 0.5517990419], [0.09459118, 0.0013117456, 0.0230907024, 0.1236695388]], [4, [10.85067572, 0.1594340766], [5.06864131, 0.2278265327], [2.46175491, 0.4089511043], [1.16532292, 0.3834860395], [0.46008995, 0.1687647303]]], 'F': 'ccpvdz', 'Li': 'ccpvdz', 'Y': [[0, [2522141.32102006, 0.001699], [449156.29990432, 0.0036724], [151720.1764528, 0.0066311], [51855.44354044, 0.0167936], [18689.66232941, 0.041001], [6875.55030786, 0.1012493], [2648.45220711, 0.2522764], [1049.980737, 0.5766767]], [0, [422.47853745, -0.5348801], [172.31836708, -0.4651198]], [0, [60.56530325, 1.0]], [0, [28.30120953, 0.7509238], [12.66764116, 0.2490761]], [0, [5.05894842, 0.6863196], [2.20390257, 0.3136803]], [0, [0.72735771, 0.6399224], [0.30401193, 0.3600775]], [0, [0.04783584, 1.0]], [0, [0.01355997, 1.0]], [1, [11876.25484875, 0.0009397], [3268.55095104, 0.0033491], [1184.41460471, 0.0136442], [463.14383928, 0.0517347], [191.23738154, 0.1583925], [82.85996128, 0.3508255], [37.20448645, 0.4211141]], [1, [17.1581726, -1.0]], [1, [7.6564011, -0.5178717], [3.40344219, -0.4821282]], [1, [1.2829311, 0.2898036], [0.54825392, 0.5360604], [0.21437241, 0.1741359]], [1, [0.41142, 1.0]], [1, [0.01782, 1.0]], [2, [251.01056821, 0.0062628], [74.41352333, 0.0434411], [27.67867091, 0.1557311], [11.29136346, 0.3101388], [4.69433459, 0.3367227], [1.90670194, 0.1477033]], [2, [0.54823392, 1.0]], [2, [0.15142201, 1.0]], [3, [0.18507, 1.0]]]}
+ecp = {}
+CPU time:         3.90
+Load from chk file.
+
+
+******** <class 'src.AIMP3_DMET_SCEI.AIMP_CAHF'> ********
+method = AIMP_CAHF
+initial guess = chk
+damping factor = 0
+level_shift factor = 4.0
+DIIS = <embed_sim.rdiis.RDIIS object at 0x7d6c653aff40>
+diis_start_cycle = 1
+diis_space = 8
+SCF conv_tol = 1e-07
+SCF conv_tol_grad = None
+SCF max_cycles = 3000
+direct_scf = True
+direct_scf_tol = 1e-13
+chkfile to save SCF result = ./Er_CAHF_RDIIS.chk
+max_memory 4000 MB (current use 112 MB)
+num. doubly occ = 171  num. singly occ = 3
+Set gradient conv threshold to 0.000316228
+h_PC is added!
+init E= -27877.8202816876
+  HOMO = 2.29517309594539  LUMO = 4.11577874668439
+cycle= 1 E= -27877.82028407  delta_E= -2.38e-06  |g|= 0.00214  |ddm|= 0.0269
+----------RDIIS-Entropy 2.612
+  HOMO = 2.29517581629329  LUMO = 4.115800170409
+cycle= 2 E= -27877.820286402  delta_E= -2.33e-06  |g|= 0.00216  |ddm|= 0.0269
+----------RDIIS-Entropy 2.612
+  HOMO = 2.73260234113239  LUMO = 4.1879890282268
+cycle= 3 E= -27877.7081019797  delta_E= 0.112  |g|= 1.83  |ddm|= 19.4
+----------RDIIS-Entropy 2.574
+  HOMO = 4.15066891696465  LUMO = 4.25510995794516
+cycle= 4 E= -27877.0850679945  delta_E= 0.623  |g|= 4.03  |ddm|=  136
+----------RDIIS-Entropy 2.581
+  HOMO = 2.38433867737558  LUMO = 4.26062427099725

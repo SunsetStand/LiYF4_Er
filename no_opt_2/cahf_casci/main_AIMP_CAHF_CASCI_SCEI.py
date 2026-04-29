@@ -120,11 +120,12 @@ if inputdict["type"].upper() in ["GEO_OPT", "GEOM_OPT", "RELAX", "GEOMOPT", "ENE
     MF.diis = rdiis.RDIIS(rdiis_prop='dS', imp_idx=CLUS_MOL.search_ao_label(['Er.*']),power=0.2)
     MF.max_cycle = 3000
     MF.conv_tol = 1e-07
-    MF.level_shift = 4.0
+    MF.level_shift = 5.0
+    MF.damp = 0.5
     MF.diis_space = 15
-    # MF.diis_start_cycle = 20
+    MF.diis_start_cycle = 20
     MF.diis_damp = 0.5
-    if os.path.exists(MF.chkfile):
+    if False:  # force atom guess, skip chk
         print("Load from chk file.")
         MF.init_guess = 'chk'
         scfdat = chkfile.load(MF.chkfile,'scf')
