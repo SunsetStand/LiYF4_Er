@@ -121,7 +121,6 @@ if inputdict["type"].upper() in ["GEO_OPT", "GEOM_OPT", "RELAX", "GEOMOPT", "ENE
     MF.max_cycle = 3000
     MF.conv_tol = 1e-07
     MF.level_shift = 5.0
-    MF.damp = 0.5
     MF.diis_space = 15
     MF.diis_start_cycle = 20
     MF.diis_damp = 0.5
