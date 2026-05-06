@@ -1,0 +1,9 @@
+<class 'src.AIMP3_DMET_SCEI.AIMP_CAHF'> does not have attributes  beta pcparams ncas orthoreg_param nsur alpha exchange_b mol2_lists dm2_list frac with_pc2 coulomb_a dme2_list spin nelecas
+Traceback (most recent call last):
+  File "/data/home/wangcx/LiYF4_Er3+/AIMPModelGenerator-main/LiYF4_Er3+/no_opt_1/cahf_casci_rdiis_ls5/main_AIMP_CAHF_CASCI_SCEI.py", line 156, in <module>
+    mysiso = siso.SISO(title, mycas, amfi=True, verbose=6)
+  File "/data/home/wangcx/LAMP_emb/embed_sim/siso.py", line 56, in __init__
+    self.statelis = read_statelis(mc)
+  File "/data/home/wangcx/LAMP_emb/embed_sim/sacasscf_mixer.py", line 51, in read_statelis
+    for solver in mc.fcisolver.fcisolvers:
+AttributeError: 'FCISolver' object has no attribute 'fcisolvers'

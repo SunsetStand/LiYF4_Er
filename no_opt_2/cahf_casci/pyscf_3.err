@@ -1,0 +1,2 @@
+<class 'src.AIMP3_DMET_SCEI.AIMP_CAHF'> does not have attributes  exchange_b nelecas beta spin dm2_list dme2_list frac ncas pcparams alpha with_pc2 orthoreg_param mol2_lists nsur coulomb_a
+slurmstepd: error: *** JOB 13450 ON amd-cpu CANCELLED AT 2026-04-30T14:14:40 ***

@@ -1,0 +1,1791 @@
+Running on host: amd-cpu
+Python Executable: /data/home/wangcx/LiYF4_Er3+/env/bin/python
+PYTHONPATH: /data/home/wangcx/LiYF4_Er3+/AIMPModelGenerator-main/LiYF4_Er3+:/data/home/wangcx/.local/lib/python3.10/site-packages:/data/home/wangcx/LAMP_emb/embed_sim:/data/home/wangcx/LAMP_emb:/data/home/wangcx/LiYF4_Er3+/dmet/embed_sim:/data/home/wangcx/LiYF4_Er3+/dmet:/data/home/wangcx/LiYF4_Er3+/AIMPModelGenerator-main/src:/data/home/wangcx/LiYF4_Er3+/AIMPModelGenerator-main
+Python OK
+Modules OK
+F is load
+Li is load
+Y is load
+#INFO: **** input file is /data/home/wangcx/LiYF4_Er3+/AIMPModelGenerator-main/LiYF4_Er3+/no_opt_2/cahf_casci/main_AIMP_CAHF_CASCI_SCEI.py ****
+import sys, os
+from embed_sim import rdiis, myavas
+
+from src.AIMP3_DMET_SCEI import AIMPEnvLoader, AIMP_RHF, AIMP_RKS, AIMP_ROHF, AIMP_ROKS, AIMP_CAHF
+from src.pckit2 import OrganicPCLoader, PointChargeParams
+from src.EnvGenerator import XYZParser
+from pyscf import gto, lib, mcscf
+from pyscf.lib import chkfile
+import yaml, getopt
+import numpy as np
+import basis_set_exchange as bse
+
+
+
+
+
+
+
+Ha2eV = 27.211324570273
+
+workdir = "./"
+inputdir = workdir + "input.yaml"
+with open(inputdir, 'r') as f:
+    inputdict = yaml.safe_load(f)
+aimpdict = inputdict["aimp"]
+clusterdict = inputdict["cluster"]
+
+# Load AIMP environment
+try: aimpdir = workdir + aimpdict["dir"]
+except KeyError: aimpdir = workdir + "aimp.xyz"
+aimpdict['dir'] = aimpdir
+aimpdict['workdir'] = workdir
+AIMP_LOADER = AIMPEnvLoader(aimpdict)
+try: orthoreg = aimpdict["orthoreg"]
+except: orthoreg = 0
+
+# Load Point Charge Environment
+try: 
+    pcdict = inputdict["pointcharge"]
+    try: is_organic = pcdict['organic']
+    except KeyError: is_organic = False
+
+    try: rawxyzdir = workdir + pcdict["rawxyzdir"]
+    except KeyError: rawxyzdir = workdir + "rawChgs.xyz"
+
+    if not is_organic:
+        try: rawchgdir = workdir + pcdict["rawchgdir"]
+        except KeyError: rawchgdir = workdir + "rawCharges.dat"
+        pcparam_raw = PointChargeParams(rawxyzdir, rawchgdir)
+    else:
+        pcdict = aimpdict
+        pcdict["dir"] = rawxyzdir
+        pcdict['workdir'] = workdir
+        pc_loader = OrganicPCLoader(pcdict)
+        pcparam_raw = pc_loader.make_param()
+
+    try: surfxyzdir = workdir + pcdict["surfxyzdir"]
+    except KeyError: surfxyzdir = workdir + "surfChgs.xyz"
+    try: surfchgdir = workdir + pcdict["surfchgdir"]
+    except KeyError: surfchgdir = workdir + "surfaceCharges.dat"
+    pcparam_surf = PointChargeParams(surfxyzdir, surfchgdir)
+
+    PCPARAM = pcparam_raw + pcparam_surf
+
+except: PCPARAM = None
+
+
+# Load cluster molecule
+try: ecp = clusterdict["ecp"]
+except KeyError: ecp = {}
+try: spin = clusterdict["spin"]
+except KeyError: spin = 0
+
+def aimp_calc(CLUS_MOL, scfdict, interpolation=False):
+
+    scftype = scfdict["calc"].upper()
+
+    if scftype in ['HF', 'RHF', 'TDHF', 'TDAHF']:
+        MF = AIMP_RHF(CLUS_MOL, AIMP_LOADER)
+    elif scftype in ['ROHF']:
+        MF = AIMP_ROHF(CLUS_MOL, AIMP_LOADER).density_fit()
+    elif scftype in ['DFT', 'KS', 'RKS', 'TDDFT', 'TDKS']:
+        try: xc = clusterdict['scf']['xc']
+        except KeyError: xc = 'b3lyp'
+        MF = AIMP_RKS(CLUS_MOL, AIMP_LOADER, xc=xc)
+    elif scftype in ['ROKS']:
+        try: xc = clusterdict['scf']['xc']
+        except KeyError: xc = "b3lyp"
+        MF = AIMP_ROKS(CLUS_MOL, AIMP_LOADER, xc=xc)
+    elif scftype in ['CAHF']:
+        try: ortho = clusterdict['scf']['orthoreg']
+        except KeyError: ortho = 0
+        MF = AIMP_CAHF(CLUS_MOL, AIMP_LOADER)
+        MF.set_orthoreg_param(ortho)
+    else:
+        raise NotImplementedError("Other tags have not been implemented yet!")
+
+    if PCPARAM is not None: MF.addPCParam2(PCPARAM)
+    MF.set_orthoreg_param(orthoreg)
+
+    # checkpoint file for TDA method
+    try: MF.chkfile = workdir + inputdict['chkfile']
+    except KeyError: pass
+    
+    return MF
+
+# AIMP Energy calculation
+if inputdict["type"].upper() in ["GEO_OPT", "GEOM_OPT", "RELAX", "GEOMOPT", "ENERGY"]:
+    try: clusterdir = workdir + clusterdict["dir"]
+    except KeyError: clusterdir = workdir + "cluster.xyz"
+
+    # added for custom basis sets in the NWChem format
+    for basis in clusterdict["basis"]:
+        if 'parse' in clusterdict["basis"][basis] or 'load' in clusterdict["basis"][basis]:
+            clusterdict["basis"][basis] = eval(clusterdict["basis"][basis])
+    
+    CLUS_MOL = gto.M(atom=clusterdir, basis=clusterdict["basis"], charge=clusterdict["charge"], spin=spin, verbose=4)
+    scfdict = clusterdict["scf"]
+    MF = aimp_calc(CLUS_MOL, scfdict)
+    MF.diis = rdiis.RDIIS(rdiis_prop='dS', imp_idx=CLUS_MOL.search_ao_label(['Er.*']),power=0.2)
+    MF.max_cycle = 3000
+    MF.conv_tol = 1e-07
+    MF.level_shift = 5.0
+    MF.diis_space = 15
+    MF.diis_start_cycle = 20
+    MF.diis_damp = 0.5
+    if False:  # force atom guess, skip chk
+        print("Load from chk file.")
+        MF.init_guess = 'chk'
+        scfdat = chkfile.load(MF.chkfile,'scf')
+        MF.e_tot = scfdat['e_tot']
+        MF.mo_coeff = scfdat['mo_coeff']
+        MF.mo_occ = scfdat['mo_occ']
+        MF.mo_energy = scfdat['mo_energy']
+        MF.kernel()
+    else:
+        MF.init_guess = 'atom'
+        print()
+        print("Ready for MF.kernel().")
+        MF.kernel()
+
+print()
+
+# --- 4. 执行 CASCI 计算 ---
+print("\n--- 开始 CASCI 计算分析 ---")
+
+# 使用 AVAS 自动提取 Er 的 7 个 4f 轨道
+# Er3+: 11个 4f 电子 -> nelec = 11, ncas = 7
+ncas_set = 7
+nelec_set = 11
+
+ncas, nelec, mo = myavas.avas(MF, ['Er 4f'], 
+                              minao=CLUS_MOL._basis['Er'], 
+                              threshold=0.5, 
+                              openshell_option=2)
+
+print(f"AVAS 提取结果: ncas={ncas}, nelec={nelec}")
+
+# 定义 CASCI (计算基态和第一激发态)
+n_states = 2
+mycas = mcscf.CASCI(MF, ncas_set, nelec_set)
+mycas.fcisolver.nroots = n_states
+
+print(f"正在求解前 {n_states} 个态...")
+mycas.kernel(mo)
+
+# --- 5. 输出结果与能级分析 ---
+if hasattr(mycas, 'e_states') and mycas.e_states is not None:
+    e_states = np.array(mycas.e_states)
+else:
+    # PySCF 执行多态计算后，e_tot 本身就是一个数组
+    e_states = np.atleast_1d(mycas.e_tot)
+
+print(f"成功获取到 {len(e_states)} 个态的能量")
+
+title = "LiYF4:Er3+"
+Ha2cm = 219474.63
+delta_e_cm = (e_states[1] - e_states[0]) * Ha2cm
+
+print("\n" + "="*40)
+print(f"{title} 基态能量: {e_states[0]:.8f} Hartree")
+print(f"{title} 第一激发态能量: {e_states[1]:.8f} Hartree")
+print(f"基态-激发态能级差: {delta_e_cm:.2f} cm^-1")
+print("="*40)
+
+# 保存能级数据
+np.savetxt(f'{title}_casci_levels.txt', (e_states - np.min(e_states)) * Ha2cm, 
+           fmt='%.6f', header='Energy levels in cm^-1')
+print(f"能级数据已保存至 {title}_casci_levels.txt")
+
+
+# # All-electron CASSCF+NEVPT2
+# from embed_sim import myavas, sacasscf_mixer, siso
+
+# title = 'Ce'
+# ncas, nelec, mo = myavas.avas(MF, ['Ce 4f','Ce 5d'], minao=CLUS_MOL._basis['Ce'], threshold=0.5, openshell_option=2)
+# print("This is ncas", ncas)
+# print("This is nelec", nelec)
+# ncas = 12
+# nelec = 1
+
+
+# mycas = sacasscf_mixer.sacasscf_mixer(MF, ncas, nelec, statelis=[0, 12, 0])
+# mycas.kernel(mo)
+# Ha2cm = 219474.63
+# np.savetxt(title+'_cas_NO_SOC.txt',(mycas.fcisolver.e_states-np.min(mycas.fcisolver.e_states))*Ha2cm,fmt='%.6f')
+
+
+# #NVEPT2
+
+# ecorr = sacasscf_mixer.sacasscf_nevpt2(mycas, method='SC')
+# mycas.fcisolver.e_states = mycas.fcisolver.e_states + ecorr
+# np.savetxt(title+'_nevpt2.txt',ecorr)
+
+# Ha2cm = 219474.63
+# np.savetxt(title+'_opt.txt',(mycas.fcisolver.e_states-np.min(mycas.fcisolver.e_states))*Ha2cm,fmt='%.6f')
+
+
+# #mysiso = siso.SISO(title, mycas, amfi=True, verbose=6).density_fit()
+# #mysiso.kernel()#INFO: ******************** input file end ********************
+
+
+System: uname_result(system='Linux', node='amd-cpu', release='6.8.0-107-generic', version='#107~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Wed Mar 18 23:40:43 UTC ', machine='x86_64')  Threads 16
+Python 3.10.19 | packaged by conda-forge | (main, Jan 26 2026, 23:45:08) [GCC 14.3.0]
+numpy 1.26.4  scipy 1.15.3  h5py 3.15.1
+Date: Thu Apr 30 05:19:48 2026
+PySCF version 2.12.0
+PySCF path  /data/home/wangcx/LiYF4_Er3+/env/lib/python3.10/site-packages/pyscf
+
+[CONFIG] conf_file None
+[INPUT] verbose = 4
+[INPUT] num. atoms = 25
+[INPUT] num. electrons = 345
+[INPUT] charge = 11
+[INPUT] spin (= nelec alpha-beta = 2S) = 3
+[INPUT] symmetry False subgroup None
+[INPUT] Mole.unit = angstrom
+[INPUT] Symbol           X                Y                Z      unit          X                Y                Z       unit  Magmom
+[INPUT]  1 Er     0.000000000000   0.000000000000   0.000000000000 AA    0.000000000000   0.000000000000   0.000000000000 Bohr   0.0
+[INPUT]  2 F      1.120153900000   1.741396600000  -0.864832900000 AA    2.116784088363   3.290762648249  -1.634297324513 Bohr   0.0
+[INPUT]  3 F      1.728219100000  -1.132954600000   0.877561600000 AA    3.265860782242  -2.140973905566   1.658351081435 Bohr   0.0
+[INPUT]  4 F     -1.122767600000  -1.741596000000  -0.864330100000 AA   -2.121723265535  -3.291139459638  -1.633347170218 Bohr   0.0
+[INPUT]  5 F     -1.727721000000   1.137402500000   0.873922300000 AA   -3.264919509660   2.149379218396   1.651473801150 Bohr   0.0
+[INPUT]  6 F     -1.136911800000   0.833023200000  -1.810397500000 AA   -2.148451929786   1.574185703409  -3.421155451597 Bohr   0.0
+[INPUT]  7 F     -0.837415700000  -1.132356600000   1.813891800000 AA   -1.582486325411  -2.139843849344   3.427758721594 Bohr   0.0
+[INPUT]  8 F      1.139044200000  -0.834823000000  -1.810900300000 AA    2.152481581774  -1.577586832488  -3.422105605893 Bohr   0.0
+[INPUT]  9 F      0.842741100000   1.138000500000   1.810252500000 AA    1.592549872915   2.150509274618   3.420881441309 Bohr   0.0
+[INPUT] 10 Li     2.544141000000   2.577740100000   0.023012300000 AA    4.807729712277   4.871222809309   0.043486944496 Bohr   0.0
+[INPUT] 11 Li    -2.558921400000  -2.573098600000   0.023012300000 AA   -4.835660620289  -4.862451645502   0.043486944496 Bohr   0.0
+[INPUT] 12 Li     2.577175500000  -2.573098600000   0.023012300000 AA    4.870155869939  -4.862451645502   0.043486944496 Bohr   0.0
+[INPUT] 13 Li    -2.591955900000   2.577740100000   0.023012300000 AA   -4.898086777951   4.871222809309   0.043486944496 Bohr   0.0
+[INPUT] 14 F     -3.407877800000  -1.132954600000   0.877561600000 AA   -6.439955707985  -2.140973905566   1.658351081435 Bohr   0.0
+[INPUT] 15 F      3.408375900000   1.137402500000   0.873922300000 AA    6.440896980568   2.149379218396   1.651473801150 Bohr   0.0
+[INPUT] 16 F      1.153188400000  -3.409442200000  -0.864832900000 AA    2.179210246025  -6.442911995535  -1.634297324513 Bohr   0.0
+[INPUT] 17 F     -1.155802100000   3.409242800000  -0.864330100000 AA   -2.184149423197   6.442535184145  -1.633347170218 Bohr   0.0
+[INPUT] 18 Li     0.026819200000  -2.572694200000   2.664801800000 AA    0.050680942880  -4.861687440257   5.035745578248 Bohr   0.0
+[INPUT] 19 Li    -0.006215300000   2.578144500000   2.664801800000 AA   -0.011745214782   4.871987014554   5.035745578248 Bohr   0.0
+[INPUT] 20 Y     -0.016757900000   2.574419800000  -2.675230500000 AA   -0.031667841423   4.864948351658  -5.055452965083 Bohr   0.0
+[INPUT] 21 Y      0.016276600000  -2.576418900000  -2.675230500000 AA    0.030758316239  -4.868726103153  -5.055452965083 Bohr   0.0
+[INPUT] 22 Y     -2.565136700000   0.005045900000   2.687814100000 AA   -4.847405835071   0.009535369052   5.079232522744 Bohr   0.0
+[INPUT] 23 Y      2.570960200000   0.005045900000   2.687814100000 AA    4.858410655157   0.009535369052   5.079232522744 Bohr   0.0
+[INPUT] 24 Li    -2.560898800000  -0.003320300000  -2.698242800000 AA   -4.839397364727  -0.006274457651  -5.098939909580 Bohr   0.0
+[INPUT] 25 Li     2.575198000000  -0.003320300000  -2.698242800000 AA    4.866418936528  -0.006274457651  -5.098939909580 Bohr   0.0
+
+nuclear repulsion = 7940.955314423
+number of shells = 177
+number of NR pGTOs = 1221
+number of NR cGTOs = 549
+basis = {'Er': [[0, [58741043.595, 0.0003095617, -0.0001259089, 6.91037e-05, -1.85591e-05, 1.0646e-05, -2.8433e-06, 8.7323e-06, -1.35596e-05, 1.22007e-05], [13545709.704, 0.0008516942, -0.0003466459, 0.000190297, -5.11104e-05, 2.93191e-05, -7.8312e-06, 2.40575e-05, -3.73546e-05, 3.35856e-05], [3592430.6955, 0.0019082673, -0.0007777057, 0.0004270617, -0.00011472, 6.5803e-05, -1.75727e-05, 5.39601e-05, -8.37945e-05, 7.54362e-05], [1068997.5743, 0.0039195893, -0.0016019262, 0.0008804759, -0.0002365759, 0.0001357079, -3.62538e-05, 0.0001114133, -0.0001729792, 0.0001553739], [349706.57902, 0.0079014176, -0.0032457866, 0.0017860832, -0.0004801945, 0.0002753786, -7.35186e-05, 0.0002256084, -0.0003504131, 0.0003160705], [123694.33912, 0.0157477694, -0.0065247398, 0.0036004833, -0.0009686648, 0.0005556288, -0.0001485097, 0.0004569229, -0.0007092419, 0.0006350258], [46678.398919, 0.0315658984, -0.0132634217, 0.0073419466, -0.001978727, 0.0011340632, -0.0003025333, 0.0009268542, -0.0014402417, 0.00130602], [18595.315822, 0.0629662301, -0.0270708201, 0.0150963167, -0.0040754906, 0.0023372419, -0.000625405, 0.001929166, -0.0029931159, 0.0026602426], [7755.2163127, 0.1221158296, -0.0546773715, 0.0307772461, -0.0083518799, 0.0047794665, -0.0012731364, 0.0038880662, -0.0060469357, 0.0055436892], [3363.779054, 0.2163719352, -0.104424382, 0.0601260542, -0.0164146081, 0.0094035178, -0.0025217555, 0.0078186556, -0.0121224202, 0.0106191691], [1509.3223033, 0.3107230962, -0.1727137331, 0.1028299975, -0.0285728915, 0.0162739243, -0.0043197692, 0.0130943713, -0.020410749, 0.0192252465], [697.35341479, 0.2829389649, -0.1915966744, 0.1213177905, -0.0342877174, 0.0196005497, -0.0053102484, 0.0168441816, -0.0260260623, 0.0212627647], [330.31834917, 0.1107960478, 0.0034524045, -0.0181721285, 0.0066342313, -0.0038699051, 0.0012231975, -0.0050898659, 0.0075551906, -0.0012422347], [159.65709504, 0.0270243507, 0.4305459366, -0.4433513468, 0.1566058182, -0.0860727872, 0.0225872722, -0.0670551554, 0.1058849283, -0.1109799087], [78.31452052, 0.0232087242, 0.4684246852, -0.6988915467, 0.2808109652, -0.1552371292, 0.0426972868, -0.1405799382, 0.2184698745, -0.1696579273], [38.72141347, 0.0055176072, 0.1426867969, 0.1943727124, -0.1280926327, 0.0718453765, -0.0217060429, 0.0829657157, -0.1245611955, 0.0411381473], [19.13306359, 0.0031445846, 0.0929387262, 1.0361135919, -0.9537793805, 0.525773751, -0.1391241817, 0.4492313044, -0.7655773076, 0.9930541848], [9.34554064, 0.0004607124, 0.0232306464, 0.2626141253, -0.0422353432, 0.0201638951, -0.0136943468, 0.0349080406, 0.0454196412, -0.6396768379], [4.45086586, 0.0001781851, -0.0031742957, -0.1267686346, 1.0541080152, -0.8378775487, 0.2628172995, -1.2056038591, 2.147979658, -1.9410318798], [2.03183894, -7.56855e-05, -0.0016126249, -0.0408915598, 0.3248928868, -0.3964838724, 0.0993913427, 0.5682899564, -1.7434598196, 3.6018504183], [0.87066929, 3.65992e-05, 0.0002068927, 0.0007349372, 0.0139982831, 0.8863351232, -0.2957863828, 0.9403581481, -1.3586599759, -2.346333334], [0.34147598, -1.51071e-05, -9.14805e-05, -0.0007009845, 0.0168647478, 0.5480126667, -0.501983712, -0.1922763278, 2.8649308149, -0.2115088121], [0.11893832, 5.8215e-06, 3.66177e-05, 0.0002306016, -0.0017855486, -0.0040889684, 0.4012936792, -1.3781196527, -1.7164544585, 1.9831692389], [0.03550733, -2.1488e-06, -1.41275e-05, -9.22395e-05, 0.0006879657, 0.0254351638, 0.8667698628, 0.6781220542, -0.02489973, -2.3638636205], [0.0106002, 6.241e-07, 3.9799e-06, 2.50085e-05, -0.0002447711, -0.0024978973, 0.0032299041, 0.4465290241, 0.684248083, 1.4645723957]], [1, [1999053.9457, 5.27248e-05, -4.22635e-05, 1.30946e-05, -4.9249e-06, -7.3048e-06, 4.3447e-06], [321492.94665, 0.0002062575, -0.0001656169, 5.13657e-05, -1.93198e-05, -2.86616e-05, 1.7027e-05], [69812.056384, 0.0007907197, -0.0006363455, 0.000197712, -7.43577e-05, -0.0001102843, 6.56782e-05], [19170.076373, 0.0028024207, -0.002264492, 0.0007050579, -0.0002652092, -0.0003936378, 0.0002333715], [6305.3605866, 0.0095627773, -0.0077776077, 0.0024344086, -0.0009155802, -0.0013579797, 0.0008104196], [2376.8728903, 0.0304081438, -0.0250497846, 0.0078955451, -0.0029703482, -0.0044130515, 0.0026094783], [991.08412563, 0.0858604085, -0.0724292592, 0.0232269816, -0.0087378, -0.0129711589, 0.0077547693], [444.45398997, 0.1955859903, -0.1717398404, 0.0563532022, -0.0212133939, -0.0316035208, 0.0186048576], [209.69390666, 0.3155610848, -0.2911116024, 0.0989987042, -0.0372819372, -0.0554689629, 0.0333537151], [102.29811686, 0.2905358073, -0.2282088299, 0.0668567425, -0.0250422154, -0.0374428239, 0.0210996293], [50.88921302, 0.1591725371, 0.2080341786, -0.1627677359, 0.0633913839, 0.099232041, -0.0550030502], [25.50997433, 0.1299786618, 0.5917917452, -0.4481104632, 0.1774758008, 0.2882984752, -0.1694027739], [12.7434798, 0.0625434303, 0.2992606204, -0.0676100109, 0.0108147877, -0.0133784295, 0.0098207141], [6.27002774, 0.0032893684, 0.0040392694, 0.6422905592, -0.3270990029, -0.7392411815, 0.3365294551], [2.99728634, -0.0006558915, -0.0130864967, 0.4864450388, -0.2791426358, -0.0930687868, 0.2382128786], [1.36875252, -0.0004321153, -0.0031844737, 0.0628819747, 0.2842338164, 1.437166915, -0.6804512825], [0.58442767, 0.0001110347, 0.000417432, 0.0028540545, 0.6667205951, -0.615533406, -0.2295587724], [0.22701214, -4.69339e-05, -0.0001930291, -0.0002962991, 0.2702142984, -1.0704463494, 0.2950152407], [0.08817945, 1.45036e-05, 5.98307e-05, 0.0001287369, 0.0016271736, 1.1394985724, 0.7705007891]], [2, [5075.2324021, 0.0004624199, -0.000212402, -0.0001338418, 7.03252e-05], [1400.6417964, 0.0037918263, -0.0017568935, -0.0010946858, 0.0006244381], [508.75311079, 0.0209012836, -0.0097240779, -0.006121187, 0.0032341649], [217.04181128, 0.0790282781, -0.0374730955, -0.0233913319, 0.0133490101], [101.12993278, 0.2106341946, -0.1012553833, -0.0640717841, 0.0335018815], [49.31418858, 0.3724161614, -0.1765190844, -0.1116543118, 0.0648584305], [24.56993946, 0.3724484114, -0.128055937, -0.0882595432, 0.0322480645], [12.30281942, 0.148439962, 0.1923894925, 0.1729546348, -0.060142795], [6.06684041, 0.0098260817, 0.4912902906, 0.4780271086, -0.2393569992], [2.84408803, -0.0060274869, 0.3965132651, 0.0275202804, -0.0459067525], [1.19180063, -0.0014732962, 0.0922209987, -1.5212904072, 0.1481679239], [0.499418, 1.92511e-05, 0.0018946649, 1.1745898944, 0.8929833783]], [3, [267.83532496, 0.002136697, -0.0023682897, 0.0028860639], [91.41297085, 0.0173101959, -0.0192847672, 0.0233886013], [38.11144675, 0.0692400235, -0.0773233756, 0.0942762644], [17.45050795, 0.1795048421, -0.2008573225, 0.24774166], [8.22655234, 0.3013531728, -0.2941870723, 0.2935809324], [3.84017672, 0.3456940442, -0.1630393094, -0.1608245388], [1.72324813, 0.2910461118, 0.2530702283, -0.7001354408], [0.7167717, 0.1773588489, 0.5241741225, 0.2478955537], [0.26038487, 0.0581198269, 0.2828111484, 0.5517990419], [0.09459118, 0.0013117456, 0.0230907024, 0.1236695388]], [4, [10.85067572, 0.1594340766], [5.06864131, 0.2278265327], [2.46175491, 0.4089511043], [1.16532292, 0.3834860395], [0.46008995, 0.1687647303]]], 'F': 'ccpvdz', 'Li': 'ccpvdz', 'Y': [[0, [2522141.32102006, 0.001699], [449156.29990432, 0.0036724], [151720.1764528, 0.0066311], [51855.44354044, 0.0167936], [18689.66232941, 0.041001], [6875.55030786, 0.1012493], [2648.45220711, 0.2522764], [1049.980737, 0.5766767]], [0, [422.47853745, -0.5348801], [172.31836708, -0.4651198]], [0, [60.56530325, 1.0]], [0, [28.30120953, 0.7509238], [12.66764116, 0.2490761]], [0, [5.05894842, 0.6863196], [2.20390257, 0.3136803]], [0, [0.72735771, 0.6399224], [0.30401193, 0.3600775]], [0, [0.04783584, 1.0]], [0, [0.01355997, 1.0]], [1, [11876.25484875, 0.0009397], [3268.55095104, 0.0033491], [1184.41460471, 0.0136442], [463.14383928, 0.0517347], [191.23738154, 0.1583925], [82.85996128, 0.3508255], [37.20448645, 0.4211141]], [1, [17.1581726, -1.0]], [1, [7.6564011, -0.5178717], [3.40344219, -0.4821282]], [1, [1.2829311, 0.2898036], [0.54825392, 0.5360604], [0.21437241, 0.1741359]], [1, [0.41142, 1.0]], [1, [0.01782, 1.0]], [2, [251.01056821, 0.0062628], [74.41352333, 0.0434411], [27.67867091, 0.1557311], [11.29136346, 0.3101388], [4.69433459, 0.3367227], [1.90670194, 0.1477033]], [2, [0.54823392, 1.0]], [2, [0.15142201, 1.0]], [3, [0.18507, 1.0]]]}
+ecp = {}
+CPU time:         4.13
+
+Ready for MF.kernel().
+
+
+******** <class 'src.AIMP3_DMET_SCEI.AIMP_CAHF'> ********
+method = AIMP_CAHF
+initial guess = atom
+damping factor = 0
+level_shift factor = 5.0
+DIIS = <embed_sim.rdiis.RDIIS object at 0x76dd4d0abdc0>
+diis_start_cycle = 20
+diis_space = 8
+SCF conv_tol = 1e-07
+SCF conv_tol_grad = None
+SCF max_cycles = 3000
+direct_scf = True
+direct_scf_tol = 1e-13
+chkfile to save SCF result = ./Er_CAHF_RDIIS.chk
+max_memory 4000 MB (current use 111 MB)
+num. doubly occ = 171  num. singly occ = 3
+Set gradient conv threshold to 0.000316228
+Initial guess from the superposition of atomic densities.
+Spherically averaged atomic HF for {'Li', 'Er', 'Y', 'F'}
+
+
+******** <class 'pyscf.scf.atom_hf.AtomSphAverageRHF'> ********
+method = AtomSphAverageRHF
+initial guess = minao
+damping factor = 0
+level_shift factor = 0
+DIIS = <class 'pyscf.scf.diis.CDIIS'>
+diis_start_cycle = 1
+diis_space = 8
+diis_damp = 0
+SCF conv_tol = 1e-09
+SCF conv_tol_grad = None
+SCF max_cycles = 50
+direct_scf = True
+direct_scf_tol = 1e-13
+chkfile to save SCF result = /tmp/tmpkeprjrvc
+max_memory 4000 MB (current use 114 MB)
+atom = Er
+Set gradient conv threshold to 3.16228e-05
+Initial guess from minao.
+init E= -11427.3091553468
+cycle= 1 E= -11466.8517199665  delta_E= -39.5  |g|=    0  |ddm|= 5.04
+cycle= 2 E= -11465.7016786187  delta_E= 1.15  |g|=    0  |ddm|= 6.76
+cycle= 3 E= -11497.1764877418  delta_E= -31.5  |g|=    0  |ddm|= 3.53
+cycle= 4 E= -11497.4036231797  delta_E= -0.227  |g|=    0  |ddm|= 0.843
+cycle= 5 E= -11497.4776470368  delta_E= -0.074  |g|=    0  |ddm|= 0.231
+cycle= 6 E= -11497.4784619244  delta_E= -0.000815  |g|=    0  |ddm|= 0.0382
+cycle= 7 E= -11497.4784988157  delta_E= -3.69e-05  |g|=    0  |ddm|= 0.0053
+cycle= 8 E= -11497.4784992874  delta_E= -4.72e-07  |g|=    0  |ddm|= 0.000655
+cycle= 9 E= -11497.4784992906  delta_E= -3.19e-09  |g|=    0  |ddm|= 6.3e-05
+cycle= 10 E= -11497.4784992906  delta_E= -3.27e-11  |g|=    0  |ddm|= 7.92e-06
+Extra cycle  E= -11497.4784992906  delta_E= 3.27e-11  |g|=    0  |ddm|= 6.28e-07
+Atomic HF for atom  Er  converged. SCF energy = -11497.4784992906
+
+
+
+******** <class 'pyscf.scf.atom_hf.AtomSphAverageRHF'> ********
+method = AtomSphAverageRHF
+initial guess = minao
+damping factor = 0
+level_shift factor = 0
+DIIS = <class 'pyscf.scf.diis.CDIIS'>
+diis_start_cycle = 1
+diis_space = 8
+diis_damp = 0
+SCF conv_tol = 1e-09
+SCF conv_tol_grad = None
+SCF max_cycles = 50
+direct_scf = True
+direct_scf_tol = 1e-13
+chkfile to save SCF result = /tmp/tmprubew6s3
+max_memory 4000 MB (current use 125 MB)
+atom = F
+Set gradient conv threshold to 3.16228e-05
+Initial guess from minao.
+init E= -99.0104601259712
+cycle= 1 E= -99.0268653974122  delta_E= -0.0164  |g|=    0  |ddm|= 0.0196
+cycle= 2 E= -99.0268906345715  delta_E= -2.52e-05  |g|=    0  |ddm|= 0.00981
+cycle= 3 E= -99.0268960257449  delta_E= -5.39e-06  |g|=    0  |ddm|= 0.00306
+cycle= 4 E= -99.0268960563136  delta_E= -3.06e-08  |g|=    0  |ddm|= 0.000364
+cycle= 5 E= -99.0268960563168  delta_E= -3.2e-12  |g|=    0  |ddm|= 3e-06
+Extra cycle  E= -99.0268960563168  delta_E=    0  |g|=    0  |ddm|= 1.33e-09
+Atomic HF for atom  F  converged. SCF energy = -99.0268960563168
+
+
+
+******** <class 'pyscf.scf.atom_hf.AtomSphAverageRHF'> ********
+method = AtomSphAverageRHF
+initial guess = minao
+damping factor = 0
+level_shift factor = 0
+DIIS = <class 'pyscf.scf.diis.CDIIS'>
+diis_start_cycle = 1
+diis_space = 8
+diis_damp = 0
+SCF conv_tol = 1e-09
+SCF conv_tol_grad = None
+SCF max_cycles = 50
+direct_scf = True
+direct_scf_tol = 1e-13
+chkfile to save SCF result = /tmp/tmp9e4m65y_
+max_memory 4000 MB (current use 125 MB)
+atom = Li
+Set gradient conv threshold to 3.16228e-05
+Initial guess from minao.
+init E= -7.37329066587083
+cycle= 1 E= -7.3767384265438  delta_E= -0.00345  |g|=    0  |ddm|= 0.302
+cycle= 2 E= -7.37685738139239  delta_E= -0.000119  |g|=    0  |ddm|= 0.0656
+cycle= 3 E= -7.37686191103613  delta_E= -4.53e-06  |g|=    0  |ddm|= 0.0157
+cycle= 4 E= -7.37686191292369  delta_E= -1.89e-09  |g|=    0  |ddm|= 0.000307
+cycle= 5 E= -7.3768619129241  delta_E= -4.03e-13  |g|=    0  |ddm|= 3.85e-06
+Extra cycle  E= -7.3768619129241  delta_E= 1.78e-15  |g|=    0  |ddm|= 5.41e-08
+Atomic HF for atom  Li  converged. SCF energy = -7.3768619129241
+
+
+
+******** <class 'pyscf.scf.atom_hf.AtomSphAverageRHF'> ********
+method = AtomSphAverageRHF
+initial guess = minao
+damping factor = 0
+level_shift factor = 0
+DIIS = <class 'pyscf.scf.diis.CDIIS'>
+diis_start_cycle = 1
+diis_space = 8
+diis_damp = 0
+SCF conv_tol = 1e-09
+SCF conv_tol_grad = None
+SCF max_cycles = 50
+direct_scf = True
+direct_scf_tol = 1e-13
+chkfile to save SCF result = /tmp/tmpm18awvey
+max_memory 4000 MB (current use 125 MB)
+atom = Y
+Set gradient conv threshold to 3.16228e-05
+Initial guess from minao.
+init E= -3292.84758673169
+cycle= 1 E= -3314.62208975787  delta_E= -21.8  |g|=    0  |ddm|= 1.56
+cycle= 2 E= -3314.63107494659  delta_E= -0.00899  |g|=    0  |ddm|= 0.327
+cycle= 3 E= -3314.63127488508  delta_E= -0.0002  |g|=    0  |ddm|= 0.0771
+cycle= 4 E= -3314.63127991812  delta_E= -5.03e-06  |g|=    0  |ddm|= 0.021
+cycle= 5 E= -3314.63128039374  delta_E= -4.76e-07  |g|=    0  |ddm|= 0.00754
+cycle= 6 E= -3314.63128043659  delta_E= -4.29e-08  |g|=    0  |ddm|= 0.00301
+cycle= 7 E= -3314.6312804366  delta_E= -1.09e-11  |g|=    0  |ddm|= 5.01e-05
+Extra cycle  E= -3314.6312804366  delta_E= 2.27e-12  |g|=    0  |ddm|= 1.5e-07
+Atomic HF for atom  Y  converged. SCF energy = -3314.6312804366
+
+h_PC is added!
+init E= -27615.8673853179
+  HOMO = 4.57989253287314  LUMO = 4.59942759593778
+cycle= 1 E= -27751.8830960999  delta_E= -136  |g|=  594  |ddm|= 9.79
+  HOMO = 3.00505695545371  LUMO = 4.96064039233399
+cycle= 2 E= -27784.4434111967  delta_E= -32.6  |g|=  548  |ddm|= 5.95
+  HOMO = 3.02682968394718  LUMO = 5.07900888348209
+cycle= 3 E= -27797.3488541403  delta_E= -12.9  |g|=  518  |ddm|= 5.23
+  HOMO = 3.03302462538158  LUMO = 5.08055038308256
+cycle= 4 E= -27803.521132646  delta_E= -6.17  |g|=  498  |ddm|=  5.7
+  HOMO = 3.02364253721801  LUMO = 5.08179738440897
+cycle= 5 E= -27806.1620929542  delta_E= -2.64  |g|=  478  |ddm|= 6.37
+  HOMO = 3.02441503025178  LUMO = 5.0837750897498
+cycle= 6 E= -27805.4834447532  delta_E= 0.679  |g|=  463  |ddm|= 7.59
+  HOMO = 3.00187851917584  LUMO = 5.08538230605412
+cycle= 7 E= -27804.4968458273  delta_E= 0.987  |g|=  447  |ddm|=  8.7
+  HOMO = 3.00880184223846  LUMO = 5.08855036405948
+cycle= 8 E= -27802.4510401735  delta_E= 2.05  |g|=  435  |ddm|= 10.5
+  HOMO = 2.97557755744909  LUMO = 5.0907804903296
+cycle= 9 E= -27803.5080107838  delta_E= -1.06  |g|=  420  |ddm|= 11.5
+  HOMO = 3.13406074496533  LUMO = 5.09565783546125
+cycle= 10 E= -27803.705432986  delta_E= -0.197  |g|=  410  |ddm|= 13.8
+  HOMO = 2.95124138303381  LUMO = 5.09872006134515
+cycle= 11 E= -27805.7399783576  delta_E= -2.03  |g|=  397  |ddm|= 14.3
+  HOMO = 3.32494926485268  LUMO = 5.10596626347555
+cycle= 12 E= -27806.6894750482  delta_E= -0.949  |g|=  388  |ddm|= 17.6
+  HOMO = 2.92993055321677  LUMO = 5.11001546574394
+cycle= 13 E= -27808.513107127  delta_E= -1.82  |g|=  377  |ddm|= 17.7
+  HOMO = 3.42677775005613  LUMO = 5.12026963806353
+cycle= 14 E= -27809.5115829723  delta_E= -0.998  |g|=  369  |ddm|= 22.3
+  HOMO = 2.91144957994414  LUMO = 5.12526124416877
+cycle= 15 E= -27811.0132775814  delta_E= -1.5  |g|=  358  |ddm|= 21.8
+  HOMO = 3.47510650252484  LUMO = 5.1389018484403
+cycle= 16 E= -27811.8756735415  delta_E= -0.862  |g|=  352  |ddm|= 27.6
+  HOMO = 2.89512421508766  LUMO = 5.14433521848757
+cycle= 17 E= -27813.1352941053  delta_E= -1.26  |g|=  342  |ddm|= 25.9
+  HOMO = 3.49453204786163  LUMO = 5.1610094301923
+cycle= 18 E= -27813.7797749822  delta_E= -0.644  |g|=  336  |ddm|= 32.6
+  HOMO = 2.87985253393348  LUMO = 5.16517382616037
+cycle= 19 E= -27814.882841049  delta_E= -1.1  |g|=  328  |ddm|= 29.2
+  HOMO = 3.49792610017004  LUMO = 5.17469629425234
+cycle= 20 E= -27815.2169427838  delta_E= -0.334  |g|=  323  |ddm|= 36.6
+----------RDIIS-Entropy 2.943
+  HOMO = 2.86380096531669  LUMO = 5.17422963748883
+cycle= 21 E= -27816.2450729213  delta_E= -1.03  |g|=  314  |ddm|= 30.6
+----------RDIIS-Entropy 3.650
+  HOMO = 2.88814177333446  LUMO = 5.18102979142301
+cycle= 22 E= -27871.5079770704  delta_E= -55.3  |g|= 11.7  |ddm|= 34.1
+----------RDIIS-Entropy 3.466
+  HOMO = 2.89469646611062  LUMO = 5.18664858260658
+cycle= 23 E= -27875.2361149416  delta_E= -3.73  |g|=    7  |ddm|= 35.2
+----------RDIIS-Entropy 3.143
+  HOMO = 2.88340840742984  LUMO = 5.19095846449748
+cycle= 24 E= -27876.4749350186  delta_E= -1.24  |g|= 3.36  |ddm|= 33.5
+----------RDIIS-Entropy 3.077
+  HOMO = 2.87119190652014  LUMO = 5.19461575710318
+cycle= 25 E= -27876.9753846845  delta_E= -0.5  |g|= 1.54  |ddm|= 31.1
+----------RDIIS-Entropy 3.082
+  HOMO = 2.85535431556149  LUMO = 5.19844633192715
+cycle= 26 E= -27877.1966483947  delta_E= -0.221  |g|= 0.771  |ddm|= 27.7
+----------RDIIS-Entropy 3.094
+  HOMO = 2.83485515490784  LUMO = 4.9881835303258
+cycle= 27 E= -27877.3306194649  delta_E= -0.134  |g|= 1.34  |ddm|= 23.4
+----------RDIIS-Entropy 3.080
+  HOMO = 2.81593900735897  LUMO = 4.74943633477685
+cycle= 28 E= -27877.3258453283  delta_E= 0.00477  |g|= 2.16  |ddm|= 19.1
+----------RDIIS-Entropy 3.035
+  HOMO = 2.81844634940176  LUMO = 4.83870786196006
+cycle= 29 E= -27877.34436993  delta_E= -0.0185  |g|= 2.33  |ddm|= 17.9
+----------RDIIS-Entropy 2.969
+  HOMO = 2.8474912164646  LUMO = 5.08397808964375
+cycle= 30 E= -27877.4287652293  delta_E= -0.0844  |g|= 2.53  |ddm|= 19.3
+----------RDIIS-Entropy 2.894
+  HOMO = 2.85516502194451  LUMO = 5.16607786680164
+cycle= 31 E= -27877.5162540676  delta_E= -0.0875  |g|=  2.2  |ddm|= 18.9
+----------RDIIS-Entropy 2.780
+  HOMO = 3.08611605803601  LUMO = 5.13591625400736
+cycle= 32 E= -27877.5086333488  delta_E= 0.00762  |g|= 2.24  |ddm|= 17.4
+----------RDIIS-Entropy 2.628
+  HOMO = 3.04386074637053  LUMO = 5.08226530824783
+cycle= 33 E= -27877.5352678417  delta_E= -0.0266  |g|= 1.92  |ddm|= 15.1
+----------RDIIS-Entropy 2.494
+  HOMO = 3.48768236476386  LUMO = 5.15368958640003
+cycle= 34 E= -27877.5132424361  delta_E= 0.022  |g|= 1.98  |ddm|= 14.7
+----------RDIIS-Entropy 2.397
+  HOMO = 3.77847393651393  LUMO = 5.14980704548881
+cycle= 35 E= -27877.5039883724  delta_E= 0.00925  |g|= 1.72  |ddm|= 13.9
+----------RDIIS-Entropy 2.318
+  HOMO = 3.86243968333697  LUMO = 5.16962144975876
+cycle= 36 E= -27877.4861574702  delta_E= 0.0178  |g|= 1.88  |ddm|= 12.9
+----------RDIIS-Entropy 2.255
+  HOMO = 4.08649864968157  LUMO = 5.11661727195396
+cycle= 37 E= -27877.5387571327  delta_E= -0.0526  |g|= 1.61  |ddm|= 13.1
+----------RDIIS-Entropy 2.197
+  HOMO = 4.29089730593749  LUMO = 5.10469428734129
+cycle= 38 E= -27877.5923225094  delta_E= -0.0536  |g|= 1.39  |ddm|= 12.7
+----------RDIIS-Entropy 2.144
+  HOMO = 4.4214993567138  LUMO = 5.0976838966644
+cycle= 39 E= -27877.6675406215  delta_E= -0.0752  |g|=  1.4  |ddm|= 13.9
+----------RDIIS-Entropy 2.109
+  HOMO = 4.27204342259495  LUMO = 5.18024095601068
+cycle= 40 E= -27877.7147506387  delta_E= -0.0472  |g|= 1.26  |ddm|= 19.9
+----------RDIIS-Entropy 2.121
+  HOMO = 4.03549512120234  LUMO = 5.20129351569386
+cycle= 41 E= -27877.713614128  delta_E= 0.00114  |g|= 0.874  |ddm|= 32.3
+----------RDIIS-Entropy 2.195
+  HOMO = 3.65521434165586  LUMO = 5.20896956292264
+cycle= 42 E= -27877.688850788  delta_E= 0.0248  |g|= 0.881  |ddm|= 37.7
+----------RDIIS-Entropy 2.306
+  HOMO = 3.65133754424022  LUMO = 4.68507842981429
+cycle= 43 E= -27877.685095662  delta_E= 0.00376  |g|= 1.17  |ddm|= 22.2
+----------RDIIS-Entropy 2.313
+  HOMO = 3.58377228645841  LUMO = 4.09376654922296
+cycle= 44 E= -27877.6853164356  delta_E= -0.000221  |g|= 1.95  |ddm|=   18
+----------RDIIS-Entropy 2.182
+  HOMO = 3.25342568164195  LUMO = 4.36096836628213
+cycle= 45 E= -27877.6941839293  delta_E= -0.00887  |g|= 1.51  |ddm|= 81.1
+----------RDIIS-Entropy 1.868
+  HOMO = 2.92651473557581  LUMO = 5.0819457459662
+cycle= 46 E= -27877.7667915935  delta_E= -0.0726  |g|= 0.806  |ddm|= 41.8
+----------RDIIS-Entropy 1.734
+  HOMO = 2.94058603535735  LUMO = 5.219045648194
+cycle= 47 E= -27877.7724094516  delta_E= -0.00562  |g|= 1.07  |ddm|=  6.5
+----------RDIIS-Entropy 1.719
+  HOMO = 2.91494688055553  LUMO = 5.22372805144004
+cycle= 48 E= -27877.758103143  delta_E= 0.0143  |g|= 0.829  |ddm|= 8.73
+----------RDIIS-Entropy 1.714
+  HOMO = 2.90583515778338  LUMO = 5.22515567806828
+cycle= 49 E= -27877.7372260215  delta_E= 0.0209  |g|= 0.77  |ddm|= 8.84
+----------RDIIS-Entropy 1.699
+  HOMO = 2.98215854082845  LUMO = 5.20872883747891
+cycle= 50 E= -27877.726435236  delta_E= 0.0108  |g|= 0.744  |ddm|= 6.62
+----------RDIIS-Entropy 1.660
+  HOMO = 2.94104662064264  LUMO = 5.20767667626349
+cycle= 51 E= -27877.7111219699  delta_E= 0.0153  |g|= 1.09  |ddm|= 5.57
+----------RDIIS-Entropy 1.631
+  HOMO = 2.89303538305397  LUMO = 5.12001033644626
+cycle= 52 E= -27877.7285692357  delta_E= -0.0174  |g|=  1.4  |ddm|= 6.06
+----------RDIIS-Entropy 1.608
+  HOMO = 2.91288275551467  LUMO = 5.17046271709649
+cycle= 53 E= -27877.743791731  delta_E= -0.0152  |g|= 1.93  |ddm|= 11.9
+----------RDIIS-Entropy 1.570
+  HOMO = 3.42224375593731  LUMO = 5.14277355885257
+cycle= 54 E= -27877.7594474072  delta_E= -0.0157  |g|= 1.46  |ddm|= 14.3
+----------RDIIS-Entropy 1.529
+  HOMO = 4.28634330764052  LUMO = 5.03893151366659
+cycle= 55 E= -27877.7585663286  delta_E= 0.000881  |g|=  1.2  |ddm|= 9.41
+----------RDIIS-Entropy 1.554
+  HOMO = 3.78858554706297  LUMO = 5.04166830307724
+cycle= 56 E= -27877.69567787  delta_E= 0.0629  |g|= 1.44  |ddm|= 23.9
+----------RDIIS-Entropy 1.630
+  HOMO = 3.70257704363075  LUMO = 5.05274019195541
+cycle= 57 E= -27877.6502445561  delta_E= 0.0454  |g|= 1.55  |ddm|=   18
+----------RDIIS-Entropy 1.716
+  HOMO = 2.99705007746759  LUMO = 5.01254461857826
+cycle= 58 E= -27877.7251139198  delta_E= -0.0749  |g|= 1.17  |ddm|= 30.5
+----------RDIIS-Entropy 1.671
+  HOMO = 3.20569456777393  LUMO = 5.02758769249092
+cycle= 59 E= -27877.7632936001  delta_E= -0.0382  |g|= 0.812  |ddm|=   52
+----------RDIIS-Entropy 1.636
+  HOMO = 3.01111958024156  LUMO = 5.04743851508773
+cycle= 60 E= -27877.7718293553  delta_E= -0.00854  |g|= 0.903  |ddm|= 62.3
+----------RDIIS-Entropy 1.566
+  HOMO = 2.94942753211688  LUMO = 5.07187602159024
+cycle= 61 E= -27877.7659159586  delta_E= 0.00591  |g|= 1.07  |ddm|= 51.6
+----------RDIIS-Entropy 1.506
+  HOMO = 2.87970809046821  LUMO = 5.08019137275605
+cycle= 62 E= -27877.7622713527  delta_E= 0.00364  |g|= 0.979  |ddm|= 43.6
+----------RDIIS-Entropy 1.435
+  HOMO = 2.88472689962296  LUMO = 5.10367702555605
+cycle= 63 E= -27877.7700537744  delta_E= -0.00778  |g|= 1.22  |ddm|= 52.2
+----------RDIIS-Entropy 1.327
+  HOMO = 3.14819759758827  LUMO = 5.1001125676923
+cycle= 64 E= -27877.793876546  delta_E= -0.0238  |g|=  1.3  |ddm|= 77.8
+----------RDIIS-Entropy 1.196
+  HOMO = 3.75673597868783  LUMO = 5.05267922270457
+cycle= 65 E= -27877.8117964277  delta_E= -0.0179  |g|= 0.733  |ddm|= 93.8
+----------RDIIS-Entropy 1.045
+  HOMO = 3.52422197537421  LUMO = 5.22690719596738
+cycle= 66 E= -27877.8174806405  delta_E= -0.00568  |g|= 0.629  |ddm|= 21.7
+----------RDIIS-Entropy 1.006
+  HOMO = 3.47410461389526  LUMO = 5.23062898243653
+cycle= 67 E= -27877.8131829633  delta_E= 0.0043  |g|= 0.717  |ddm|= 8.53
+----------RDIIS-Entropy 1.001
+  HOMO = 3.20698901703698  LUMO = 5.06954567123186
+cycle= 68 E= -27877.8297562664  delta_E= -0.0166  |g|= 0.783  |ddm|= 25.4
+----------RDIIS-Entropy 0.971
+  HOMO = 3.27445439925539  LUMO = 5.01502511493678
+cycle= 69 E= -27877.8331009162  delta_E= -0.00334  |g|= 0.711  |ddm|=   35
+----------RDIIS-Entropy 0.936
+  HOMO = 3.28176117504121  LUMO = 4.99091033848746
+cycle= 70 E= -27877.8380818738  delta_E= -0.00498  |g|= 0.829  |ddm|=   24
+----------RDIIS-Entropy 0.911
+  HOMO = 3.27698349054707  LUMO = 4.97798622458586
+cycle= 71 E= -27877.8379408368  delta_E= 0.000141  |g|= 1.05  |ddm|= 17.4
+----------RDIIS-Entropy 0.892
+  HOMO = 3.22196086769339  LUMO = 5.02569444761923
+cycle= 72 E= -27877.8551015681  delta_E= -0.0172  |g|= 0.998  |ddm|= 10.6
+----------RDIIS-Entropy 0.887
+  HOMO = 3.19989694743767  LUMO = 5.07566467962825
+cycle= 73 E= -27877.8602255815  delta_E= -0.00512  |g|= 0.94  |ddm|= 6.33
+----------RDIIS-Entropy 0.893
+  HOMO = 3.18115150740128  LUMO = 4.93844867993448
+cycle= 74 E= -27877.8760542789  delta_E= -0.0158  |g|= 0.569  |ddm|= 10.4
+----------RDIIS-Entropy 0.891
+  HOMO = 3.59922046703089  LUMO = 4.85470466404444
+cycle= 75 E= -27877.8701750566  delta_E= 0.00588  |g|= 0.571  |ddm|= 10.2
+----------RDIIS-Entropy 0.896
+  HOMO = 3.34999147875435  LUMO = 4.95046372196164
+cycle= 76 E= -27877.8655979611  delta_E= 0.00458  |g|= 0.648  |ddm|=  6.3
+----------RDIIS-Entropy 0.900
+  HOMO = 2.8804106297371  LUMO = 5.08311852050355
+cycle= 77 E= -27877.8806800462  delta_E= -0.0151  |g|= 0.384  |ddm|= 4.05
+----------RDIIS-Entropy 0.899
+  HOMO = 2.87815230636625  LUMO = 5.08894351017882
+cycle= 78 E= -27877.8880828301  delta_E= -0.0074  |g|= 0.216  |ddm|= 4.37
+----------RDIIS-Entropy 0.897
+  HOMO = 2.87864883540975  LUMO = 5.09148420103244
+cycle= 79 E= -27877.8923883826  delta_E= -0.00431  |g|= 0.156  |ddm|= 4.39
+----------RDIIS-Entropy 0.894
+  HOMO = 2.88161587938319  LUMO = 5.08987128703893
+cycle= 80 E= -27877.8949868136  delta_E= -0.0026  |g|= 0.149  |ddm|= 4.22
+----------RDIIS-Entropy 0.892
+  HOMO = 2.89191552292743  LUMO = 5.08127465768943
+cycle= 81 E= -27877.8971156277  delta_E= -0.00213  |g|= 0.207  |ddm|=  3.9
+----------RDIIS-Entropy 0.890
+  HOMO = 2.89557468714769  LUMO = 5.07987574390429
+cycle= 82 E= -27877.898560177  delta_E= -0.00144  |g|= 0.248  |ddm|= 3.78
+----------RDIIS-Entropy 0.891
+  HOMO = 2.89594529798203  LUMO = 5.08127026212278
+cycle= 83 E= -27877.8987186079  delta_E= -0.000158  |g|= 0.244  |ddm|= 3.91
+----------RDIIS-Entropy 0.891
+  HOMO = 3.06654719883072  LUMO = 5.08332546596526
+cycle= 84 E= -27877.8946531211  delta_E= 0.00407  |g|= 0.313  |ddm|= 4.71
+----------RDIIS-Entropy 0.892
+  HOMO = 3.38124501314122  LUMO = 5.08224653379869
+cycle= 85 E= -27877.8848845089  delta_E= 0.00977  |g|=  0.5  |ddm|= 13.4
+----------RDIIS-Entropy 0.910
+  HOMO = 3.54921088451659  LUMO = 5.11925252897874
+cycle= 86 E= -27877.8588010401  delta_E= 0.0261  |g|= 0.816  |ddm|= 38.1
+----------RDIIS-Entropy 0.972
+  HOMO = 3.50333628272778  LUMO = 4.93543393862322
+cycle= 87 E= -27877.8309663544  delta_E= 0.0278  |g|= 1.16  |ddm|= 83.7
+----------RDIIS-Entropy 1.120
+  HOMO = 3.45667973920211  LUMO = 5.10017787284141
+cycle= 88 E= -27877.7616993837  delta_E= 0.0693  |g|= 1.37  |ddm|=  208
+----------RDIIS-Entropy 1.492
+  HOMO = 3.04244304528994  LUMO = 4.90214874625941
+cycle= 89 E= -27877.7946226299  delta_E= -0.0329  |g|=  0.7  |ddm|= 72.4
+----------RDIIS-Entropy 1.616
+  HOMO = 3.00769568777382  LUMO = 4.93206152057669
+cycle= 90 E= -27877.7824003257  delta_E= 0.0122  |g|= 0.652  |ddm|= 82.1
+----------RDIIS-Entropy 1.756
+  HOMO = 2.96975559433112  LUMO = 5.00832161405012
+cycle= 91 E= -27877.7619545977  delta_E= 0.0204  |g|= 0.723  |ddm|= 69.9
+----------RDIIS-Entropy 1.870
+  HOMO = 2.97247419470771  LUMO = 5.12095166882064
+cycle= 92 E= -27877.7285382584  delta_E= 0.0334  |g|= 0.941  |ddm|= 70.8
+----------RDIIS-Entropy 1.987
+  HOMO = 2.97121377239694  LUMO = 5.14790359192571
+cycle= 93 E= -27877.7034419365  delta_E= 0.0251  |g|= 1.09  |ddm|=   50
+----------RDIIS-Entropy 2.076
+  HOMO = 2.96467694481818  LUMO = 5.09490878868704
+cycle= 94 E= -27877.6929696613  delta_E= 0.0105  |g|= 1.11  |ddm|= 50.8
+----------RDIIS-Entropy 2.167
+  HOMO = 2.96992495572752  LUMO = 5.09793543967379
+cycle= 95 E= -27877.6887220124  delta_E= 0.00425  |g|= 1.11  |ddm|= 20.2
+----------RDIIS-Entropy 2.188
+  HOMO = 3.12650161704397  LUMO = 4.83568004806174
+cycle= 96 E= -27877.6598678167  delta_E= 0.0289  |g|= 1.54  |ddm|= 38.9
+----------RDIIS-Entropy 2.130
+  HOMO = 3.27558729605561  LUMO = 4.67902292782898
+cycle= 97 E= -27877.6267709481  delta_E= 0.0331  |g|= 2.05  |ddm|= 17.6
+----------RDIIS-Entropy 2.117
+  HOMO = 3.39233295761796  LUMO = 4.64896946920558
+cycle= 98 E= -27877.5875974033  delta_E= 0.0392  |g|= 2.21  |ddm|= 40.7
+----------RDIIS-Entropy 2.075
+  HOMO = 3.43877872983648  LUMO = 4.80056648969608
+cycle= 99 E= -27877.6726988309  delta_E= -0.0851  |g|= 1.51  |ddm|=  115
+----------RDIIS-Entropy 1.906
+  HOMO = 3.32312170322867  LUMO = 5.08752502661554
+cycle= 100 E= -27877.7376511371  delta_E= -0.065  |g|= 1.08  |ddm|=  142
+----------RDIIS-Entropy 1.654
+  HOMO = 2.99543265220378  LUMO = 5.2531555561066
+cycle= 101 E= -27877.7693209868  delta_E= -0.0317  |g|= 1.13  |ddm|=  113
+----------RDIIS-Entropy 1.399
+  HOMO = 3.14768092903015  LUMO = 5.26643390722434
+cycle= 102 E= -27877.7694469851  delta_E= -0.000126  |g|= 1.14  |ddm|= 49.6
+----------RDIIS-Entropy 1.280
+  HOMO = 3.22875628934085  LUMO = 5.26141861270392
+cycle= 103 E= -27877.7692934537  delta_E= 0.000154  |g|= 0.948  |ddm|= 36.4
+----------RDIIS-Entropy 1.206
+  HOMO = 3.32030818758567  LUMO = 5.09732857101773
+cycle= 104 E= -27877.7665454297  delta_E= 0.00275  |g|= 0.974  |ddm|= 40.2
+----------RDIIS-Entropy 1.144
+  HOMO = 3.37851985889199  LUMO = 5.03233082824023
+cycle= 105 E= -27877.7721330912  delta_E= -0.00559  |g|= 1.04  |ddm|= 37.6
+----------RDIIS-Entropy 1.090
+  HOMO = 3.31882405153092  LUMO = 5.01042816967739
+cycle= 106 E= -27877.773318952  delta_E= -0.00119  |g|= 1.02  |ddm|= 33.5
+----------RDIIS-Entropy 1.047
+  HOMO = 3.32056448670515  LUMO = 5.02576047119178
+cycle= 107 E= -27877.7793082782  delta_E= -0.00599  |g|= 0.968  |ddm|= 37.2
+----------RDIIS-Entropy 0.996
+  HOMO = 3.46567330487186  LUMO = 4.9250452724715
+cycle= 108 E= -27877.790770224  delta_E= -0.0115  |g|= 0.893  |ddm|= 37.3
+----------RDIIS-Entropy 0.936
+  HOMO = 3.14466927732063  LUMO = 4.99886276830138
+cycle= 109 E= -27877.8209991226  delta_E= -0.0302  |g|= 0.84  |ddm|= 58.2
+----------RDIIS-Entropy 0.834
+  HOMO = 3.12252353596671  LUMO = 5.0393556783928
+cycle= 110 E= -27877.8400133304  delta_E= -0.019  |g|= 0.802  |ddm|= 45.7
+----------RDIIS-Entropy 0.765
+  HOMO = 3.25535806641148  LUMO = 5.03045884532072
+cycle= 111 E= -27877.8414743301  delta_E= -0.00146  |g|= 0.802  |ddm|=   37
+----------RDIIS-Entropy 0.713
+  HOMO = 3.30471937567907  LUMO = 5.01656989762606
+cycle= 112 E= -27877.8472730802  delta_E= -0.0058  |g|= 0.795  |ddm|= 28.7
+----------RDIIS-Entropy 0.667
+  HOMO = 3.23064254709705  LUMO = 4.98177080130963
+cycle= 113 E= -27877.8600277403  delta_E= -0.0128  |g|= 0.593  |ddm|= 19.1
+----------RDIIS-Entropy 0.631
+  HOMO = 3.2856999053294  LUMO = 5.00450671910467
+cycle= 114 E= -27877.8598709097  delta_E= 0.000157  |g|= 0.586  |ddm|= 21.4
+----------RDIIS-Entropy 0.606
+  HOMO = 3.37079577226485  LUMO = 5.00852074064303
+cycle= 115 E= -27877.8561391812  delta_E= 0.00373  |g|= 0.675  |ddm|= 21.9
+----------RDIIS-Entropy 0.581
+  HOMO = 3.2837939879613  LUMO = 5.02804741800255
+cycle= 116 E= -27877.8556484  delta_E= 0.000491  |g|= 0.708  |ddm|= 20.5
+----------RDIIS-Entropy 0.545
+  HOMO = 3.32402011675414  LUMO = 5.03623579983261
+cycle= 117 E= -27877.8592819978  delta_E= -0.00363  |g|= 0.682  |ddm|=   21
+----------RDIIS-Entropy 0.510
+  HOMO = 2.94020263188951  LUMO = 5.12681796858907
+cycle= 118 E= -27877.8836477581  delta_E= -0.0244  |g|= 0.435  |ddm|= 20.1
+----------RDIIS-Entropy 0.486
+  HOMO = 3.03730740814766  LUMO = 5.08868453642774
+cycle= 119 E= -27877.8838337756  delta_E= -0.000186  |g|= 0.426  |ddm|= 14.3
+----------RDIIS-Entropy 0.467
+  HOMO = 3.19266327169209  LUMO = 5.07479344717243
+cycle= 120 E= -27877.8832838734  delta_E= 0.00055  |g|= 0.42  |ddm|= 10.9
+----------RDIIS-Entropy 0.452
+  HOMO = 3.26835639833377  LUMO = 5.08390750839673
+cycle= 121 E= -27877.8872959618  delta_E= -0.00401  |g|= 0.395  |ddm|= 10.7
+----------RDIIS-Entropy 0.436
+  HOMO = 3.18585512343716  LUMO = 5.05885196908191
+cycle= 122 E= -27877.889921364  delta_E= -0.00263  |g|= 0.409  |ddm|=  5.6
+----------RDIIS-Entropy 0.427
+  HOMO = 3.21779197851659  LUMO = 5.04525473475518
+cycle= 123 E= -27877.890148969  delta_E= -0.000228  |g|= 0.386  |ddm|= 4.08
+----------RDIIS-Entropy 0.420
+  HOMO = 3.0619753420242  LUMO = 5.03091612214935
+cycle= 124 E= -27877.8930872646  delta_E= -0.00294  |g|= 0.491  |ddm|= 4.38
+----------RDIIS-Entropy 0.413
+  HOMO = 3.21961116697512  LUMO = 5.00080338383336
+cycle= 125 E= -27877.8933296514  delta_E= -0.000242  |g|= 0.493  |ddm|= 7.79
+----------RDIIS-Entropy 0.406
+  HOMO = 3.06984266855011  LUMO = 5.05341397273756
+cycle= 126 E= -27877.8942622695  delta_E= -0.000933  |g|= 0.481  |ddm|= 4.77
+----------RDIIS-Entropy 0.402
+  HOMO = 3.2530288343409  LUMO = 5.04083892600033
+cycle= 127 E= -27877.8891180008  delta_E= 0.00514  |g|= 0.574  |ddm|= 5.56
+----------RDIIS-Entropy 0.401
+  HOMO = 3.21881796583941  LUMO = 5.05052418766402
+cycle= 128 E= -27877.8880800956  delta_E= 0.00104  |g|= 0.576  |ddm|= 6.58
+----------RDIIS-Entropy 0.402
+  HOMO = 2.89835275116792  LUMO = 5.09391880267445
+cycle= 129 E= -27877.9051489973  delta_E= -0.0171  |g|= 0.308  |ddm|= 10.6
+----------RDIIS-Entropy 0.389
+  HOMO = 2.92235722402898  LUMO = 5.1040370892529
+cycle= 130 E= -27877.9080190749  delta_E= -0.00287  |g|= 0.23  |ddm|= 10.8
+----------RDIIS-Entropy 0.371
+  HOMO = 2.93888253976441  LUMO = 5.1054238907278
+cycle= 131 E= -27877.9069727727  delta_E= 0.00105  |g|= 0.316  |ddm|= 7.54
+----------RDIIS-Entropy 0.361
+  HOMO = 3.01352559892099  LUMO = 5.07011052672189
+cycle= 132 E= -27877.9034538837  delta_E= 0.00352  |g|= 0.362  |ddm|= 2.01
+----------RDIIS-Entropy 0.359
+  HOMO = 2.98132536011758  LUMO = 5.05344671922287
+cycle= 133 E= -27877.8997471606  delta_E= 0.00371  |g|= 0.372  |ddm|= 1.41
+----------RDIIS-Entropy 0.357
+  HOMO = 3.09043130871407  LUMO = 5.03642339099175
+cycle= 134 E= -27877.8918723191  delta_E= 0.00787  |g|= 0.373  |ddm|= 2.83
+----------RDIIS-Entropy 0.358
+  HOMO = 2.93815059021435  LUMO = 5.04994968800359
+cycle= 135 E= -27877.8989541729  delta_E= -0.00708  |g|= 0.279  |ddm|= 4.76
+----------RDIIS-Entropy 0.360
+  HOMO = 3.12261433327757  LUMO = 5.01578063568992
+cycle= 136 E= -27877.8883445871  delta_E= 0.0106  |g|= 0.371  |ddm|=   21
+----------RDIIS-Entropy 0.382
+  HOMO = 2.91757725074915  LUMO = 5.07931520493574
+cycle= 137 E= -27877.9027460847  delta_E= -0.0144  |g|= 0.258  |ddm|= 6.44
+----------RDIIS-Entropy 0.376
+  HOMO = 2.9196301561431  LUMO = 5.08301050377732
+cycle= 138 E= -27877.9061941482  delta_E= -0.00345  |g|= 0.223  |ddm|= 6.26
+----------RDIIS-Entropy 0.366
+  HOMO = 2.92934284878564  LUMO = 5.07652218546768
+cycle= 139 E= -27877.9073678971  delta_E= -0.00117  |g|= 0.224  |ddm|= 4.21
+----------RDIIS-Entropy 0.359
+  HOMO = 2.94749643044364  LUMO = 5.05376823051257
+cycle= 140 E= -27877.9066172204  delta_E= 0.000751  |g|= 0.293  |ddm|= 2.98
+----------RDIIS-Entropy 0.361
+  HOMO = 3.08512221480199  LUMO = 5.05730600115622
+cycle= 141 E= -27877.9036748884  delta_E= 0.00294  |g|= 0.334  |ddm|= 4.68
+----------RDIIS-Entropy 0.369
+  HOMO = 3.15344503008416  LUMO = 5.06689294340196
+cycle= 142 E= -27877.9014517839  delta_E= 0.00222  |g|= 0.32  |ddm|=  7.4
+----------RDIIS-Entropy 0.383
+  HOMO = 3.05970743253266  LUMO = 5.06572089319989
+cycle= 143 E= -27877.9007521027  delta_E= 0.0007  |g|= 0.306  |ddm|= 8.83
+----------RDIIS-Entropy 0.398
+  HOMO = 3.12002611664195  LUMO = 5.07334445520728
+cycle= 144 E= -27877.898192643  delta_E= 0.00256  |g|= 0.332  |ddm|= 12.6
+----------RDIIS-Entropy 0.419
+  HOMO = 3.08786518197186  LUMO = 5.04706584720175
+cycle= 145 E= -27877.8945144326  delta_E= 0.00368  |g|= 0.391  |ddm|= 23.5
+----------RDIIS-Entropy 0.455
+  HOMO = 3.06960818862964  LUMO = 5.04137871618174
+cycle= 146 E= -27877.8886335922  delta_E= 0.00588  |g|= 0.396  |ddm|= 49.7
+----------RDIIS-Entropy 0.521
+  HOMO = 2.96749613362032  LUMO = 5.07945753355693
+cycle= 147 E= -27877.880414392  delta_E= 0.00822  |g|= 0.453  |ddm|= 57.6
+----------RDIIS-Entropy 0.596
+  HOMO = 2.95460892556666  LUMO = 5.03297822375778
+cycle= 148 E= -27877.8690580547  delta_E= 0.0114  |g|= 0.583  |ddm|= 46.1
+----------RDIIS-Entropy 0.650
+  HOMO = 2.94980766203829  LUMO = 5.02650221146353
+cycle= 149 E= -27877.8611385078  delta_E= 0.00792  |g|= 0.627  |ddm|= 53.1
+----------RDIIS-Entropy 0.710
+  HOMO = 2.94896182806219  LUMO = 5.07616050199068
+cycle= 150 E= -27877.8544345265  delta_E= 0.0067  |g|= 0.628  |ddm|= 61.3
+----------RDIIS-Entropy 0.787
+  HOMO = 2.94428560921863  LUMO = 4.97112937961981
+cycle= 151 E= -27877.8542511033  delta_E= 0.000183  |g|= 0.61  |ddm|= 46.4
+----------RDIIS-Entropy 0.849
+  HOMO = 3.04663925490193  LUMO = 4.80872352498804
+cycle= 152 E= -27877.8604086625  delta_E= -0.00616  |g|= 0.531  |ddm|= 28.3
+----------RDIIS-Entropy 0.884
+  HOMO = 3.00745456346616  LUMO = 4.88147856057704
+cycle= 153 E= -27877.8576455999  delta_E= 0.00276  |g|= 0.544  |ddm|= 41.4
+----------RDIIS-Entropy 0.929
+  HOMO = 2.97924889273139  LUMO = 4.91575458456013
+cycle= 154 E= -27877.8545554466  delta_E= 0.00309  |g|= 0.562  |ddm|= 45.1
+----------RDIIS-Entropy 0.973
+  HOMO = 3.1077955896986  LUMO = 4.83783796163838
+cycle= 155 E= -27877.8418593376  delta_E= 0.0127  |g|= 0.784  |ddm|= 45.9
+----------RDIIS-Entropy 1.012
+  HOMO = 3.12181677811013  LUMO = 4.96534004018223
+cycle= 156 E= -27877.8338354035  delta_E= 0.00802  |g|= 0.668  |ddm|= 60.6
+----------RDIIS-Entropy 1.068
+  HOMO = 3.14923446976989  LUMO = 5.12025205186801
+cycle= 157 E= -27877.8239238624  delta_E= 0.00991  |g|= 0.564  |ddm|= 46.9
+----------RDIIS-Entropy 1.112
+  HOMO = 3.16902274775644  LUMO = 4.77008347965705
+cycle= 158 E= -27877.8344401901  delta_E= -0.0105  |g|= 0.646  |ddm|= 19.7
+----------RDIIS-Entropy 1.083
+  HOMO = 3.1873048323825  LUMO = 4.96303340564151
+cycle= 159 E= -27877.8340537548  delta_E= 0.000386  |g|= 0.658  |ddm|= 37.7
+----------RDIIS-Entropy 1.036
+  HOMO = 3.20590893180381  LUMO = 5.17798186252536
+cycle= 160 E= -27877.831115818  delta_E= 0.00294  |g|= 0.613  |ddm|= 77.3
+----------RDIIS-Entropy 0.954
+  HOMO = 3.40130746783124  LUMO = 5.17040305106157
+cycle= 161 E= -27877.8021827088  delta_E= 0.0289  |g|= 1.26  |ddm|=  119
+----------RDIIS-Entropy 0.821
+  HOMO = 3.53008345437089  LUMO = 5.1811217960811
+cycle= 162 E= -27877.8107762255  delta_E= -0.00859  |g|= 0.925  |ddm|= 90.3
+----------RDIIS-Entropy 0.735
+  HOMO = 3.25345648659667  LUMO = 5.18011702443809
+cycle= 163 E= -27877.8252778615  delta_E= -0.0145  |g|= 0.781  |ddm|= 74.2
+----------RDIIS-Entropy 0.655
+  HOMO = 3.19048171221403  LUMO = 4.76438400485669
+cycle= 164 E= -27877.8670724659  delta_E= -0.0418  |g|= 0.471  |ddm|=  121
+----------RDIIS-Entropy 0.511
+  HOMO = 3.17263834842373  LUMO = 5.09281764851338
+cycle= 165 E= -27877.881063335  delta_E= -0.014  |g|= 0.356  |ddm|=   70
+----------RDIIS-Entropy 0.431
+  HOMO = 3.1195682341818  LUMO = 5.04887804443121
+cycle= 166 E= -27877.8847509874  delta_E= -0.00369  |g|= 0.31  |ddm|=   34
+----------RDIIS-Entropy 0.388
+  HOMO = 3.0989750236499  LUMO = 5.00747730093806
+cycle= 167 E= -27877.8874301632  delta_E= -0.00268  |g|= 0.272  |ddm|=   22
+----------RDIIS-Entropy 0.358
+  HOMO = 3.10562692141556  LUMO = 4.9502013001643
+cycle= 168 E= -27877.8896174629  delta_E= -0.00219  |g|= 0.247  |ddm|= 10.6
+----------RDIIS-Entropy 0.341
+  HOMO = 3.09169691738389  LUMO = 4.84277292159792
+cycle= 169 E= -27877.8904827597  delta_E= -0.000865  |g|= 0.262  |ddm|= 4.99
+----------RDIIS-Entropy 0.336
+  HOMO = 3.10040451092791  LUMO = 4.868058318995
+cycle= 170 E= -27877.8909808849  delta_E= -0.000498  |g|= 0.283  |ddm|=  5.2
+----------RDIIS-Entropy 0.333
+  HOMO = 3.08753388441854  LUMO = 4.88372562810884
+cycle= 171 E= -27877.8927578593  delta_E= -0.00178  |g|= 0.311  |ddm|= 4.97
+----------RDIIS-Entropy 0.323
+  HOMO = 3.16285392410177  LUMO = 4.90110170464458
+cycle= 172 E= -27877.8911008823  delta_E= 0.00166  |g|= 0.343  |ddm|= 13.4
+----------RDIIS-Entropy 0.330
+  HOMO = 3.01633195219171  LUMO = 4.97992021992841
+cycle= 173 E= -27877.8909186375  delta_E= 0.000182  |g|= 0.386  |ddm|= 17.4
+----------RDIIS-Entropy 0.342
+  HOMO = 2.91722428695624  LUMO = 5.0544719657819
+cycle= 174 E= -27877.8948360403  delta_E= -0.00392  |g|= 0.331  |ddm|= 3.01
+----------RDIIS-Entropy 0.341
+  HOMO = 2.91174368538086  LUMO = 5.0854985205394
+cycle= 175 E= -27877.9008575677  delta_E= -0.00602  |g|= 0.318  |ddm|= 10.8
+----------RDIIS-Entropy 0.329
+  HOMO = 2.91578015026538  LUMO = 5.0953114601908
+cycle= 176 E= -27877.9058877509  delta_E= -0.00503  |g|= 0.233  |ddm|= 12.7
+----------RDIIS-Entropy 0.317
+  HOMO = 3.12463959245859  LUMO = 5.0872840971031
+cycle= 177 E= -27877.9047344452  delta_E= 0.00115  |g|= 0.384  |ddm|= 9.06
+----------RDIIS-Entropy 0.311
+  HOMO = 2.92302955079974  LUMO = 5.07452391172971
+cycle= 178 E= -27877.911350613  delta_E= -0.00662  |g|= 0.233  |ddm|= 4.34
+----------RDIIS-Entropy 0.306
+  HOMO = 3.04181555581842  LUMO = 4.99320912472039
+cycle= 179 E= -27877.9063080755  delta_E= 0.00504  |g|= 0.405  |ddm|= 8.99
+----------RDIIS-Entropy 0.312
+  HOMO = 3.31197189016883  LUMO = 5.00087228882103
+cycle= 180 E= -27877.8924815218  delta_E= 0.0138  |g|= 0.535  |ddm|= 18.9
+----------RDIIS-Entropy 0.326
+  HOMO = 2.98658007127209  LUMO = 5.03692186625874
+cycle= 181 E= -27877.8959481461  delta_E= -0.00347  |g|= 0.421  |ddm|= 18.3
+----------RDIIS-Entropy 0.344
+  HOMO = 2.92221345648025  LUMO = 5.05988072183306
+cycle= 182 E= -27877.8973184219  delta_E= -0.00137  |g|= 0.388  |ddm|=   15
+----------RDIIS-Entropy 0.358
+  HOMO = 2.91173747289352  LUMO = 5.06935169824073
+cycle= 183 E= -27877.9034883286  delta_E= -0.00617  |g|= 0.337  |ddm|= 3.13
+----------RDIIS-Entropy 0.360
+  HOMO = 2.91207244400949  LUMO = 5.07077467155828
+cycle= 184 E= -27877.9056067392  delta_E= -0.00212  |g|= 0.351  |ddm|= 4.99
+----------RDIIS-Entropy 0.354
+  HOMO = 2.91382941176111  LUMO = 5.06437938959948
+cycle= 185 E= -27877.906707539  delta_E= -0.0011  |g|= 0.308  |ddm|= 4.54
+----------RDIIS-Entropy 0.347
+  HOMO = 2.92959449123782  LUMO = 5.04483410231136
+cycle= 186 E= -27877.9044102111  delta_E= 0.0023  |g|= 0.377  |ddm|= 5.62
+----------RDIIS-Entropy 0.341
+  HOMO = 3.17846392604568  LUMO = 5.0309357879875
+cycle= 187 E= -27877.8961060454  delta_E= 0.0083  |g|= 0.491  |ddm|= 8.49
+----------RDIIS-Entropy 0.337
+  HOMO = 3.03634459878429  LUMO = 5.05507382818676
+cycle= 188 E= -27877.8985396808  delta_E= -0.00243  |g|= 0.409  |ddm|= 3.62
+----------RDIIS-Entropy 0.335
+  HOMO = 3.60907624560025  LUMO = 5.05672903543395
+cycle= 189 E= -27877.883597927  delta_E= 0.0149  |g|= 0.671  |ddm|=   16
+----------RDIIS-Entropy 0.357
+  HOMO = 3.62974719844544  LUMO = 5.09590755976535
+cycle= 190 E= -27877.8763312143  delta_E= 0.00727  |g|= 0.722  |ddm|= 27.8
+----------RDIIS-Entropy 0.399
+  HOMO = 3.65417196702247  LUMO = 5.12158791649198
+cycle= 191 E= -27877.8657394921  delta_E= 0.0106  |g|= 0.764  |ddm|= 53.9
+----------RDIIS-Entropy 0.482
+  HOMO = 3.02660902059885  LUMO = 5.03018909179939
+cycle= 192 E= -27877.8737938474  delta_E= -0.00805  |g|= 0.659  |ddm|= 25.2
+----------RDIIS-Entropy 0.525
+  HOMO = 2.94892631449813  LUMO = 4.95758396064331
+cycle= 193 E= -27877.8731473914  delta_E= 0.000646  |g|= 0.528  |ddm|= 21.8
+----------RDIIS-Entropy 0.552
+  HOMO = 2.99029929343351  LUMO = 4.97811135131924
+cycle= 194 E= -27877.8676513626  delta_E= 0.0055  |g|= 0.488  |ddm|= 39.4
+----------RDIIS-Entropy 0.602
+  HOMO = 2.9481291216786  LUMO = 4.98243124384961
+cycle= 195 E= -27877.8602568937  delta_E= 0.00739  |g|= 0.512  |ddm|= 38.5
+----------RDIIS-Entropy 0.647
+  HOMO = 2.99262122121337  LUMO = 4.94798741393844
+cycle= 196 E= -27877.8581740596  delta_E= 0.00208  |g|= 0.481  |ddm|=   43
+----------RDIIS-Entropy 0.707
+  HOMO = 2.96890289254754  LUMO = 4.98767345838396
+cycle= 197 E= -27877.8509504504  delta_E= 0.00722  |g|= 0.503  |ddm|= 53.9
+----------RDIIS-Entropy 0.778
+  HOMO = 2.98630895831173  LUMO = 4.95602426141377
+cycle= 198 E= -27877.8481323564  delta_E= 0.00282  |g|= 0.493  |ddm|= 40.3
+----------RDIIS-Entropy 0.827
+  HOMO = 3.17852482894028  LUMO = 4.73713008288161
+cycle= 199 E= -27877.8539860588  delta_E= -0.00585  |g|= 0.605  |ddm|= 35.6
+----------RDIIS-Entropy 0.782
+  HOMO = 3.13799888528483  LUMO = 4.76894220401509
+cycle= 200 E= -27877.86432954  delta_E= -0.0103  |g|= 0.495  |ddm|= 63.2
+----------RDIIS-Entropy 0.697
+  HOMO = 3.0884518557016  LUMO = 4.85098793367769
+cycle= 201 E= -27877.8759717917  delta_E= -0.0116  |g|= 0.464  |ddm|=   78
+----------RDIIS-Entropy 0.597
+  HOMO = 3.00337302509482  LUMO = 4.928030006256
+cycle= 202 E= -27877.8897646945  delta_E= -0.0138  |g|= 0.362  |ddm|= 85.9
+----------RDIIS-Entropy 0.486
+  HOMO = 2.94378962436728  LUMO = 5.0207872383794
+cycle= 203 E= -27877.9002904365  delta_E= -0.0105  |g|= 0.284  |ddm|= 67.8
+----------RDIIS-Entropy 0.395
+  HOMO = 2.99548761097916  LUMO = 4.86701582481057
+cycle= 204 E= -27877.9052859433  delta_E= -0.005  |g|= 0.26  |ddm|= 26.8
+----------RDIIS-Entropy 0.354
+  HOMO = 3.00631788107482  LUMO = 4.86014452299458
+cycle= 205 E= -27877.9086892332  delta_E= -0.0034  |g|= 0.222  |ddm|= 17.1
+----------RDIIS-Entropy 0.327
+  HOMO = 2.99123038131392  LUMO = 4.87450346414795
+cycle= 206 E= -27877.9107780322  delta_E= -0.00209  |g|= 0.201  |ddm|= 9.45
+----------RDIIS-Entropy 0.311
+  HOMO = 2.99792714327097  LUMO = 4.86960427649764
+cycle= 207 E= -27877.9117298997  delta_E= -0.000952  |g|= 0.21  |ddm|= 3.35
+----------RDIIS-Entropy 0.305
+  HOMO = 2.99630832472157  LUMO = 4.87277008834892
+cycle= 208 E= -27877.9130660839  delta_E= -0.00134  |g|= 0.189  |ddm|= 4.04
+----------RDIIS-Entropy 0.297
+  HOMO = 3.01451527476156  LUMO = 4.85994938796156
+cycle= 209 E= -27877.9135247768  delta_E= -0.000459  |g|= 0.19  |ddm|= 2.04
+----------RDIIS-Entropy 0.294
+  HOMO = 3.02059374350161  LUMO = 4.86514452303665
+cycle= 210 E= -27877.913475717  delta_E= 4.91e-05  |g|= 0.202  |ddm|= 6.12
+----------RDIIS-Entropy 0.301
+  HOMO = 3.02342470648049  LUMO = 4.91340387300142
+cycle= 211 E= -27877.9106440805  delta_E= 0.00283  |g|= 0.223  |ddm|= 25.4
+----------RDIIS-Entropy 0.334
+  HOMO = 2.98049431162099  LUMO = 5.07909280513823
+cycle= 212 E= -27877.9015501028  delta_E= 0.00909  |g|= 0.315  |ddm|= 65.8
+----------RDIIS-Entropy 0.415
+  HOMO = 2.96684007428302  LUMO = 5.12320198169194
+cycle= 213 E= -27877.890218446  delta_E= 0.0113  |g|= 0.363  |ddm|= 84.7
+----------RDIIS-Entropy 0.516
+  HOMO = 2.94758642942699  LUMO = 5.13384226536604
+cycle= 214 E= -27877.8848084738  delta_E= 0.00541  |g|= 0.372  |ddm|= 81.5
+----------RDIIS-Entropy 0.618
+  HOMO = 2.93454260040407  LUMO = 5.11003877119528
+cycle= 215 E= -27877.8814593816  delta_E= 0.00335  |g|= 0.359  |ddm|= 63.9
+----------RDIIS-Entropy 0.698
+  HOMO = 2.92928698441985  LUMO = 5.09357575066062
+cycle= 216 E= -27877.8763638779  delta_E= 0.0051  |g|= 0.313  |ddm|= 59.6
+----------RDIIS-Entropy 0.764
+  HOMO = 2.92810576082437  LUMO = 5.11874228196209
+cycle= 217 E= -27877.8701745402  delta_E= 0.00619  |g|= 0.303  |ddm|= 54.8
+----------RDIIS-Entropy 0.824
+  HOMO = 2.92813059106348  LUMO = 5.13234153842963
+cycle= 218 E= -27877.8665979093  delta_E= 0.00358  |g|= 0.283  |ddm|= 33.2
+----------RDIIS-Entropy 0.861
+  HOMO = 2.92730908595354  LUMO = 5.11218510672258
+cycle= 219 E= -27877.8635146024  delta_E= 0.00308  |g|= 0.28  |ddm|= 33.1
+----------RDIIS-Entropy 0.899
+  HOMO = 2.92346436717116  LUMO = 4.98109704618492
+cycle= 220 E= -27877.8625305043  delta_E= 0.000984  |g|= 0.462  |ddm|= 30.8
+----------RDIIS-Entropy 0.928
+  HOMO = 3.12308268333659  LUMO = 4.70657814923837
+cycle= 221 E= -27877.8643916938  delta_E= -0.00186  |g|= 0.485  |ddm|= 38.4
+----------RDIIS-Entropy 0.913
+  HOMO = 3.31411149330262  LUMO = 4.62787881473904
+cycle= 222 E= -27877.8696712094  delta_E= -0.00528  |g|= 0.454  |ddm|= 83.2
+----------RDIIS-Entropy 0.854
+  HOMO = 3.2091138492076  LUMO = 4.81345005182609
+cycle= 223 E= -27877.8777690465  delta_E= -0.0081  |g|= 0.425  |ddm|=  123
+----------RDIIS-Entropy 0.742
+  HOMO = 2.98327689645625  LUMO = 5.01922664202971
+cycle= 224 E= -27877.8873856141  delta_E= -0.00962  |g|= 0.49  |ddm|=  123
+----------RDIIS-Entropy 0.609
+  HOMO = 2.96485746380253  LUMO = 5.09027078679044
+cycle= 225 E= -27877.8965151106  delta_E= -0.00913  |g|= 0.377  |ddm|= 96.5
+----------RDIIS-Entropy 0.487
+  HOMO = 2.99762014687936  LUMO = 4.90568383910173
+cycle= 226 E= -27877.9069157272  delta_E= -0.0104  |g|= 0.308  |ddm|= 66.3
+----------RDIIS-Entropy 0.386
+  HOMO = 2.97547249884346  LUMO = 4.95408516727747
+cycle= 227 E= -27877.9125414045  delta_E= -0.00563  |g|= 0.204  |ddm|= 51.5
+----------RDIIS-Entropy 0.310
+  HOMO = 2.96087125449951  LUMO = 5.0264521540026
+cycle= 228 E= -27877.9147351489  delta_E= -0.00219  |g|= 0.157  |ddm|=   26
+----------RDIIS-Entropy 0.272
+  HOMO = 2.96036035733027  LUMO = 4.99792228046874
+cycle= 229 E= -27877.9142809732  delta_E= 0.000454  |g|= 0.145  |ddm|= 6.28
+----------RDIIS-Entropy 0.261
+  HOMO = 2.96855397004921  LUMO = 4.99282963607599
+cycle= 230 E= -27877.9135823598  delta_E= 0.000699  |g|= 0.133  |ddm|= 4.81
+----------RDIIS-Entropy 0.253
+  HOMO = 2.98005272241441  LUMO = 4.97156041135985
+cycle= 231 E= -27877.9120614289  delta_E= 0.00152  |g|= 0.132  |ddm|= 3.53
+----------RDIIS-Entropy 0.248
+  HOMO = 3.06401292498269  LUMO = 4.88999724068708
+cycle= 232 E= -27877.9076293381  delta_E= 0.00443  |g|= 0.16  |ddm|= 4.84
+----------RDIIS-Entropy 0.253
+  HOMO = 3.05773982935573  LUMO = 4.91129534183916
+cycle= 233 E= -27877.9049998696  delta_E= 0.00263  |g|= 0.168  |ddm|=   15
+----------RDIIS-Entropy 0.272
+  HOMO = 3.06520928551734  LUMO = 5.03445255669831
+cycle= 234 E= -27877.888597692  delta_E= 0.0164  |g|= 0.289  |ddm|= 47.9
+----------RDIIS-Entropy 0.335
+  HOMO = 3.05003490427449  LUMO = 5.11924939113694
+cycle= 235 E= -27877.8735991761  delta_E= 0.015  |g|= 0.343  |ddm|= 76.2
+----------RDIIS-Entropy 0.436
+  HOMO = 2.96357182954913  LUMO = 5.12797024003327
+cycle= 236 E= -27877.8658313514  delta_E= 0.00777  |g|= 0.406  |ddm|=   78
+----------RDIIS-Entropy 0.544
+  HOMO = 2.94653950217173  LUMO = 5.13312948319979
+cycle= 237 E= -27877.8598833025  delta_E= 0.00595  |g|= 0.482  |ddm|= 76.9
+----------RDIIS-Entropy 0.653
+  HOMO = 2.94960776426391  LUMO = 5.1332926779793
+cycle= 238 E= -27877.8617430638  delta_E= -0.00186  |g|= 0.586  |ddm|= 45.7
+----------RDIIS-Entropy 0.723
+  HOMO = 2.94703988175633  LUMO = 5.13210927538238
+cycle= 239 E= -27877.8575613168  delta_E= 0.00418  |g|= 0.642  |ddm|= 44.9
+----------RDIIS-Entropy 0.785
+  HOMO = 2.94684684894736  LUMO = 5.13515748818558
+cycle= 240 E= -27877.8541055978  delta_E= 0.00346  |g|= 0.64  |ddm|= 44.2
+----------RDIIS-Entropy 0.846
+  HOMO = 2.9483909929665  LUMO = 5.02292442908771
+cycle= 241 E= -27877.8536830623  delta_E= 0.000423  |g|= 0.538  |ddm|= 18.1
+----------RDIIS-Entropy 0.866
+  HOMO = 2.96809616173694  LUMO = 4.92412181368083
+cycle= 242 E= -27877.849839857  delta_E= 0.00384  |g|= 0.518  |ddm|= 10.4
+----------RDIIS-Entropy 0.864
+  HOMO = 3.08981366607485  LUMO = 4.78549198664246
+cycle= 243 E= -27877.849308478  delta_E= 0.000531  |g|= 0.529  |ddm|= 15.7
+----------RDIIS-Entropy 0.859
+  HOMO = 3.14653527190323  LUMO = 4.76935943221805
+cycle= 244 E= -27877.8502194218  delta_E= -0.000911  |g|= 0.476  |ddm|= 38.8
+----------RDIIS-Entropy 0.814
+  HOMO = 3.13202146452932  LUMO = 4.94342739273659
+cycle= 245 E= -27877.849287079  delta_E= 0.000932  |g|= 0.472  |ddm|= 95.8
+----------RDIIS-Entropy 0.706
+  HOMO = 3.07135540977723  LUMO = 5.10843889363118
+cycle= 246 E= -27877.8546913023  delta_E= -0.0054  |g|= 0.452  |ddm|=  111
+----------RDIIS-Entropy 0.574
+  HOMO = 2.94023640235935  LUMO = 5.12206343891891
+cycle= 247 E= -27877.8658175931  delta_E= -0.0111  |g|= 0.43  |ddm|= 89.2
+----------RDIIS-Entropy 0.455
+  HOMO = 2.93786432339461  LUMO = 5.02065463745379
+cycle= 248 E= -27877.8687906604  delta_E= -0.00297  |g|=  0.4  |ddm|= 61.4
+----------RDIIS-Entropy 0.365
+  HOMO = 2.9383365218442  LUMO = 5.04219562903002
+cycle= 249 E= -27877.8733762544  delta_E= -0.00459  |g|= 0.283  |ddm|= 36.9
+----------RDIIS-Entropy 0.311
+  HOMO = 2.94995021509968  LUMO = 4.99546694361799
+cycle= 250 E= -27877.8757648346  delta_E= -0.00239  |g|= 0.234  |ddm|=   16
+----------RDIIS-Entropy 0.288
+  HOMO = 2.98834692958042  LUMO = 4.95586916694552
+cycle= 251 E= -27877.8788854149  delta_E= -0.00312  |g|= 0.182  |ddm|= 9.87
+----------RDIIS-Entropy 0.274
+  HOMO = 2.99348152191106  LUMO = 4.960568941764
+cycle= 252 E= -27877.8813927614  delta_E= -0.00251  |g|= 0.182  |ddm|= 6.84
+----------RDIIS-Entropy 0.264
+  HOMO = 3.03370589558565  LUMO = 4.93276408947364
+cycle= 253 E= -27877.8851154014  delta_E= -0.00372  |g|=  0.2  |ddm|= 1.12
+----------RDIIS-Entropy 0.264
+  HOMO = 3.07636616409569  LUMO = 4.92189814889003
+cycle= 254 E= -27877.8889360692  delta_E= -0.00382  |g|= 0.23  |ddm|= 11.8
+----------RDIIS-Entropy 0.280
+  HOMO = 3.07310642197295  LUMO = 4.9695482098217
+cycle= 255 E= -27877.8890960249  delta_E= -0.00016  |g|= 0.268  |ddm|=   31
+----------RDIIS-Entropy 0.321
+  HOMO = 2.96716387188988  LUMO = 5.06472143336325
+cycle= 256 E= -27877.884270293  delta_E= 0.00483  |g|= 0.335  |ddm|= 56.7
+----------RDIIS-Entropy 0.394
+  HOMO = 3.02520264002425  LUMO = 5.11507501301009
+cycle= 257 E= -27877.8794299008  delta_E= 0.00484  |g|= 0.34  |ddm|=   81
+----------RDIIS-Entropy 0.498
+  HOMO = 2.94180490731524  LUMO = 5.05827259989722
+cycle= 258 E= -27877.8753275691  delta_E= 0.0041  |g|= 0.275  |ddm|= 59.1
+----------RDIIS-Entropy 0.566
+  HOMO = 2.93921255279634  LUMO = 5.06032462844005
+cycle= 259 E= -27877.8706479199  delta_E= 0.00468  |g|= 0.278  |ddm|= 63.9
+----------RDIIS-Entropy 0.638
+  HOMO = 2.93856200445138  LUMO = 5.09338205764724
+cycle= 260 E= -27877.8653103793  delta_E= 0.00534  |g|= 0.286  |ddm|=   67
+----------RDIIS-Entropy 0.714
+  HOMO = 2.93846368489944  LUMO = 5.09111764682843
+cycle= 261 E= -27877.8664629205  delta_E= -0.00115  |g|= 0.29  |ddm|= 36.4
+----------RDIIS-Entropy 0.750
+  HOMO = 2.93899373642321  LUMO = 5.03751144862541
+cycle= 262 E= -27877.8707795599  delta_E= -0.00432  |g|= 0.266  |ddm|= 20.7
+----------RDIIS-Entropy 0.759
+  HOMO = 2.97912650256638  LUMO = 4.95746788194533
+cycle= 263 E= -27877.8736498021  delta_E= -0.00287  |g|= 0.295  |ddm|= 32.8
+----------RDIIS-Entropy 0.783
+  HOMO = 3.1399599777715  LUMO = 4.81943512345748
+cycle= 264 E= -27877.8797962459  delta_E= -0.00615  |g|= 0.291  |ddm|= 31.5
+----------RDIIS-Entropy 0.784
+  HOMO = 3.20924473675411  LUMO = 4.76848245135806
+cycle= 265 E= -27877.8859154328  delta_E= -0.00612  |g|= 0.276  |ddm|=   44
+----------RDIIS-Entropy 0.764
+  HOMO = 3.16174112053396  LUMO = 4.81930923368119
+cycle= 266 E= -27877.8898742836  delta_E= -0.00396  |g|= 0.254  |ddm|= 47.6
+----------RDIIS-Entropy 0.753
+  HOMO = 3.15040694520415  LUMO = 4.8546118258062
+cycle= 267 E= -27877.8911940178  delta_E= -0.00132  |g|= 0.256  |ddm|= 49.6
+----------RDIIS-Entropy 0.745
+  HOMO = 3.08835662678092  LUMO = 4.88064052615635
+cycle= 268 E= -27877.8775587163  delta_E= 0.0136  |g|= 0.884  |ddm|= 40.7
+----------RDIIS-Entropy 0.694
+  HOMO = 3.25616619940787  LUMO = 4.79089964202757
+cycle= 269 E= -27877.8749594192  delta_E= 0.0026  |g|= 0.687  |ddm|=   80
+----------RDIIS-Entropy 0.609
+  HOMO = 2.99310675925659  LUMO = 4.97872783478764
+cycle= 270 E= -27877.878143332  delta_E= -0.00318  |g|= 0.467  |ddm|=  102
+----------RDIIS-Entropy 0.496
+  HOMO = 3.30938493739084  LUMO = 4.97714722779908
+cycle= 271 E= -27877.8758372509  delta_E= 0.00231  |g|= 0.563  |ddm|= 50.5
+----------RDIIS-Entropy 0.443
+  HOMO = 3.099713370495  LUMO = 5.04224377089317
+cycle= 272 E= -27877.8799439545  delta_E= -0.00411  |g|= 0.416  |ddm|= 48.2
+----------RDIIS-Entropy 0.389
+  HOMO = 3.1134896597728  LUMO = 4.9751762575745
+cycle= 273 E= -27877.8809775226  delta_E= -0.00103  |g|= 0.251  |ddm|= 36.1
+----------RDIIS-Entropy 0.361
+  HOMO = 3.16998091163515  LUMO = 4.98042679587516
+cycle= 274 E= -27877.8749416549  delta_E= 0.00604  |g|= 0.331  |ddm|= 29.1
+----------RDIIS-Entropy 0.332
+  HOMO = 3.12123751535505  LUMO = 5.00121184185512
+cycle= 275 E= -27877.8721374426  delta_E= 0.0028  |g|= 0.317  |ddm|= 25.9
+----------RDIIS-Entropy 0.307
+  HOMO = 3.05006157387874  LUMO = 4.96565291771368
+cycle= 276 E= -27877.867986299  delta_E= 0.00415  |g|= 0.361  |ddm|=   11
+----------RDIIS-Entropy 0.297
+  HOMO = 3.09153199310563  LUMO = 4.95367598693934
+cycle= 277 E= -27877.8630105223  delta_E= 0.00498  |g|= 0.326  |ddm|= 8.98
+----------RDIIS-Entropy 0.291
+  HOMO = 3.11452225264294  LUMO = 4.95207478361878
+cycle= 278 E= -27877.8575271036  delta_E= 0.00548  |g|= 0.369  |ddm|= 8.27
+----------RDIIS-Entropy 0.291
+  HOMO = 2.95518778792419  LUMO = 5.04052793179182
+cycle= 279 E= -27877.8597516176  delta_E= -0.00222  |g|= 0.322  |ddm|= 2.23
+----------RDIIS-Entropy 0.289
+  HOMO = 3.08070253508574  LUMO = 4.97735065039658
+cycle= 280 E= -27877.851888157  delta_E= 0.00786  |g|= 0.406  |ddm|= 7.93
+----------RDIIS-Entropy 0.295
+  HOMO = 3.02660452413689  LUMO = 5.01589088872732
+cycle= 281 E= -27877.8526379523  delta_E= -0.00075  |g|= 0.401  |ddm|= 10.2
+----------RDIIS-Entropy 0.303
+  HOMO = 2.93688593601402  LUMO = 5.06288828916286
+cycle= 282 E= -27877.8578703876  delta_E= -0.00523  |g|= 0.298  |ddm|= 6.61
+----------RDIIS-Entropy 0.308
+  HOMO = 2.92398480770186  LUMO = 5.10512330085962
+cycle= 283 E= -27877.8661176123  delta_E= -0.00825  |g|= 0.201  |ddm|= 2.89
+----------RDIIS-Entropy 0.307
+  HOMO = 2.92748253137157  LUMO = 5.10521676130943
+cycle= 284 E= -27877.8701338717  delta_E= -0.00402  |g|= 0.151  |ddm|= 2.37
+----------RDIIS-Entropy 0.306
+  HOMO = 2.92788977333376  LUMO = 5.10610952687728
+cycle= 285 E= -27877.8738187576  delta_E= -0.00368  |g|= 0.136  |ddm|= 2.39
+----------RDIIS-Entropy 0.306
+  HOMO = 2.93013745284171  LUMO = 5.10620487288109
+cycle= 286 E= -27877.8781855008  delta_E= -0.00437  |g|= 0.143  |ddm|= 1.42
+----------RDIIS-Entropy 0.306
+  HOMO = 2.93257799527662  LUMO = 5.10647513020474
+cycle= 287 E= -27877.8818806581  delta_E= -0.0037  |g|= 0.139  |ddm|= 1.81
+----------RDIIS-Entropy 0.305
+  HOMO = 2.93171951887723  LUMO = 5.10465795607175
+cycle= 288 E= -27877.8864484124  delta_E= -0.00457  |g|= 0.149  |ddm|= 1.33
+----------RDIIS-Entropy 0.304
+  HOMO = 2.92980735784993  LUMO = 5.10720029899387
+cycle= 289 E= -27877.8896331701  delta_E= -0.00318  |g|= 0.136  |ddm|= 3.12
+----------RDIIS-Entropy 0.301
+  HOMO = 2.93110916443908  LUMO = 5.10667985083118
+cycle= 290 E= -27877.8928310002  delta_E= -0.0032  |g|= 0.0935  |ddm|= 3.27
+----------RDIIS-Entropy 0.298
+  HOMO = 2.92842764659134  LUMO = 5.09774281325429
+cycle= 291 E= -27877.8994849411  delta_E= -0.00665  |g|= 0.21  |ddm|= 1.22
+----------RDIIS-Entropy 0.297
+  HOMO = 3.12875694987945  LUMO = 5.08649823828425
+cycle= 292 E= -27877.9030201834  delta_E= -0.00354  |g|= 0.361  |ddm|= 1.98
+----------RDIIS-Entropy 0.299
+  HOMO = 3.31171623508607  LUMO = 5.08665965032771
+cycle= 293 E= -27877.9001882547  delta_E= 0.00283  |g|= 0.466  |ddm|= 3.51
+----------RDIIS-Entropy 0.304
+  HOMO = 3.23294623772968  LUMO = 5.0906887745949
+cycle= 294 E= -27877.9000478905  delta_E= 0.00014  |g|= 0.461  |ddm|= 4.91
+----------RDIIS-Entropy 0.313
+  HOMO = 2.93375836521474  LUMO = 5.09799779697189
+cycle= 295 E= -27877.9038137676  delta_E= -0.00377  |g|= 0.294  |ddm|=  2.5
+----------RDIIS-Entropy 0.315
+  HOMO = 3.16796489023475  LUMO = 5.08723380800872
+cycle= 296 E= -27877.9037728127  delta_E= 4.1e-05  |g|= 0.375  |ddm|= 6.99
+----------RDIIS-Entropy 0.327
+  HOMO = 2.93617186723466  LUMO = 5.09910675854385
+cycle= 297 E= -27877.9014379044  delta_E= 0.00233  |g|= 0.308  |ddm|= 4.55
+----------RDIIS-Entropy 0.332
+  HOMO = 2.9395150513871  LUMO = 5.09425768948802
+cycle= 298 E= -27877.8927570765  delta_E= 0.00868  |g|= 0.329  |ddm|= 6.94
+----------RDIIS-Entropy 0.339
+  HOMO = 2.93570303181362  LUMO = 5.10445576990116
+cycle= 299 E= -27877.8924898491  delta_E= 0.000267  |g|= 0.291  |ddm|= 8.15
+----------RDIIS-Entropy 0.349
+  HOMO = 2.93470642392016  LUMO = 5.11059648012834
+cycle= 300 E= -27877.8928416709  delta_E= -0.000352  |g|= 0.294  |ddm|= 10.9
+----------RDIIS-Entropy 0.363
+  HOMO = 2.93727812209382  LUMO = 5.06539847213338
+cycle= 301 E= -27877.8890468889  delta_E= 0.00379  |g|= 0.361  |ddm|= 19.7
+----------RDIIS-Entropy 0.389
+  HOMO = 2.94174843542615  LUMO = 4.9706144037788
+cycle= 302 E= -27877.879483716  delta_E= 0.00956  |g|= 0.344  |ddm|= 37.1
+----------RDIIS-Entropy 0.437
+  HOMO = 2.94059378232875  LUMO = 5.03485993439161
+cycle= 303 E= -27877.8698298377  delta_E= 0.00965  |g|= 0.394  |ddm|= 42.7
+----------RDIIS-Entropy 0.494
+  HOMO = 2.94419572802983  LUMO = 5.02732713326871
+cycle= 304 E= -27877.8630159438  delta_E= 0.00681  |g|= 0.462  |ddm|= 42.5
+----------RDIIS-Entropy 0.552
+  HOMO = 2.94638069988451  LUMO = 5.01446440903419
+cycle= 305 E= -27877.8575233684  delta_E= 0.00549  |g|= 0.58  |ddm|= 28.4
+----------RDIIS-Entropy 0.594
+  HOMO = 2.94646594253053  LUMO = 4.96301632556718
+cycle= 306 E= -27877.8523707153  delta_E= 0.00515  |g|= 0.583  |ddm|=   31
+----------RDIIS-Entropy 0.642
+  HOMO = 2.94405794266791  LUMO = 4.99702236546421
+cycle= 307 E= -27877.8468742451  delta_E= 0.0055  |g|= 0.616  |ddm|= 32.4
+----------RDIIS-Entropy 0.690
+  HOMO = 2.94831075984951  LUMO = 4.97668338557003
+cycle= 308 E= -27877.8405837879  delta_E= 0.00629  |g|= 0.701  |ddm|= 30.7
+----------RDIIS-Entropy 0.738
+  HOMO = 2.94816175897556  LUMO = 5.01279163099258
+cycle= 309 E= -27877.8340713312  delta_E= 0.00651  |g|= 0.784  |ddm|= 35.7
+----------RDIIS-Entropy 0.796
+  HOMO = 2.94773863322499  LUMO = 5.06098244929912
+cycle= 310 E= -27877.8283625261  delta_E= 0.00571  |g|= 0.821  |ddm|= 32.7
+----------RDIIS-Entropy 0.852
+  HOMO = 3.06815507624654  LUMO = 4.81843631279672
+cycle= 311 E= -27877.8294848542  delta_E= -0.00112  |g|= 0.762  |ddm|= 33.9
+----------RDIIS-Entropy 0.826
+  HOMO = 3.02627979365743  LUMO = 4.93262729912399
+cycle= 312 E= -27877.8447015844  delta_E= -0.0152  |g|= 0.784  |ddm|=  101
+----------RDIIS-Entropy 0.693
+  HOMO = 2.94438776111328  LUMO = 5.17427616494312
+cycle= 313 E= -27877.8726629295  delta_E= -0.028  |g|= 0.546  |ddm|=  124
+----------RDIIS-Entropy 0.524
+  HOMO = 2.94711484570966  LUMO = 5.1803092771012
+cycle= 314 E= -27877.8865761134  delta_E= -0.0139  |g|= 0.382  |ddm|= 75.4
+----------RDIIS-Entropy 0.420
+  HOMO = 2.94430364030892  LUMO = 5.16192643895732
+cycle= 315 E= -27877.8945693764  delta_E= -0.00799  |g|= 0.309  |ddm|= 37.6
+----------RDIIS-Entropy 0.357
+  HOMO = 2.94144203406288  LUMO = 5.06541014207626
+cycle= 316 E= -27877.9004973772  delta_E= -0.00593  |g|= 0.222  |ddm|= 21.7
+----------RDIIS-Entropy 0.317
+  HOMO = 2.96236214410552  LUMO = 4.9538866648806
+cycle= 317 E= -27877.9032730836  delta_E= -0.00278  |g|= 0.229  |ddm|= 14.4
+----------RDIIS-Entropy 0.294
+  HOMO = 2.9507275965975  LUMO = 4.98516978735169
+cycle= 318 E= -27877.9053345138  delta_E= -0.00206  |g|= 0.206  |ddm|= 9.11
+----------RDIIS-Entropy 0.283
+  HOMO = 2.99601315084169  LUMO = 4.9302141232117
+cycle= 319 E= -27877.9078797468  delta_E= -0.00255  |g|= 0.205  |ddm|= 3.32
+----------RDIIS-Entropy 0.278
+  HOMO = 3.04846876419055  LUMO = 4.88930388662757
+cycle= 320 E= -27877.9096649792  delta_E= -0.00179  |g|= 0.214  |ddm|= 3.34
+----------RDIIS-Entropy 0.281
+  HOMO = 3.03566648330742  LUMO = 4.94051071366104
+cycle= 321 E= -27877.9079880882  delta_E= 0.00168  |g|= 0.236  |ddm|= 20.3
+----------RDIIS-Entropy 0.312
+  HOMO = 2.98311497452922  LUMO = 5.06439092034747
+cycle= 322 E= -27877.8990901911  delta_E= 0.0089  |g|= 0.302  |ddm|= 53.5
+----------RDIIS-Entropy 0.396
+  HOMO = 2.98203314512493  LUMO = 5.07558999681561
+cycle= 323 E= -27877.8878590096  delta_E= 0.0112  |g|= 0.333  |ddm|= 66.6
+----------RDIIS-Entropy 0.503
+  HOMO = 2.97444609423594  LUMO = 5.08602353694074
+cycle= 324 E= -27877.8756212663  delta_E= 0.0122  |g|= 0.377  |ddm|= 64.4
+----------RDIIS-Entropy 0.606
+  HOMO = 2.94804997531273  LUMO = 5.10481544754549
+cycle= 325 E= -27877.8733739155  delta_E= 0.00225  |g|= 0.389  |ddm|= 39.3
+----------RDIIS-Entropy 0.680
+  HOMO = 2.95256580494318  LUMO = 5.06496737743323
+cycle= 326 E= -27877.8668731839  delta_E= 0.0065  |g|= 0.42  |ddm|= 51.9
+----------RDIIS-Entropy 0.772
+  HOMO = 2.94704848821039  LUMO = 5.11368588727099
+cycle= 327 E= -27877.8606605081  delta_E= 0.00621  |g|= 0.434  |ddm|= 41.4
+----------RDIIS-Entropy 0.842
+  HOMO = 2.94840714711763  LUMO = 5.0977328083532
+cycle= 328 E= -27877.8558653196  delta_E= 0.0048  |g|= 0.414  |ddm|= 34.5
+----------RDIIS-Entropy 0.899
+  HOMO = 2.94736781492562  LUMO = 5.04414508063581
+cycle= 329 E= -27877.8503538352  delta_E= 0.00551  |g|= 0.431  |ddm|= 41.7
+----------RDIIS-Entropy 0.965
+  HOMO = 2.95059197199862  LUMO = 4.9779151930658
+cycle= 330 E= -27877.8482644329  delta_E= 0.00209  |g|= 0.402  |ddm|= 36.7
+----------RDIIS-Entropy 1.020
+  HOMO = 2.99685366858351  LUMO = 4.89383906069281
+cycle= 331 E= -27877.8485569036  delta_E= -0.000292  |g|= 0.48  |ddm|= 31.5
+----------RDIIS-Entropy 1.056
+  HOMO = 3.18044230601417  LUMO = 4.72430047289232
+cycle= 332 E= -27877.850731714  delta_E= -0.00217  |g|= 0.603  |ddm|= 31.9
+----------RDIIS-Entropy 1.068
+  HOMO = 3.33978433262327  LUMO = 4.65995969361327
+cycle= 333 E= -27877.8562621232  delta_E= -0.00553  |g|= 0.669  |ddm|= 46.7
+----------RDIIS-Entropy 1.074
+  HOMO = 3.27348637411736  LUMO = 4.87943139853546
+cycle= 334 E= -27877.8629325239  delta_E= -0.00667  |g|= 0.568  |ddm|= 51.7
+----------RDIIS-Entropy 1.049
+  HOMO = 3.15460211128711  LUMO = 5.06194031774458
+cycle= 335 E= -27877.8696010307  delta_E= -0.00667  |g|= 0.946  |ddm|= 80.6
+----------RDIIS-Entropy 0.950
+  HOMO = 3.11668244087899  LUMO = 5.15697549120402
+cycle= 336 E= -27877.8749909723  delta_E= -0.00539  |g|= 0.567  |ddm|= 97.9
+----------RDIIS-Entropy 0.837
+  HOMO = 2.95671208078281  LUMO = 5.17498064358388
+cycle= 337 E= -27877.8806531312  delta_E= -0.00566  |g|= 0.824  |ddm|=  104
+----------RDIIS-Entropy 0.707
+  HOMO = 3.05119578937568  LUMO = 5.19812273430035
+cycle= 338 E= -27877.8721407284  delta_E= 0.00851  |g|= 0.886  |ddm|= 84.5
+----------RDIIS-Entropy 0.595
+  HOMO = 3.22759243097246  LUMO = 5.19821615621188
+cycle= 339 E= -27877.8656961994  delta_E= 0.00644  |g|= 0.556  |ddm|= 58.9
+----------RDIIS-Entropy 0.517
+  HOMO = 3.21281102913014  LUMO = 5.19853664224498
+cycle= 340 E= -27877.8605716248  delta_E= 0.00512  |g|= 0.512  |ddm|= 35.9
+----------RDIIS-Entropy 0.469
+  HOMO = 3.08430681632387  LUMO = 5.19598389872618
+cycle= 341 E= -27877.8604628614  delta_E= 0.000109  |g|= 0.422  |ddm|= 22.9
+----------RDIIS-Entropy 0.439
+  HOMO = 3.03624838292214  LUMO = 5.17449037320935
+cycle= 342 E= -27877.8584718839  delta_E= 0.00199  |g|=  0.4  |ddm|= 16.4
+----------RDIIS-Entropy 0.417
+  HOMO = 3.13780618220251  LUMO = 4.91939447485777
+cycle= 343 E= -27877.8565352875  delta_E= 0.00194  |g|= 0.373  |ddm|= 14.7
+----------RDIIS-Entropy 0.405
+  HOMO = 3.13166785223124  LUMO = 4.96395327583634
+cycle= 344 E= -27877.8522546013  delta_E= 0.00428  |g|= 0.386  |ddm|= 23.6
+----------RDIIS-Entropy 0.415
+  HOMO = 3.06498594659073  LUMO = 5.04920950866178
+cycle= 345 E= -27877.8434769044  delta_E= 0.00878  |g|= 0.473  |ddm|= 39.4
+----------RDIIS-Entropy 0.450
+  HOMO = 2.99392339465773  LUMO = 5.10896464771144
+cycle= 346 E= -27877.8375516991  delta_E= 0.00593  |g|= 0.476  |ddm|= 58.3
+----------RDIIS-Entropy 0.510
+  HOMO = 2.95540039593801  LUMO = 5.13677340012559
+cycle= 347 E= -27877.833534467  delta_E= 0.00402  |g|= 0.466  |ddm|= 66.3
+----------RDIIS-Entropy 0.581
+  HOMO = 2.93704448210123  LUMO = 5.09855293648536
+cycle= 348 E= -27877.8396094252  delta_E= -0.00607  |g|= 0.456  |ddm|=   61
+----------RDIIS-Entropy 0.651
+  HOMO = 2.94381782384659  LUMO = 5.04603109348006
+cycle= 349 E= -27877.8400185254  delta_E= -0.000409  |g|= 0.436  |ddm|= 74.3
+----------RDIIS-Entropy 0.743
+  HOMO = 2.93373181276338  LUMO = 5.09895503607044
+cycle= 350 E= -27877.8362103461  delta_E= 0.00381  |g|= 0.423  |ddm|= 76.2
+----------RDIIS-Entropy 0.836
+  HOMO = 2.93367126872391  LUMO = 5.19771914649416
+cycle= 351 E= -27877.8330419044  delta_E= 0.00317  |g|= 0.45  |ddm|= 46.9
+----------RDIIS-Entropy 0.890
+  HOMO = 2.94075789890939  LUMO = 5.19779877585816
+cycle= 352 E= -27877.8303322074  delta_E= 0.00271  |g|= 0.512  |ddm|= 21.5
+----------RDIIS-Entropy 0.907
+  HOMO = 2.94358306187378  LUMO = 5.19781915204458
+cycle= 353 E= -27877.827813366  delta_E= 0.00252  |g|= 0.553  |ddm|= 9.63
+----------RDIIS-Entropy 0.906
+  HOMO = 2.94215162439928  LUMO = 5.08604192684032
+cycle= 354 E= -27877.8253378562  delta_E= 0.00248  |g|= 0.646  |ddm|= 14.1
+----------RDIIS-Entropy 0.889
+  HOMO = 3.26903768452903  LUMO = 4.73910689020885
+cycle= 355 E= -27877.8241500622  delta_E= 0.00119  |g|= 0.627  |ddm|= 53.3
+----------RDIIS-Entropy 0.826
+  HOMO = 3.02576493579872  LUMO = 5.12525501188161
+cycle= 356 E= -27877.8272712743  delta_E= -0.00312  |g|= 0.64  |ddm|=  116
+----------RDIIS-Entropy 0.673
+  HOMO = 3.04814489748068  LUMO = 5.19765191221027
+cycle= 357 E= -27877.8385825204  delta_E= -0.0113  |g|= 0.568  |ddm|=  133
+----------RDIIS-Entropy 0.492
+  HOMO = 2.99990410951826  LUMO = 5.19522087282772
+cycle= 358 E= -27877.8457265909  delta_E= -0.00714  |g|= 0.416  |ddm|= 83.8
+----------RDIIS-Entropy 0.375
+  HOMO = 2.98411161836512  LUMO = 4.98301239042878
+cycle= 359 E= -27877.8590521361  delta_E= -0.0133  |g|= 0.338  |ddm|= 42.8
+----------RDIIS-Entropy 0.310
+  HOMO = 2.9437560804038  LUMO = 5.04266568208967
+cycle= 360 E= -27877.8677923658  delta_E= -0.00874  |g|= 0.19  |ddm|= 27.4
+----------RDIIS-Entropy 0.267
+  HOMO = 2.94151611667299  LUMO = 5.08131446751013
+cycle= 361 E= -27877.8724725842  delta_E= -0.00468  |g|= 0.178  |ddm|= 11.2
+----------RDIIS-Entropy 0.248
+  HOMO = 2.94424707777282  LUMO = 5.06890786518244
+cycle= 362 E= -27877.8762365481  delta_E= -0.00376  |g|= 0.173  |ddm|= 4.01
+----------RDIIS-Entropy 0.241
+  HOMO = 2.94533149737608  LUMO = 5.04803371244716
+cycle= 363 E= -27877.8797983004  delta_E= -0.00356  |g|= 0.17  |ddm|= 1.96
+----------RDIIS-Entropy 0.238
+  HOMO = 2.98928195476333  LUMO = 4.97573620447925
+cycle= 364 E= -27877.8835490402  delta_E= -0.00375  |g|= 0.195  |ddm|= 0.892
+----------RDIIS-Entropy 0.237
+  HOMO = 3.05686102332078  LUMO = 4.91520007485624
+cycle= 365 E= -27877.8871342125  delta_E= -0.00359  |g|= 0.244  |ddm|= 9.88
+----------RDIIS-Entropy 0.252
+  HOMO = 3.00804488938756  LUMO = 4.99919609534546
+cycle= 366 E= -27877.8841974786  delta_E= 0.00294  |g|= 0.289  |ddm|= 30.6
+----------RDIIS-Entropy 0.297
+  HOMO = 2.9619329779218  LUMO = 5.10368182324409
+cycle= 367 E= -27877.8763467472  delta_E= 0.00785  |g|= 0.365  |ddm|= 54.4
+----------RDIIS-Entropy 0.376
+  HOMO = 2.94175559904045  LUMO = 5.11301200263339
+cycle= 368 E= -27877.8633063827  delta_E= 0.013  |g|= 0.46  |ddm|= 53.3
+----------RDIIS-Entropy 0.454
+  HOMO = 2.94168118637114  LUMO = 5.12366347063194
+cycle= 369 E= -27877.8481447883  delta_E= 0.0152  |g|= 0.524  |ddm|= 57.2
+----------RDIIS-Entropy 0.537
+  HOMO = 2.94194946504089  LUMO = 5.12244166796438
+cycle= 370 E= -27877.8438720189  delta_E= 0.00427  |g|= 0.488  |ddm|= 43.8
+----------RDIIS-Entropy 0.597
+  HOMO = 2.94163289972772  LUMO = 5.12636009343221
+cycle= 371 E= -27877.8403121621  delta_E= 0.00356  |g|= 0.516  |ddm|= 45.2
+----------RDIIS-Entropy 0.660
+  HOMO = 2.94148082990109  LUMO = 5.1277833898576
+cycle= 372 E= -27877.8374560446  delta_E= 0.00286  |g|= 0.546  |ddm|= 44.6
+----------RDIIS-Entropy 0.722
+  HOMO = 2.94153982376957  LUMO = 5.12879495071349
+cycle= 373 E= -27877.8343962345  delta_E= 0.00306  |g|= 0.557  |ddm|= 40.7
+----------RDIIS-Entropy 0.778
+  HOMO = 2.93961850760881  LUMO = 5.12856320460729
+cycle= 374 E= -27877.8328944273  delta_E= 0.0015  |g|= 0.536  |ddm|= 38.2
+----------RDIIS-Entropy 0.828
+  HOMO = 2.95782174219729  LUMO = 4.93795252385548
+cycle= 375 E= -27877.8393659909  delta_E= -0.00647  |g|= 0.513  |ddm|= 43.2
+----------RDIIS-Entropy 0.874
+  HOMO = 2.97236320926283  LUMO = 4.97515160864715
+cycle= 376 E= -27877.8412297896  delta_E= -0.00186  |g|= 0.549  |ddm|=   37
+----------RDIIS-Entropy 0.905
+  HOMO = 3.09023734693715  LUMO = 4.86227900763608
+cycle= 377 E= -27877.8443477423  delta_E= -0.00312  |g|= 0.567  |ddm|= 37.1
+----------RDIIS-Entropy 0.909
+  HOMO = 3.0102395597738  LUMO = 5.05128821255828
+cycle= 378 E= -27877.8547751596  delta_E= -0.0104  |g|= 0.607  |ddm|= 50.5
+----------RDIIS-Entropy 0.844
+  HOMO = 2.95141212745503  LUMO = 5.12679683820645
+cycle= 379 E= -27877.8720866297  delta_E= -0.0173  |g|= 0.435  |ddm|=  106
+----------RDIIS-Entropy 0.699
+  HOMO = 2.93943151278465  LUMO = 5.13954679852347
+cycle= 380 E= -27877.8834612572  delta_E= -0.0114  |g|= 0.406  |ddm|= 98.2
+----------RDIIS-Entropy 0.566
+  HOMO = 2.93146909185299  LUMO = 5.14474051144098
+cycle= 381 E= -27877.8907466515  delta_E= -0.00729  |g|= 0.339  |ddm|= 87.6
+----------RDIIS-Entropy 0.451
+  HOMO = 2.94114515611054  LUMO = 5.14133882015181
+cycle= 382 E= -27877.8962388171  delta_E= -0.00549  |g|= 0.344  |ddm|=   55
+----------RDIIS-Entropy 0.381
+  HOMO = 2.94314104535435  LUMO = 5.14011795834341
+cycle= 383 E= -27877.9016070891  delta_E= -0.00537  |g|= 0.188  |ddm|= 37.1
+----------RDIIS-Entropy 0.334
+  HOMO = 2.94376539372528  LUMO = 5.13365512710586
+cycle= 384 E= -27877.9050695173  delta_E= -0.00346  |g|= 0.147  |ddm|=   20
+----------RDIIS-Entropy 0.309
+  HOMO = 2.9451701371838  LUMO = 5.02253665570489
+cycle= 385 E= -27877.9080259889  delta_E= -0.00296  |g|= 0.142  |ddm|= 16.1
+----------RDIIS-Entropy 0.289
+  HOMO = 3.0080280833967  LUMO = 4.96401991597051
+cycle= 386 E= -27877.910647708  delta_E= -0.00262  |g|= 0.124  |ddm|= 12.5
+----------RDIIS-Entropy 0.275
+  HOMO = 3.03451970676608  LUMO = 4.94124271755515
+cycle= 387 E= -27877.9133007156  delta_E= -0.00265  |g|= 0.117  |ddm|= 5.94
+----------RDIIS-Entropy 0.268
+  HOMO = 3.06606744399082  LUMO = 4.91979830972778
+cycle= 388 E= -27877.9155005948  delta_E= -0.0022  |g|= 0.15  |ddm|=  4.5
+----------RDIIS-Entropy 0.273
+  HOMO = 3.06662921668792  LUMO = 4.94702636196974
+cycle= 389 E= -27877.9161081526  delta_E= -0.000608  |g|= 0.207  |ddm|= 24.5
+----------RDIIS-Entropy 0.304
+  HOMO = 3.02667367530183  LUMO = 4.99599318162333
+cycle= 390 E= -27877.9139786386  delta_E= 0.00213  |g|= 0.192  |ddm|= 43.6
+----------RDIIS-Entropy 0.358
+  HOMO = 2.98521289635505  LUMO = 5.03209141177092
+cycle= 391 E= -27877.9146545737  delta_E= -0.000676  |g|= 0.18  |ddm|= 58.8
+----------RDIIS-Entropy 0.431
+  HOMO = 2.93854203857869  LUMO = 5.11815829430102
+cycle= 392 E= -27877.9125362445  delta_E= 0.00212  |g|= 0.17  |ddm|= 76.1
+----------RDIIS-Entropy 0.527
+  HOMO = 2.93795810653828  LUMO = 5.12887733078844
+cycle= 393 E= -27877.9094116026  delta_E= 0.00312  |g|= 0.153  |ddm|=   67
+----------RDIIS-Entropy 0.612
+  HOMO = 2.93777589445815  LUMO = 5.14412544569384
+cycle= 394 E= -27877.9064334546  delta_E= 0.00298  |g|= 0.166  |ddm|= 64.9
+----------RDIIS-Entropy 0.696
+  HOMO = 2.93754234537838  LUMO = 5.15547177922238
+cycle= 395 E= -27877.9035272664  delta_E= 0.00291  |g|= 0.177  |ddm|= 59.5
+----------RDIIS-Entropy 0.774
+  HOMO = 2.93812509166748  LUMO = 5.14849224320571
+cycle= 396 E= -27877.9012444764  delta_E= 0.00228  |g|= 0.247  |ddm|= 32.5
+----------RDIIS-Entropy 0.819
+  HOMO = 2.93880402735205  LUMO = 5.10381077923201
+cycle= 397 E= -27877.9024714994  delta_E= -0.00123  |g|= 0.256  |ddm|= 19.4
+----------RDIIS-Entropy 0.846
+  HOMO = 2.98765393639409  LUMO = 5.02640924380795
+cycle= 398 E= -27877.9025509712  delta_E= -7.95e-05  |g|= 0.246  |ddm|= 17.9
+----------RDIIS-Entropy 0.870
+  HOMO = 3.01327095951989  LUMO = 4.99937242220476
+cycle= 399 E= -27877.9006745743  delta_E= 0.00188  |g|= 0.256  |ddm|= 18.4
+----------RDIIS-Entropy 0.896
+  HOMO = 3.16324194609303  LUMO = 4.84002788304185
+cycle= 400 E= -27877.8979405741  delta_E= 0.00273  |g|= 0.283  |ddm|= 15.2
+----------RDIIS-Entropy 0.912
+  HOMO = 3.13526776399499  LUMO = 4.86858602948393
+cycle= 401 E= -27877.8948659678  delta_E= 0.00307  |g|= 0.287  |ddm|= 18.1
+----------RDIIS-Entropy 0.933
+  HOMO = 3.15420069298602  LUMO = 4.85011134023377
+cycle= 402 E= -27877.8934107999  delta_E= 0.00146  |g|= 0.304  |ddm|= 20.3
+----------RDIIS-Entropy 0.955
+  HOMO = 3.05864507904934  LUMO = 5.0035115329716
+cycle= 403 E= -27877.867585253  delta_E= 0.0258  |g|= 0.594  |ddm|=   67
+----------RDIIS-Entropy 0.990
+  HOMO = 3.67218002008652  LUMO = 5.1979547096215
+cycle= 404 E= -27877.7949099851  delta_E= 0.0727  |g|= 0.929  |ddm|=  123
+----------RDIIS-Entropy 1.038
+  HOMO = 3.82676969151639  LUMO = 5.21296504527549
+cycle= 405 E= -27877.7375058471  delta_E= 0.0574  |g|= 0.956  |ddm|=  134
+----------RDIIS-Entropy 1.108
+  HOMO = 3.63659407190352  LUMO = 5.22302773432645
+cycle= 406 E= -27877.7080054922  delta_E= 0.0295  |g|= 1.08  |ddm|=   89
+----------RDIIS-Entropy 1.194
+  HOMO = 3.04308035941774  LUMO = 5.21949528499191
+cycle= 407 E= -27877.7245825261  delta_E= -0.0166  |g|= 1.12  |ddm|= 39.3
+----------RDIIS-Entropy 1.259
+  HOMO = 2.89559471067519  LUMO = 5.00724928526266
+cycle= 408 E= -27877.756814752  delta_E= -0.0322  |g|= 1.16  |ddm|= 30.2
+----------RDIIS-Entropy 1.324
+  HOMO = 2.90820679208721  LUMO = 4.74435847561548
+cycle= 409 E= -27877.7602990447  delta_E= -0.00348  |g|= 1.21  |ddm|= 48.9
+----------RDIIS-Entropy 1.386
+  HOMO = 2.93750226551018  LUMO = 4.89144459572677
+cycle= 410 E= -27877.7325787728  delta_E= 0.0277  |g|= 1.31  |ddm|= 53.2
+----------RDIIS-Entropy 1.462
+  HOMO = 3.01861605284067  LUMO = 5.02976230837395
+cycle= 411 E= -27877.7246591821  delta_E= 0.00792  |g|= 1.21  |ddm|= 28.7
+----------RDIIS-Entropy 1.529
+  HOMO = 3.0416781711838  LUMO = 4.94932768470799
+cycle= 412 E= -27877.7309393715  delta_E= -0.00628  |g|= 1.66  |ddm|= 12.7
+----------RDIIS-Entropy 1.544
+  HOMO = 3.05872990266643  LUMO = 4.88572725568133
+cycle= 413 E= -27877.7325828712  delta_E= -0.00164  |g|= 1.47  |ddm|= 19.9
+----------RDIIS-Entropy 1.531
+  HOMO = 2.90256177233044  LUMO = 5.08642041333223
+cycle= 414 E= -27877.7478565719  delta_E= -0.0153  |g|=  1.3  |ddm|= 20.9
+----------RDIIS-Entropy 1.507
+  HOMO = 2.9868301136051  LUMO = 5.17301629617914
+cycle= 415 E= -27877.745117406  delta_E= 0.00274  |g|= 1.22  |ddm|= 17.6
+----------RDIIS-Entropy 1.482
+  HOMO = 3.08201157360767  LUMO = 5.16180610602764
+cycle= 416 E= -27877.7170827447  delta_E= 0.028  |g|= 1.21  |ddm|= 21.7
+----------RDIIS-Entropy 1.449
+  HOMO = 3.02915736965976  LUMO = 5.15784448795462
+cycle= 417 E= -27877.7201621287  delta_E= -0.00308  |g|= 1.04  |ddm|= 27.4
+----------RDIIS-Entropy 1.401
+  HOMO = 2.93553439489713  LUMO = 5.12523320116564
+cycle= 418 E= -27877.7304258101  delta_E= -0.0103  |g|= 1.36  |ddm|= 52.8
+----------RDIIS-Entropy 1.272
+  HOMO = 3.39512118281436  LUMO = 5.15003262327575
+cycle= 419 E= -27877.7743260481  delta_E= -0.0439  |g|= 1.56  |ddm|= 42.1
+----------RDIIS-Entropy 1.186
+  HOMO = 3.72902077560303  LUMO = 5.15744719948669
+cycle= 420 E= -27877.7703273553  delta_E= 0.004  |g|= 0.971  |ddm|= 30.9
+----------RDIIS-Entropy 1.152
+  HOMO = 3.50829544918124  LUMO = 5.17204758997689
+cycle= 421 E= -27877.7787259143  delta_E= -0.0084  |g|= 0.968  |ddm|= 25.6
+----------RDIIS-Entropy 1.136
+  HOMO = 3.41216268670327  LUMO = 5.17729311191446
+cycle= 422 E= -27877.7872566904  delta_E= -0.00853  |g|= 0.839  |ddm|= 24.1
+----------RDIIS-Entropy 1.150
+  HOMO = 3.20477886427153  LUMO = 5.17793437493094
+cycle= 423 E= -27877.7940061652  delta_E= -0.00675  |g|= 0.974  |ddm|= 20.3
+----------RDIIS-Entropy 1.164
+  HOMO = 3.13109311335164  LUMO = 5.16578122898202
+cycle= 424 E= -27877.7832959114  delta_E= 0.0107  |g|= 0.87  |ddm|= 18.6
+----------RDIIS-Entropy 1.174
+  HOMO = 3.17677109227588  LUMO = 5.1490265361181
+cycle= 425 E= -27877.7631834686  delta_E= 0.0201  |g|= 0.969  |ddm|= 28.9
+----------RDIIS-Entropy 1.211
+  HOMO = 2.84766304351861  LUMO = 5.1161150917377
+cycle= 426 E= -27877.8108487952  delta_E= -0.0477  |g|= 0.842  |ddm|=   44
+----------RDIIS-Entropy 1.128
+  HOMO = 2.86735957546393  LUMO = 5.15136605625762
+cycle= 427 E= -27877.8309644996  delta_E= -0.0201  |g|= 0.66  |ddm|= 46.9
+----------RDIIS-Entropy 1.036
+  HOMO = 2.90454105084708  LUMO = 5.14557116326481
+cycle= 428 E= -27877.8315080411  delta_E= -0.000544  |g|= 1.05  |ddm|= 65.8
+----------RDIIS-Entropy 0.914
+  HOMO = 2.95470361902298  LUMO = 5.06799902189073
+cycle= 429 E= -27877.8597309327  delta_E= -0.0282  |g|= 0.779  |ddm|= 90.7
+----------RDIIS-Entropy 0.749
+  HOMO = 2.97662337926972  LUMO = 5.09865547341441
+cycle= 430 E= -27877.8836859949  delta_E= -0.024  |g|= 0.452  |ddm|= 87.3
+----------RDIIS-Entropy 0.590
+  HOMO = 2.95439125445838  LUMO = 5.10224273020719
+cycle= 431 E= -27877.8967401047  delta_E= -0.0131  |g|= 0.362  |ddm|=   56
+----------RDIIS-Entropy 0.485
+  HOMO = 2.93759522661769  LUMO = 4.98440750977259
+cycle= 432 E= -27877.9038534051  delta_E= -0.00711  |g|=  0.2  |ddm|= 30.4
+----------RDIIS-Entropy 0.427
+  HOMO = 2.94495735725944  LUMO = 4.96815249626798
+cycle= 433 E= -27877.9064636242  delta_E= -0.00261  |g|= 0.209  |ddm|= 21.2
+----------RDIIS-Entropy 0.390
+  HOMO = 2.94267542167541  LUMO = 5.0170850651765
+cycle= 434 E= -27877.9082000052  delta_E= -0.00174  |g|= 0.165  |ddm|= 17.4
+----------RDIIS-Entropy 0.362
+  HOMO = 2.95342818560089  LUMO = 5.00928452863377
+cycle= 435 E= -27877.9090268977  delta_E= -0.000827  |g|= 0.159  |ddm|= 8.85
+----------RDIIS-Entropy 0.350
+  HOMO = 2.9801193558065  LUMO = 4.97884408317762
+cycle= 436 E= -27877.9079142663  delta_E= 0.00111  |g|= 0.182  |ddm|= 9.06
+----------RDIIS-Entropy 0.365
+  HOMO = 2.98926988039942  LUMO = 4.98099313429498
+cycle= 437 E= -27877.9046355284  delta_E= 0.00328  |g|= 0.191  |ddm|= 19.3
+----------RDIIS-Entropy 0.400
+  HOMO = 2.99254382176646  LUMO = 4.99108683162765
+cycle= 438 E= -27877.8992739024  delta_E= 0.00536  |g|= 0.229  |ddm|= 28.7
+----------RDIIS-Entropy 0.450
+  HOMO = 2.98067827721695  LUMO = 5.02459590356963
+cycle= 439 E= -27877.8913830323  delta_E= 0.00789  |g|= 0.314  |ddm|= 42.9
+----------RDIIS-Entropy 0.525
+  HOMO = 2.95340683433152  LUMO = 5.07850559630777
+cycle= 440 E= -27877.8808295934  delta_E= 0.0106  |g|= 0.391  |ddm|= 54.9
+----------RDIIS-Entropy 0.624
+  HOMO = 2.95510837337634  LUMO = 5.13035914794589
+cycle= 441 E= -27877.8615651248  delta_E= 0.0193  |g|= 0.536  |ddm|= 72.1
+----------RDIIS-Entropy 0.751
+  HOMO = 2.95492256071726  LUMO = 5.15947414288459
+cycle= 442 E= -27877.8408417047  delta_E= 0.0207  |g|= 0.673  |ddm|= 72.7
+----------RDIIS-Entropy 0.877
+  HOMO = 2.95188368931443  LUMO = 5.15130002063826
+cycle= 443 E= -27877.8235234102  delta_E= 0.0173  |g|= 0.768  |ddm|= 62.5
+----------RDIIS-Entropy 0.984
+  HOMO = 2.94839668923917  LUMO = 5.11694724608869
+cycle= 444 E= -27877.8088905296  delta_E= 0.0146  |g|= 0.865  |ddm|= 52.2
+----------RDIIS-Entropy 1.073
+  HOMO = 2.94693049985287  LUMO = 5.15207645771374
+cycle= 445 E= -27877.7961790335  delta_E= 0.0127  |g|= 0.911  |ddm|= 58.5
+----------RDIIS-Entropy 1.171
+  HOMO = 2.95006550901  LUMO = 5.00320460722179
+cycle= 446 E= -27877.7986997821  delta_E= -0.00252  |g|= 0.849  |ddm|= 8.24
+----------RDIIS-Entropy 1.174
+  HOMO = 3.00246800153854  LUMO = 4.89157763182205
+cycle= 447 E= -27877.8021083295  delta_E= -0.00341  |g|= 0.948  |ddm|= 35.2
+----------RDIIS-Entropy 1.105
+  HOMO = 3.02593996986539  LUMO = 4.88478042182089
+cycle= 448 E= -27877.8186443418  delta_E= -0.0165  |g|= 0.903  |ddm|=   65
+----------RDIIS-Entropy 0.983
+  HOMO = 2.98168974136534  LUMO = 4.93538162932106
+cycle= 449 E= -27877.8557814113  delta_E= -0.0371  |g|= 0.605  |ddm|=  122
+----------RDIIS-Entropy 0.760
+  HOMO = 2.93966640082013  LUMO = 5.04135644986433
+cycle= 450 E= -27877.8822881138  delta_E= -0.0265  |g|= 0.438  |ddm|=  117
+----------RDIIS-Entropy 0.552
+  HOMO = 2.93739474819704  LUMO = 5.10571827393549
+cycle= 451 E= -27877.8978392394  delta_E= -0.0156  |g|= 0.34  |ddm|= 78.1
+----------RDIIS-Entropy 0.416
+  HOMO = 2.94999646692633  LUMO = 4.99133872078496
+cycle= 452 E= -27877.904660188  delta_E= -0.00682  |g|= 0.239  |ddm|= 31.6
+----------RDIIS-Entropy 0.364
+  HOMO = 2.94872335978115  LUMO = 5.00441373435545
+cycle= 453 E= -27877.9084946754  delta_E= -0.00383  |g|= 0.196  |ddm|= 24.1
+----------RDIIS-Entropy 0.325
+  HOMO = 2.94897031330979  LUMO = 5.00724630404855
+cycle= 454 E= -27877.9107002045  delta_E= -0.00221  |g|= 0.175  |ddm|=   17
+----------RDIIS-Entropy 0.300
+  HOMO = 2.95036435723499  LUMO = 4.98149235425922
+cycle= 455 E= -27877.9114262975  delta_E= -0.000726  |g|= 0.178  |ddm|=  9.1
+----------RDIIS-Entropy 0.287
+  HOMO = 2.95462669263341  LUMO = 4.97028270919944
+cycle= 456 E= -27877.9121963128  delta_E= -0.00077  |g|= 0.161  |ddm|= 7.19
+----------RDIIS-Entropy 0.278
+  HOMO = 2.96633677745752  LUMO = 4.9582124413505
+cycle= 457 E= -27877.9126643154  delta_E= -0.000468  |g|= 0.148  |ddm|= 4.48
+----------RDIIS-Entropy 0.273
+  HOMO = 3.00136874444274  LUMO = 4.95828244530683
+cycle= 458 E= -27877.9114914879  delta_E= 0.00117  |g|= 0.171  |ddm|=   10
+----------RDIIS-Entropy 0.289
+  HOMO = 3.01834823818548  LUMO = 4.98705895919064
+cycle= 459 E= -27877.9082933397  delta_E= 0.0032  |g|= 0.215  |ddm|= 28.5
+----------RDIIS-Entropy 0.335
+  HOMO = 3.00940608024806  LUMO = 5.02167821780937
