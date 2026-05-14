@@ -117,8 +117,10 @@ if inputdict["type"].upper() in ["GEO_OPT", "GEOM_OPT", "RELAX", "GEOMOPT", "ENE
     MF = aimp_calc(CLUS_MOL, scfdict)
     
     # ---- ROHF SCF: simple setup, no RDIIS ----
-    MF.max_cycle = 3000
-    MF.conv_tol = 1e-07
+    MF.max_cycle = 500
+    MF.conv_tol = 1e-7
+    MF.conv_tol_grad = 3e-4       # 放宽梯度容限（默认约 3.16e-4），避免卡在能量已收敛但梯度振荡的状态
+    MF.level_shift = 0.3           # 微量 level shift 抑制振荡
     
     # 使用 atom 初猜（纯 ROHF，不依赖 CAHF chk）
     if os.path.exists(MF.chkfile):
