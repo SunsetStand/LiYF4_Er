@@ -15,6 +15,7 @@ sys.path.insert(0, '/data/home/wangcx/LiYF4_Er3+/AIMPModelGenerator-main')
 sys.path.insert(0, '/data/home/wangcx/LiYF4_Er3+/AIMPModelGenerator-main/src')
 from fitting_ewald.neighborTools import neighbors
 from fitting_ewald.exact_potential import formal_charges
+from fitting_ewald.potential_fitting import PotentialFitOnlyCharges
 from ase.io import read
 
 # === Parameters ===
@@ -178,41 +179,43 @@ surf_raw = np.array([formal_charges[s] for s in merged_syms[surf_mask]])
 np.savetxt('surfaceCharges.dat', surf_raw)
 
 # ============================================================
-# Step 5: Surface charges — use pre-opt values directly
-#   (Surface charge re-fitting is NOT needed: the lattice is unchanged
-#    (ISIF=2), formal charges are identical, and inner-region relaxation
-#    has negligible effect on far-field Madelung potential at r > 12 A.)
+# Step 5: Generate pre-opt surface charges via PotentialFitOnlyCharges
+#   The surface charges come from the pre-opt structure (same lattice as
+#   post-opt, ISIF=2). Inner-region relaxation has negligible effect on
+#   far-field Madelung potential, so pre-opt surface charges are sufficient.
+#   This way, adjusting cluster radii auto-updates the fitting.
 # ============================================================
-print("\n--- Step 5: Surface charges (from pre-opt, no re-fitting) ---")
-print("  Using pre-optimization surface charges (师兄确认不需要重拟合)")
-print("  Reason: same lattice (ISIF=2), same formal charges, inner relaxation")
-print("  affects surface potential by < 0.1% at r > 12 A.")
+print("\n--- Step 5: Fitting surface charges on pre-opt structure ---")
+print("  Using PotentialFitOnlyCharges on pre-opt crystal...")
 
-# Copy pre-opt surface charges (will be done in setup step)
+pot_fit = PotentialFitOnlyCharges(
+    pre_opt_poscar,
+    cAtom='Y', cAtomIndex=1,
+    rCut=rChgs, rSurface=rSurface,
+    num_sites=num_sites
+)
+pot_fit.run_fit()
+pot_fit.show_res()
 
-# Copy CONTCAR and pre-opt surface charges for reference
+# Write pre-opt surface charge .xyz and fitted .dat
+pre_surf_nbs = pot_fit.surface_neighbors
+pre_surf_coords = pre_surf_nbs.get_cartesian_coordinates(origin_shifted=True)
+pre_surf_syms = [pre_surf_nbs.mol.get_chemical_symbols()[idx] 
+                 for idx in pre_surf_nbs.get_neighbors()[0]]
+write_xyz('surfChgs.xyz', pre_surf_syms, pre_surf_coords)
+np.savetxt('surfaceCharges.dat', pot_fit.surf_chgs)
+
+print(f"\n  Wrote surfChgs.xyz: {len(pre_surf_syms)} atoms")
+print(f"  Wrote surfaceCharges.dat: {len(pot_fit.surf_chgs)} fitted charges")
+
+# Copy CONTCAR for reference
 import shutil
 shutil.copy(post_opt_poscar, 'CONTCAR')
-
-# Copy pre-opt surface charges (no re-fitting — see Step 5 note)
-pre_opt_surface_charges = os.path.join(os.path.dirname(pre_opt_poscar), 'surfaceCharges.dat')
-pre_opt_surf_xyz = os.path.join(os.path.dirname(pre_opt_poscar), 'surfChgs.xyz')
-# The pre-opt surface charge files should be provided alongside the poscar
-# or from a previous run. We copy if available.
-ref_surf_dir = os.path.join(os.path.dirname(os.path.dirname(pre_opt_poscar)), 'rohf_casscf')
-ref_sc = os.path.join(ref_surf_dir, 'surfaceCharges.dat')
-ref_sxyz = os.path.join(ref_surf_dir, 'surfChgs.xyz')
-if os.path.exists(ref_sc) and os.path.exists(ref_sxyz):
-    shutil.copy(ref_sc, 'surfaceCharges.dat')
-    shutil.copy(ref_sxyz, 'surfChgs.xyz')
-    print("\n  Copied pre-opt surface charges from:", ref_surf_dir)
-else:
-    print("\n  WARNING: pre-opt surface charges not found at:", ref_surf_dir)
-    print("  Please copy surfaceCharges.dat and surfChgs.xyz manually.")
 
 print("\n" + "=" * 60)
 print("  DONE! All files written to:")
 print(f"  {workdir}")
+print("  Surface charges: fitted on pre-opt crystal via PotentialFitOnlyCharges")
 print("=" * 60)
 print("\n  Output files:")
 for f in ['cluster.xyz', 'aimp.xyz', 'rawChgs.xyz', 'rawCharges.dat',
