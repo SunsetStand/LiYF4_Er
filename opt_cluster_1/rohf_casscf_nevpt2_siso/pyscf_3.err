@@ -1,1 +1,1 @@
-<class 'pyscf.df.df_jk.DFAIMP_ROHF'> does not have attributes  nsur mol2_lists pcparams with_pc2 dme2_list dm2_list orthoreg_param
+<class 'pyscf.df.df_jk.DFAIMP_ROHF'> does not have attributes  mol2_lists dme2_list with_pc2 pcparams orthoreg_param dm2_list nsur

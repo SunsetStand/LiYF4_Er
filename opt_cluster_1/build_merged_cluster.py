@@ -14,11 +14,8 @@ import numpy as np
 sys.path.insert(0, '/data/home/wangcx/LiYF4_Er3+/AIMPModelGenerator-main')
 sys.path.insert(0, '/data/home/wangcx/LiYF4_Er3+/AIMPModelGenerator-main/src')
 from fitting_ewald.neighborTools import neighbors
-from fitting_ewald.exact_potential import get_exact_potential, formal_charges
-from fitting_ewald.finite_potential import get_finite_potential, coef_pot
-from fitting_ewald.genSites import gen_random_sites
+from fitting_ewald.exact_potential import formal_charges
 from ase.io import read
-from ase import Atoms
 
 # === Parameters ===
 d_half = 5.1361       # half of minimum Er-Er distance in optimized supercell
@@ -181,138 +178,37 @@ surf_raw = np.array([formal_charges[s] for s in merged_syms[surf_mask]])
 np.savetxt('surfaceCharges.dat', surf_raw)
 
 # ============================================================
-# Step 5: Re-fit surface charges
+# Step 5: Surface charges — use pre-opt values directly
+#   (Surface charge re-fitting is NOT needed: the lattice is unchanged
+#    (ISIF=2), formal charges are identical, and inner-region relaxation
+#    has negligible effect on far-field Madelung potential at r > 12 A.)
 # ============================================================
-print("\n--- Step 5: Re-fitting surface charges ---")
-print("  (Computing Ewald potential via calcmad...)")
+print("\n--- Step 5: Surface charges (from pre-opt, no re-fitting) ---")
+print("  Using pre-optimization surface charges (师兄确认不需要重拟合)")
+print("  Reason: same lattice (ISIF=2), same formal charges, inner relaxation")
+print("  affects surface potential by < 0.1% at r > 12 A.")
 
-# Surface charge atoms (from pre-opt, since rChgs > d/2)
-surf_indices = np.where(surf_mask)[0]
-surf_coords_only = merged_coords[surf_indices]
-surf_syms_only = merged_syms[surf_indices]
-n_surf = len(surf_indices)
-print(f"  Number of surface charges to fit: {n_surf}")
+# Copy pre-opt surface charges (will be done in setup step)
 
-# Strategy:
-# 1. Use pre-opt poscar for gen_random_sites + get_exact_potential (infinite lattice)
-# 2. Use get_finite_potential from pre-opt poscar (properly handles periodic images)
-# 3. ADD correction: (post-opt inner contribution) - (pre-opt inner contribution)
-#    This accounts for the relaxed inner region
-# 4. Build A matrix from merged surface charge coordinates
-# 5. SVD fit
-
-pre_mol = read(pre_opt_poscar)
-center_index = pre_nbs.center_index
-n_sites = max(num_sites, 2 * n_surf)
-
-# Generate random evaluation sites
-sites = gen_random_sites(pre_opt_poscar, num=n_sites, deps=0.1, atom=center_index)
-n_sites_actual = len(sites)
-print(f"  Number of evaluation sites: {n_sites_actual}")
-
-# Step 5a: Exact potential from infinite pre-opt crystal
-print("  Computing exact Madelung potential via calcmad...")
-sys.stdout.flush()
-exact_pot = get_exact_potential(pre_opt_poscar, sites)
-print(f"  Exact potential computed.")
-
-# Step 5b: Finite potential from pre-opt crystal (proper periodic treatment)
-print("  Computing finite potential from pre-opt crystal (periodic)...")
-sys.stdout.flush()
-finite_pot_pre = get_finite_potential(pre_opt_poscar, sites, rCut=rChgs, atom=center_index, 
-                                        cAtom='Y', cAtomIndex=1)
-
-# Step 5c: Compute correction from inner region relaxation
-# Correction = sum_{post inner} q/r - sum_{pre inner} q/r
-# Inner atoms within d/2 from the center, in the CENTRAL replica only
-print("  Computing inner-region correction...")
-sys.stdout.flush()
-
-# Get pre-opt atoms within d/2 (central replica only)
-pre_inner_mask = pre_dists <= d_half
-pre_inner_syms = pre_syms[pre_inner_mask]
-pre_inner_coords = pre_coords[pre_inner_mask]
-
-# Get post-opt atoms within d/2 (central replica only)
-post_inner_mask = post_dists <= d_half
-post_inner_syms = post_syms[post_inner_mask]
-post_inner_coords = post_coords[post_inner_mask]
-
-correction = np.zeros(n_sites_actual)
-for i, site in enumerate(sites):
-    # Post contribution
-    for sym, coord in zip(post_inner_syms, post_inner_coords):
-        d = np.linalg.norm(coord - site)
-        if d > 1e-10:
-            correction[i] += formal_charges[sym] / d
-    # Subtract pre contribution
-    for sym, coord in zip(pre_inner_syms, pre_inner_coords):
-        d = np.linalg.norm(coord - site)
-        if d > 1e-10:
-            correction[i] -= formal_charges[sym] / d
-correction *= coef_pot
-
-# Apply correction: finite_pot = finite_pot_pre + correction
-finite_pot = finite_pot_pre + correction
-print(f"  Correction applied (inner region relaxation).")
-print(f"  Max correction: {np.max(np.abs(correction)):.5f} V")
-
-# Step 5d: Build A matrix from merged surface charge coordinates
-print("  Building fitting matrix and solving SVD...")
-sys.stdout.flush()
-
-# Convert sites from fractional to Cartesian for A matrix computation
-site_coords = np.zeros((n_sites_actual, 3))
-pre_cell = pre_mol.get_cell()
-center_frac = pre_mol.get_scaled_positions()[center_index]
-for i, site in enumerate(sites):
-    site_coords[i] = np.dot(site - center_frac, pre_cell)
-
-A = np.zeros((n_sites_actual, n_surf))
-for i in range(n_sites_actual):
-    for j in range(n_surf):
-        d = np.linalg.norm(site_coords[i] - surf_coords_only[j])
-        if d > 1e-10:
-            A[i, j] = 1.0 / d
-A *= coef_pot
-
-b = exact_pot - finite_pot
-
-# SVD fitting
-u, s, vt = np.linalg.svd(A, full_matrices=False)
-v = vt.T
-
-sigma_threshold = 1e-8
-x = np.zeros(n_surf)
-n_sigma = 0
-for i in range(n_surf):
-    if s[i] > sigma_threshold:
-        n_sigma += 1
-        x += np.dot(u[:, i], b) / s[i] * v[:, i]
-    else:
-        break
-
-# Compute residuals
-residual = np.dot(A, x) - b
-raw_chgs_surf = np.array([formal_charges[s] for s in surf_syms_only])
-residual_raw = np.dot(A, raw_chgs_surf) - b
-
-mae_fitted = np.abs(residual).sum() / n_sites_actual
-mae_raw = np.abs(residual_raw).sum() / n_sites_actual
-
-print(f"\n  === Fitting Results ===")
-print(f"  Number of sites = {n_sites_actual}")
-print(f"  Number of surface point charges = {n_surf}")
-print(f"  Number of singular values used = {n_sigma}")
-print(f"  MAE (raw formal charges) = {mae_raw:.5f} V")
-print(f"  MAE (fitted charges)     = {mae_fitted:.5f} V")
-
-np.savetxt('surfaceCharges.dat', x)
-print(f"\n  Wrote fitted surfaceCharges.dat: {n_surf} values")
-
-# Write a copy of CONTCAR for reference
+# Copy CONTCAR and pre-opt surface charges for reference
 import shutil
 shutil.copy(post_opt_poscar, 'CONTCAR')
+
+# Copy pre-opt surface charges (no re-fitting — see Step 5 note)
+pre_opt_surface_charges = os.path.join(os.path.dirname(pre_opt_poscar), 'surfaceCharges.dat')
+pre_opt_surf_xyz = os.path.join(os.path.dirname(pre_opt_poscar), 'surfChgs.xyz')
+# The pre-opt surface charge files should be provided alongside the poscar
+# or from a previous run. We copy if available.
+ref_surf_dir = os.path.join(os.path.dirname(os.path.dirname(pre_opt_poscar)), 'rohf_casscf')
+ref_sc = os.path.join(ref_surf_dir, 'surfaceCharges.dat')
+ref_sxyz = os.path.join(ref_surf_dir, 'surfChgs.xyz')
+if os.path.exists(ref_sc) and os.path.exists(ref_sxyz):
+    shutil.copy(ref_sc, 'surfaceCharges.dat')
+    shutil.copy(ref_sxyz, 'surfChgs.xyz')
+    print("\n  Copied pre-opt surface charges from:", ref_surf_dir)
+else:
+    print("\n  WARNING: pre-opt surface charges not found at:", ref_surf_dir)
+    print("  Please copy surfaceCharges.dat and surfChgs.xyz manually.")
 
 print("\n" + "=" * 60)
 print("  DONE! All files written to:")

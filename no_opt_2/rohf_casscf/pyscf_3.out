@@ -814,3 +814,18 @@ h_PC is added!
 ******** <class 'embed_sim.nevpt2.NEVPT'> ********
 NEVPT2 (7e+4e, 7o), ncore = 167, nvir = 375
 spin = 3  root = 7
+h_PC is added!
+Sr    (-1)',   E = -0.00280120479058
+Si    (+1)',   E = -0.00013387358771
+Sijrs (0)  ,   E = -3.78744692883546
+Sijr  (+1) ,   E = -0.06829323856268
+Srsi  (-1) ,   E = -0.55145876120184
+Srs   (-2) ,   E = -0.31785829821197
+Sij   (+2) ,   E = -0.00173842776664
+Sir   (0)' ,   E = -0.08429348613255
+Nevpt2 Energy = -4.814024219089425
+h_PC is added!
+
+******** <class 'embed_sim.nevpt2.NEVPT'> ********
+NEVPT2 (7e+4e, 7o), ncore = 167, nvir = 375
+spin = 3  root = 8
