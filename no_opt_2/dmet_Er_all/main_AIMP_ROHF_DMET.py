@@ -105,9 +105,12 @@ if inputdict["type"].upper() in ["GEO_OPT", "GEOM_OPT", "RELAX", "GEOMOPT", "ENE
     if not os.path.exists(MF.chkfile):
         raise FileNotFoundError(f"ROHF chk file not found: {MF.chkfile}")
     print(f"Loading ROHF from chk: {MF.chkfile}")
-    MF.init_guess = 'chk'
     scfdat = chkfile.load(MF.chkfile, 'scf')
-    print(f"Loaded: e_tot={scfdat['e_tot']:.8f}")
+    MF.e_tot = scfdat['e_tot']
+    MF.mo_coeff = scfdat['mo_coeff']
+    MF.mo_occ = scfdat['mo_occ']
+    MF.mo_energy = scfdat['mo_energy']
+    print(f"Loaded: e_tot={MF.e_tot:.8f}")
 
 print()
 
