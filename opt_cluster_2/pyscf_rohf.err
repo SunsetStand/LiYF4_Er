@@ -1,0 +1,1 @@
+<class 'pyscf.df.df_jk.DFAIMP_ROHF'> does not have attributes  pcparams nsur orthoreg_param mol2_lists dme2_list dm2_list with_pc2

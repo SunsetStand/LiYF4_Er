@@ -23,8 +23,8 @@ clusterdict = inputdict["cluster"]
 # Load AIMP environment
 try: aimpdir = workdir + aimpdict["dir"]
 except KeyError: aimpdir = workdir + "aimp.xyz"
-aimpdict['dir'] = aimpdir
-aimpdict['workdir'] = workdir
+aimpdict["dir"] = aimpdir
+aimpdict["workdir"] = workdir
 AIMP_LOADER = AIMPEnvLoader(aimpdict)
 try: orthoreg = aimpdict["orthoreg"]
 except: orthoreg = 0
@@ -32,7 +32,7 @@ except: orthoreg = 0
 # Load Point Charge Environment
 try:
     pcdict = inputdict["pointcharge"]
-    try: is_organic = pcdict['organic']
+    try: is_organic = pcdict["organic"]
     except KeyError: is_organic = False
     try: rawxyzdir = workdir + pcdict["rawxyzdir"]
     except KeyError: rawxyzdir = workdir + "rawChgs.xyz"
@@ -41,10 +41,10 @@ try:
         except KeyError: rawchgdir = workdir + "rawCharges.dat"
         pcparam_raw = PointChargeParams(rawxyzdir, rawchgdir)
     else:
-        pcdict = aimpdict
-        pcdict["dir"] = rawxyzdir
-        pcdict['workdir'] = workdir
-        pc_loader = OrganicPCLoader(pcdict)
+        pcdict2 = dict(aimpdict)
+        pcdict2["dir"] = rawxyzdir
+        pcdict2["workdir"] = workdir
+        pc_loader = OrganicPCLoader(pcdict2)
         pcparam_raw = pc_loader.make_param()
     try: surfxyzdir = workdir + pcdict["surfxyzdir"]
     except KeyError: surfxyzdir = workdir + "surfChgs.xyz"
@@ -62,28 +62,13 @@ except KeyError: spin = 0
 
 def aimp_calc(CLUS_MOL, scfdict, interpolation=False):
     scftype = scfdict["calc"].upper()
-    if scftype in ['HF', 'RHF', 'TDHF', 'TDAHF']:
-        MF = AIMP_RHF(CLUS_MOL, AIMP_LOADER)
-    elif scftype in ['ROHF']:
+    if scftype in ["ROHF"]:
         MF = AIMP_ROHF(CLUS_MOL, AIMP_LOADER).density_fit()
-    elif scftype in ['DFT', 'KS', 'RKS', 'TDDFT', 'TDKS']:
-        try: xc = clusterdict['scf']['xc']
-        except KeyError: xc = 'b3lyp'
-        MF = AIMP_RKS(CLUS_MOL, AIMP_LOADER, xc=xc)
-    elif scftype in ['ROKS']:
-        try: xc = clusterdict['scf']['xc']
-        except KeyError: xc = "b3lyp"
-        MF = AIMP_ROKS(CLUS_MOL, AIMP_LOADER, xc=xc)
-    elif scftype in ['CAHF']:
-        try: ortho = clusterdict['scf']['orthoreg']
-        except KeyError: ortho = 0
-        MF = AIMP_CAHF(CLUS_MOL, AIMP_LOADER)
-        MF.set_orthoreg_param(ortho)
     else:
-        raise NotImplementedError("Other tags have not been implemented yet!")
+        raise NotImplementedError("Only ROHF supported for DMET restart")
     if PCPARAM is not None: MF.addPCParam2(PCPARAM)
     MF.set_orthoreg_param(orthoreg)
-    try: MF.chkfile = workdir + inputdict['chkfile']
+    try: MF.chkfile = workdir + inputdict["chkfile"]
     except KeyError: pass
     return MF
 
@@ -94,7 +79,7 @@ if inputdict["type"].upper() in ["GEO_OPT", "GEOM_OPT", "RELAX", "GEOMOPT", "ENE
     try: clusterdir = workdir + clusterdict["dir"]
     except KeyError: clusterdir = workdir + "cluster.xyz"
     for basis in clusterdict["basis"]:
-        if 'parse' in clusterdict["basis"][basis] or 'load' in clusterdict["basis"][basis]:
+        if "parse" in clusterdict["basis"][basis] or "load" in clusterdict["basis"][basis]:
             clusterdict["basis"][basis] = eval(clusterdict["basis"][basis])
     CLUS_MOL = gto.M(atom=clusterdir, basis=clusterdict["basis"],
                      charge=clusterdict["charge"], spin=spin, verbose=4)
@@ -105,11 +90,11 @@ if inputdict["type"].upper() in ["GEO_OPT", "GEOM_OPT", "RELAX", "GEOMOPT", "ENE
     if not os.path.exists(MF.chkfile):
         raise FileNotFoundError(f"ROHF chk file not found: {MF.chkfile}")
     print(f"Loading ROHF from chk: {MF.chkfile}")
-    scfdat = chkfile.load(MF.chkfile, 'scf')
-    MF.e_tot = scfdat['e_tot']
-    MF.mo_coeff = scfdat['mo_coeff']
-    MF.mo_occ = scfdat['mo_occ']
-    MF.mo_energy = scfdat['mo_energy']
+    scfdat = chkfile.load(MF.chkfile, "scf")
+    MF.e_tot = scfdat["e_tot"]
+    MF.mo_coeff = scfdat["mo_coeff"]
+    MF.mo_occ = scfdat["mo_occ"]
+    MF.mo_energy = scfdat["mo_energy"]
     print(f"Loaded: e_tot={MF.e_tot:.8f}")
 
 print()
@@ -117,15 +102,15 @@ print()
 # ===================================================================
 # DMET — impurity: Er + all F atoms (ErF8 cluster)
 # ===================================================================
-IMP_NAME = 'ErF8'
-IMP_LABELS = ['Er', 'F']
-IMP_DESC = 'Er + all F atoms (ErF8 cluster)'
+IMP_NAME = "ErF8"
+IMP_LABELS = ["Er", "F"]
+IMP_DESC = "Er + all F atoms (optbig 25-atom cluster)"
 
-title_base = 'LiYF4:Er3+'
+title_base = "LiYF4:Er3+_optbig"
 ncas_set = 7
 nelec_set = 11
 
-title = f'{title_base}_DMET_{IMP_NAME}'
+title = f"{title_base}_DMET_{IMP_NAME}"
 print("=" * 70)
 print(f"  DMET impurity: {IMP_DESC}")
 print(f"  Title: {title}")
@@ -142,8 +127,8 @@ print(f"  Frozen orbital energy: {dmet.fo_ene:.8f} Hartree")
 
 # Step 2: AVAS
 print(f"\n[Step 2] AVAS: Er 4f from embedded space")
-ncas, nelec, es_mo = dmet.avas(['Er 4f'],
-                                minao=CLUS_MOL._basis['Er'],
+ncas, nelec, es_mo = dmet.avas(["Er 4f"],
+                                minao=CLUS_MOL._basis["Er"],
                                 threshold=0.5,
                                 openshell_option=2)
 print(f"  AVAS: ncas={ncas}, nelec={nelec}")
@@ -156,16 +141,16 @@ es_mycas.kernel(es_mo)
 e_cas = es_mycas.fcisolver.e_states
 e_min = np.min(e_cas)
 print(f"  CASSCF E_min = {e_min:.8f} H")
-np.savetxt(f'{title}_cas_NO_SOC.txt', (e_cas - e_min) * Ha2cm, fmt='%.6f')
+np.savetxt(f"{title}_cas_NO_SOC.txt", (e_cas - e_min) * Ha2cm, fmt="%.6f")
 
 # Step 4: NEVPT2
 print(f"\n[Step 4] NEVPT2")
-ecorr = sacasscf_mixer.sacasscf_nevpt2(es_mycas, method='SC')
+ecorr = sacasscf_mixer.sacasscf_nevpt2(es_mycas, method="SC")
 es_mycas.fcisolver.e_states = e_cas + ecorr
-np.savetxt(f'{title}_nevpt2.txt', ecorr)
-np.savetxt(f'{title}_opt.txt',
+np.savetxt(f"{title}_nevpt2.txt", ecorr)
+np.savetxt(f"{title}_opt.txt",
            (es_mycas.fcisolver.e_states - np.min(es_mycas.fcisolver.e_states)) * Ha2cm,
-           fmt='%.6f')
+           fmt="%.6f")
 print(f"  NEVPT2 corrections: {np.min(ecorr)*Ha2cm:.2f} to {np.max(ecorr)*Ha2cm:.2f} cm^-1")
 
 # Step 5: SISO
@@ -174,6 +159,6 @@ total_cas = dmet.total_cas(es_mycas)
 mysiso = siso.SISO(title, total_cas, amfi=True, verbose=6)
 mysiso.kernel()
 mysiso.analyze()
-print(f"  SISO done → {title}_mag.txt")
+print(f"  SISO done -> {title}_mag.txt")
 
 print(f"\n  [{IMP_NAME}] finished!\n")

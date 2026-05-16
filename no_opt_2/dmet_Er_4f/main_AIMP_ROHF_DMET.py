@@ -138,7 +138,7 @@ es_mf = dmet.build()
 print(f"  Embedded space: {dmet.nes} orbitals")
 print(f"  impurity: {len(dmet.imp_idx)} orbitals")
 print(f"  frozen occupied: {dmet.nfo},  frozen virtual: {dmet.nfv}")
-print(f"  Frozen orbital energy: {dmet.fo_ene():.8f} Hartree")
+print(f"  Frozen orbital energy: {dmet.fo_ene:.8f} Hartree")
 
 # Step 2: AVAS
 print(f"\n[Step 2] AVAS: Er 4f from embedded space")

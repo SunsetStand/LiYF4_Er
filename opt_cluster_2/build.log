@@ -1,0 +1,21 @@
+CONTCAR: 96 atoms, cell: Cell([[10.272193731059971, 0.0, 0.0], [-0.0660690007371, 10.301677503800528, 0.0], [-5.096757647663712, -5.13874784437464, 10.726089188207226]])
+Er original pos: [2.54738281 3.86995456 6.70089437]
+  r < 2.5: 9 atoms
+  r < 3.0: 9 atoms
+  r < 3.5: 9 atoms
+  r < 4.0: 25 atoms
+  r < 5.0: 43 atoms
+  r < 8.0: 86 atoms
+
+Cluster: 25 atoms (r < 3.8)
+AIMP: 61 atoms (3.8 < r < 8.0)
+
+Wrote /data/home/wangcx/LiYF4_Er3+/AIMPModelGenerator-main/LiYF4_Er3+/opt_cluster_2/cluster.xyz (25 atoms)
+Wrote /data/home/wangcx/LiYF4_Er3+/AIMPModelGenerator-main/LiYF4_Er3+/opt_cluster_2/aimp.xyz (61 atoms)
+
+Cluster composition:
+  Er: 1
+  F: 12
+  Li: 8
+  Y: 4
+slurmstepd: error: *** JOB 13842 ON amd-cpu CANCELLED AT 2026-05-15T12:02:45 ***
