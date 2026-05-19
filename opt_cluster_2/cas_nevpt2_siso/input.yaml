@@ -1,0 +1,36 @@
+# 25-atom big cluster, plain CASSCF+NEVPT2+SISO (NO DMET)
+# Control experiment for DMET comparison
+
+type: "ENERGY"
+chkfile: "Er_ROHF_CASSCF.chk"
+
+aimp:
+  dir: "aimp.xyz"
+  orthoreg: 0.0
+  charge:
+    F: -1
+    Li: 1
+    Y: 3
+  basis:
+    F: "ccpvdz"
+    Li: "ccpvdz"
+    Y: "gto.basis.parse(bse.get_basis('jorge-DZP-DKH',elements='Y',fmt='nwchem'))"
+
+pointcharge:
+  organic: false
+  rawxyzdir: "rawChgs.xyz"
+  rawchgdir: "rawCharges.dat"
+  surfxyzdir: "surfChgs.xyz"
+  surfchgdir: "surfaceCharges.dat"
+
+cluster:
+  dir: "cluster.xyz"
+  charge: 11
+  spin: 3
+  basis:
+    Er: "gto.basis.parse(bse.get_basis('ANO-R2',elements='Er',fmt='nwchem'))"
+    F: "ccpvdz"
+    Li: "ccpvdz"
+    Y: "gto.basis.parse(bse.get_basis('jorge-DZP-DKH',elements='Y',fmt='nwchem'))"
+  scf:
+    calc: "ROHF"
