@@ -146,6 +146,11 @@ nelec_set = 11
 # CASSCF: 35 roots for 4f11 CAS(11,7) S=3/2 manifold
 statelis = [0, 0, 0, 35]
 mycas = sacasscf_mixer.sacasscf_mixer(MF, ncas_set, nelec_set, statelis=statelis)
+# Convergence tuning for post-opt structure (harder landscape than pre-opt)
+mycas.max_cycle_macro = 150     # default 50 not enough for post-opt
+mycas.level_shift = 0.3          # suppress orbital rotation oscillations
+mycas.ah_level_shift = 1e-3      # augmented Hessian regularization
+mycas.conv_tol_grad = 1e-3       # slightly relaxed gradient tolerance
 mycas.kernel(mo)
 Ha2cm = 219474.63
 np.savetxt(title+'_cas_NO_SOC.txt',
